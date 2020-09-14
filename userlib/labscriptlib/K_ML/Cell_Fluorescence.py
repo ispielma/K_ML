@@ -28,8 +28,6 @@ def SetDefault(t):
     ni_pci_02_ao7.constant(t+0.001, 0.0)
     
 # Begin issuing labscript primitives
-# A timing variable t is used for convenience
-# start() elicits the commencement of the shot
 t = 0
 ls.start()
 
@@ -39,26 +37,37 @@ ls.start()
 
 SetDefault(t)
 
+#
+# Snap a dark frame
+#
 ls.add_time_marker(t, "Snap dark frame", verbose=True)
+MOT_x.snap(t, 'fluorescence', frametype='dark', trigger_duration=1*ms)
+t += 1*ms
 
-t += 0.002
+#
+# Apply UV
+#
 ls.add_time_marker(t, "UV on", verbose=True)
 UV_DO.go_high(t)
-
-# Wait for 0.5 seconds
 t += 0.5
+
+#
+# Acquire bright frame post UV
+#
+
 UV_DO.go_low(t)
 D2_Repump_DO.go_high(t)
 D2_Repump_Sh.go_high(t)
-# Ramp analog_out from 0.0 V to 1.0 V over 0.25 s with a 1 kS/s sample rate
-t += D2_Repump_AO.ramp(t=t, initial=0.0, final=1.0, duration=2.0, samplerate=1e3)
+D2_Repump_AO.constant(t, 1.0)
+MOT_x.snap(t, 'fluorescence', frametype='bright', trigger_duration=1*ms)
+
+t+= 1*ms
 
 #
 # Set Dafault state
 #
-t += 2.0
 SetDefault(t)
 
 # Stop the experiment shot with stop()
-t += 0.1
+t += 1*ms
 ls.stop(t)
