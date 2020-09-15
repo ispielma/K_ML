@@ -79,7 +79,7 @@ ls.AnalogOut(name='ni_pci_01_ao6', parent_device=NI_PCI_01, connection='ao6')
 ls.AnalogOut(name='ni_pci_01_ao7', parent_device=NI_PCI_01, connection='ao7')
 
 
-ls.DigitalOut(name='ni_pci_01_do0', parent_device=NI_PCI_01, connection='port0/line0')
+ls.DigitalOut(name='ScopeTrigger', parent_device=NI_PCI_01, connection='port0/line0')
 ls.DigitalOut(name='ni_pci_01_do1', parent_device=NI_PCI_01, connection='port0/line1')
 ls.DigitalOut(name='ni_pci_01_do2', parent_device=NI_PCI_01, connection='port0/line2')
 ls.DigitalOut(name='ni_pci_01_do3', parent_device=NI_PCI_01, connection='port0/line3')
@@ -172,10 +172,9 @@ Basler_camera_imaqdx_attributes = {
     'CameraAttributes::AcquisitionTrigger::AcquisitionFrameCount': 1,
     'CameraAttributes::AcquisitionTrigger::AcquisitionFrameRateAbs': 59.99880002399952,
     'CameraAttributes::AcquisitionTrigger::AcquisitionFrameRateEnable': 0,
-    'CameraAttributes::AcquisitionTrigger::AcquisitionMode': 'Single Frame',
+    'CameraAttributes::AcquisitionTrigger::AcquisitionMode': 'Continuous',
     'CameraAttributes::AcquisitionTrigger::ExposureAuto': 'Off',
     'CameraAttributes::AcquisitionTrigger::ExposureMode': 'Trigger Width',
-#    'CameraAttributes::AcquisitionTrigger::ExposeTimeRaw': 8000, # Should be ignored
     'CameraAttributes::AcquisitionTrigger::TriggerActivation': 'Rising Edge',
     'CameraAttributes::AcquisitionTrigger::TriggerMode': 'On',
     'CameraAttributes::AcquisitionTrigger::TriggerSelector': 'Frame Start',
