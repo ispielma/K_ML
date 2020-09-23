@@ -43,29 +43,29 @@ SetDefault(t)
 ls.add_time_marker(t, "Snap dark frame", verbose=True)
 ScopeTrigger.go_high(t)
 ScopeTrigger.go_low(t+1*ms)
-MOT_x.expose(t, 'fluorescence', frametype='dark', trigger_duration=100*ms)
-t += 200*ms
+MOT_x.expose(t, 'fluorescence', frametype='dark', trigger_duration=2000*ms)
+t += 2100*ms
 
 #
 # Apply UV
 #
-ls.add_time_marker(t, "UV on", verbose=True)
-UV_DO.go_high(t)
-t += 1
+# ls.add_time_marker(t, "UV on", verbose=True)
+# UV_DO.go_high(t)
+# t += 1
 
 #
 # Acquire bright frame post UV
 #
 
-UV_DO.go_low(t)
+# UV_DO.go_low(t)
 t += 10*ms
 
 
 D2_Repump_DO.go_high(t)
 D2_Repump_Sh.go_high(t)
 D2_Repump_AO.constant(t, 1.0)
-MOT_x.expose(t, 'fluorescence', frametype='bright', trigger_duration=100*ms)
-t+= 100*ms
+MOT_x.expose(t, 'fluorescence', frametype='bright', trigger_duration=2000*ms)
+t+= 2000*ms
 D2_Repump_DO.go_low(t)
 D2_Repump_Sh.go_low(t)
 D2_Repump_AO.constant(t, 0.0)

@@ -109,7 +109,7 @@ ls.DigitalOut(name='D2_Lock_DO', parent_device=NI_PCI_02, connection='port0/line
 ls.DigitalOut(name='D2_Repump_DO', parent_device=NI_PCI_02, connection='port0/line1')
 ls.DigitalOut(name='D2_Repump_Sh', parent_device=NI_PCI_02, connection='port0/line2')
 ls.DigitalOut(name='UV_DO', parent_device=NI_PCI_02, connection='port0/line3')
-ls.DigitalOut(name='ni_pci_02_do4', parent_device=NI_PCI_02, connection='port0/line4')
+ls.DigitalOut(name='D2_Cooling_DO', parent_device=NI_PCI_02, connection='port0/line4')
 ls.DigitalOut(name='ni_pci_02_do5', parent_device=NI_PCI_02, connection='port0/line5')
 ls.DigitalOut(name='ni_pci_02_do6', parent_device=NI_PCI_02, connection='port0/line6')
 ls.Trigger(name='MOT_Camera_Trigger', parent_device=NI_PCI_02, connection='port0/line7')
