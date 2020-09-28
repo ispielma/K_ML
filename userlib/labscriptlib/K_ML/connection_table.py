@@ -29,7 +29,7 @@ from labscript_devices.IMAQdxCamera.labscript_devices import IMAQdxCamera
 
 PulseBlasterUSB('pb0', board_number=0, programming_scheme='pb_stop_programming/STOP')
 
-ls.DigitalOut(name="pb0_00", parent_device=pb0.direct_outputs, connection='flag 0')
+ls.DigitalOut(name="D2_Lock_DO", parent_device=pb0.direct_outputs, connection='flag 0')
 ls.DigitalOut(name="pb0_01", parent_device=pb0.direct_outputs, connection='flag 1')
 ls.DigitalOut(name="pb0_02", parent_device=pb0.direct_outputs, connection='flag 2')
 ls.DigitalOut(name="pb0_03", parent_device=pb0.direct_outputs, connection='flag 3')
@@ -80,13 +80,13 @@ ls.AnalogOut(name='ni_pci_01_ao7', parent_device=NI_PCI_01, connection='ao7')
 
 
 ls.DigitalOut(name='ScopeTrigger', parent_device=NI_PCI_01, connection='port0/line0')
-ls.DigitalOut(name='ni_pci_01_do1', parent_device=NI_PCI_01, connection='port0/line1')
+ls.DigitalOut(name='UV_DO', parent_device=NI_PCI_01, connection='port0/line1')
 ls.DigitalOut(name='ni_pci_01_do2', parent_device=NI_PCI_01, connection='port0/line2')
 ls.DigitalOut(name='ni_pci_01_do3', parent_device=NI_PCI_01, connection='port0/line3')
 ls.DigitalOut(name='ni_pci_01_do4', parent_device=NI_PCI_01, connection='port0/line4')
 ls.DigitalOut(name='ni_pci_01_do5', parent_device=NI_PCI_01, connection='port0/line5')
 ls.DigitalOut(name='ni_pci_01_do6', parent_device=NI_PCI_01, connection='port0/line6')
-ls.DigitalOut(name='ni_pci_01_do7', parent_device=NI_PCI_01, connection='port0/line7')
+ls.Trigger(name='MOT_Camera_Trigger', parent_device=NI_PCI_01, connection='port0/line7')
 
 NI_PCI_6733(
     name="NI_PCI_02", 
@@ -96,23 +96,22 @@ NI_PCI_6733(
 )
 
 ls.AnalogOut(name='D2_Repump_AO', parent_device=NI_PCI_02, connection='ao0')
-ls.AnalogOut(name='ni_pci_02_ao1', parent_device=NI_PCI_02, connection='ao1')
-ls.AnalogOut(name='ni_pci_02_ao2', parent_device=NI_PCI_02, connection='ao2')
-ls.AnalogOut(name='ni_pci_02_ao3', parent_device=NI_PCI_02, connection='ao3')
+ls.AnalogOut(name='D2_Repump_FM', parent_device=NI_PCI_02, connection='ao1')
+ls.AnalogOut(name='D2_Cooling_AO', parent_device=NI_PCI_02, connection='ao2')
+ls.AnalogOut(name='D2_Probe_OP_AO', parent_device=NI_PCI_02, connection='ao3')
 ls.AnalogOut(name='ni_pci_02_ao4', parent_device=NI_PCI_02, connection='ao4')
 ls.AnalogOut(name='ni_pci_02_ao5', parent_device=NI_PCI_02, connection='ao5')
 ls.AnalogOut(name='ni_pci_02_ao6', parent_device=NI_PCI_02, connection='ao6')
 ls.AnalogOut(name='ni_pci_02_ao7', parent_device=NI_PCI_02, connection='ao7')
 
-
-ls.DigitalOut(name='D2_Lock_DO', parent_device=NI_PCI_02, connection='port0/line0')
-ls.DigitalOut(name='D2_Repump_DO', parent_device=NI_PCI_02, connection='port0/line1')
-ls.DigitalOut(name='D2_Repump_Sh', parent_device=NI_PCI_02, connection='port0/line2')
-ls.DigitalOut(name='UV_DO', parent_device=NI_PCI_02, connection='port0/line3')
-ls.DigitalOut(name='D2_Cooling_DO', parent_device=NI_PCI_02, connection='port0/line4')
-ls.DigitalOut(name='ni_pci_02_do5', parent_device=NI_PCI_02, connection='port0/line5')
-ls.DigitalOut(name='ni_pci_02_do6', parent_device=NI_PCI_02, connection='port0/line6')
-ls.Trigger(name='MOT_Camera_Trigger', parent_device=NI_PCI_02, connection='port0/line7')
+ls.DigitalOut(name='D2_Repump_DO', parent_device=NI_PCI_02, connection='port0/line0')
+ls.DigitalOut(name='D2_Repump_Sh', parent_device=NI_PCI_02, connection='port0/line1')
+ls.DigitalOut(name='D2_Cooling_DO', parent_device=NI_PCI_02, connection='port0/line2')
+ls.DigitalOut(name='D2_Cooling_Sh', parent_device=NI_PCI_02, connection='port0/line3')
+ls.DigitalOut(name='D2_Probe_OP_DO', parent_device=NI_PCI_02, connection='port0/line4')
+ls.DigitalOut(name='D2_Probe_1_Sh', parent_device=NI_PCI_02, connection='port0/line5')
+ls.DigitalOut(name='D2_Probe_2_Sh', parent_device=NI_PCI_02, connection='port0/line6')
+ls.DigitalOut(name='D2_OP_Sh', parent_device=NI_PCI_02, connection='port0/line7')
 
 ###############################################################################
 #
