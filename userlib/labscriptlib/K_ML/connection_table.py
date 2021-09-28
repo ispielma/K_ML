@@ -16,10 +16,7 @@ from labscript_devices.NI_DAQmx.labscript_devices import NI_PCI_6733, NI_USB_622
 from labscript_devices.NovaTechDDS9M import NovaTechDDS9M
 from labscript_devices.IMAQdxCamera.labscript_devices import IMAQdxCamera
 
-# from labscriptlib.rb_k.common.MOT_lock import MOT_freqVolt
-# from labscriptlib.rb_k.common.linear_voltage import LinearVoltage
-# from labscriptlib.rb_k.common.photoDetector import photodectorCalibration, MixerCalibration
-# from labscript_utils.unitconversions import BidirectionalCoilDriver
+from labscript_utils.unitconversions import IntraAction
 
 ###############################################################################
 #
@@ -96,7 +93,10 @@ NI_PCI_6733(
 )
 
 ls.AnalogOut(name='D2_Repump_AO', parent_device=NI_PCI_02, connection='ao0')
-ls.AnalogOut(name='D2_Repump_FM', parent_device=NI_PCI_02, connection='ao1')
+ls.AnalogOut(name='D2_Repump_FM', parent_device=NI_PCI_02, connection='ao1', 
+             unit_conversion_class=IntraAction.IntraAction_FM, 
+             unit_conversion_parameters={'f_0': 80.23, 'MHz_per_V': 30.49}
+             )
 ls.AnalogOut(name='D2_Cooling_AO', parent_device=NI_PCI_02, connection='ao2')
 ls.AnalogOut(name='D2_Probe_OP_AO', parent_device=NI_PCI_02, connection='ao3')
 ls.AnalogOut(name='ni_pci_02_ao4', parent_device=NI_PCI_02, connection='ao4')
@@ -112,6 +112,23 @@ ls.DigitalOut(name='D2_Probe_OP_DO', parent_device=NI_PCI_02, connection='port0/
 ls.DigitalOut(name='D2_Probe_1_Sh', parent_device=NI_PCI_02, connection='port0/line5')
 ls.DigitalOut(name='D2_Probe_2_Sh', parent_device=NI_PCI_02, connection='port0/line6')
 ls.DigitalOut(name='D2_OP_Sh', parent_device=NI_PCI_02, connection='port0/line7')
+
+NI_USB_6229(
+    name="NI_USB_01", 
+    parent_device=pb0_NI_PCI,
+    MAX_name='USB_01',
+    clock_terminal='/USB_01/PFI0',
+)
+
+ls.AnalogOut(name='Power_AMP_CNTRL_Line_CH1', parent_device=NI_USB_01, connection='ao0')
+ls.AnalogOut(name='Power_AMP_CNTRL_Line_CH2', parent_device=NI_USB_01, connection='ao1')
+ls.AnalogOut(name='Power_AMP_CNTRL_Line_CH3', parent_device=NI_USB_01, connection='ao2')
+ls.AnalogOut(name='Power_AMP_CNTRL_Line_CH4', parent_device=NI_USB_01, connection='ao3')
+
+ls.DigitalOut(name='Power_AMP_DIS_Line_CH1', parent_device=NI_USB_01, connection='port0/line0')
+ls.DigitalOut(name='Power_AMP_DIS_Line_CH2', parent_device=NI_USB_01, connection='port0/line1')
+ls.DigitalOut(name='Power_AMP_DIS_Line_CH3', parent_device=NI_USB_01, connection='port0/line2')
+ls.DigitalOut(name='Power_AMP_DIS_Line_CH4', parent_device=NI_USB_01, connection='port0/line3')
 
 ###############################################################################
 #
