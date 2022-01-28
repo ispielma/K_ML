@@ -38,14 +38,14 @@ ls.DigitalOut(name="pb0_08", parent_device=pb0.direct_outputs, connection='flag 
 ls.DigitalOut(name="pb0_09", parent_device=pb0.direct_outputs, connection='flag 9')
 ls.DigitalOut(name="pb0_10", parent_device=pb0.direct_outputs, connection='flag 10')
 ls.DigitalOut(name="pb0_11", parent_device=pb0.direct_outputs, connection='flag 11')
-ls.DigitalOut(name="pb0_12", parent_device=pb0.direct_outputs, connection='flag 12') 
+ls.DigitalOut(name="pb0_12", parent_device=pb0.direct_outputs, connection='flag 12')
 ls.DigitalOut(name="pb0_13", parent_device=pb0.direct_outputs, connection='flag 13')
 ls.DigitalOut(name="pb0_14", parent_device=pb0.direct_outputs, connection='flag 14')
 ls.DigitalOut(name="pb0_15", parent_device=pb0.direct_outputs, connection='flag 15')
 ls.DigitalOut(name="pb0_16", parent_device=pb0.direct_outputs, connection='flag 16')
 ls.DigitalOut(name="pb0_17", parent_device=pb0.direct_outputs, connection='flag 17')
 ls.DigitalOut(name="pb0_18", parent_device=pb0.direct_outputs, connection='flag 18')
-ls.DigitalOut(name="pb0_19", parent_device=pb0.direct_outputs, connection='flag 19')
+ls.ClockLine(name="pb0_NI_USB", pseudoclock=pb0.pseudoclock, connection='flag 19')
 ls.ClockLine(name="pb0_NI_PCI", pseudoclock=pb0.pseudoclock, connection='flag 20')
 ls.ClockLine(name="pb0_nt1", pseudoclock=pb0.pseudoclock, connection='flag 21')
 
@@ -60,7 +60,7 @@ ls.DigitalOut(name='pb0_23', parent_device=pb0.direct_outputs, connection='flag 
 ###############################################################################
 
 NI_PCI_6733(
-    name="NI_PCI_01", 
+    name="NI_PCI_01",
     parent_device=pb0_NI_PCI,
     MAX_name='PCI_01',
     clock_terminal='/PCI_01/PFI0',
@@ -86,15 +86,15 @@ ls.DigitalOut(name='ni_pci_01_do6', parent_device=NI_PCI_01, connection='port0/l
 ls.Trigger(name='MOT_Camera_Trigger', parent_device=NI_PCI_01, connection='port0/line7')
 
 NI_PCI_6733(
-    name="NI_PCI_02", 
+    name="NI_PCI_02",
     parent_device=pb0_NI_PCI,
     MAX_name='PCI_02',
     clock_terminal='/PCI_02/PFI0',
 )
 
 ls.AnalogOut(name='D2_Repump_AO', parent_device=NI_PCI_02, connection='ao0')
-ls.AnalogOut(name='D2_Repump_FM', parent_device=NI_PCI_02, connection='ao1', 
-             unit_conversion_class=IntraAction.IntraAction_FM, 
+ls.AnalogOut(name='D2_Repump_FM', parent_device=NI_PCI_02, connection='ao1',
+             unit_conversion_class=IntraAction.IntraAction_FM,
              unit_conversion_parameters={'f_0': 80.23, 'MHz_per_V': 30.49}
              )
 ls.AnalogOut(name='D2_Cooling_AO', parent_device=NI_PCI_02, connection='ao2')
@@ -114,22 +114,27 @@ ls.DigitalOut(name='D2_Probe_2_Sh', parent_device=NI_PCI_02, connection='port0/l
 ls.DigitalOut(name='D2_OP_Sh', parent_device=NI_PCI_02, connection='port0/line7')
 
 NI_USB_6229(
-    name="NI_USB_01", 
-    parent_device=pb0_NI_PCI,
+    name="NI_USB_01",
+    parent_device=pb0_NI_USB,
     MAX_name='USB_01',
     clock_terminal='/USB_01/PFI0',
 )
 
-ls.AnalogOut(name='Power_AMP_CNTRL_Line_CH1', parent_device=NI_USB_01, connection='ao0')
-ls.AnalogOut(name='Power_AMP_CNTRL_Line_CH2', parent_device=NI_USB_01, connection='ao1')
-ls.AnalogOut(name='Power_AMP_CNTRL_Line_CH3', parent_device=NI_USB_01, connection='ao2')
-ls.AnalogOut(name='Power_AMP_CNTRL_Line_CH4', parent_device=NI_USB_01, connection='ao3')
+ls.AnalogOut(name='OPAMP_CTRL_CH1', parent_device=NI_USB_01, connection='ao0')
+ls.AnalogOut(name='OPAMP_CTRL_CH2', parent_device=NI_USB_01, connection='ao1')
+ls.AnalogOut(name='OPAMP_CTRL_CH3', parent_device=NI_USB_01, connection='ao2')
+ls.AnalogOut(name='OPAMP_CTRL_CH4', parent_device=NI_USB_01, connection='ao3')
+ls.DigitalOut(name='OPAMP_DIS_CH1', parent_device=NI_USB_01, connection='port0/line0')
+ls.DigitalOut(name='OPAMP_DIS_CH2', parent_device=NI_USB_01, connection='port0/line1')
+ls.DigitalOut(name='OPAMP_DIS_CH3', parent_device=NI_USB_01, connection='port0/line2')
+ls.DigitalOut(name='OPAMP_DIS_CH4', parent_device=NI_USB_01, connection='port0/line3')
 
-ls.DigitalOut(name='Power_AMP_DIS_Line_CH1', parent_device=NI_USB_01, connection='port0/line0')
-ls.DigitalOut(name='Power_AMP_DIS_Line_CH2', parent_device=NI_USB_01, connection='port0/line1')
-ls.DigitalOut(name='Power_AMP_DIS_Line_CH3', parent_device=NI_USB_01, connection='port0/line2')
-ls.DigitalOut(name='Power_AMP_DIS_Line_CH4', parent_device=NI_USB_01, connection='port0/line3')
-
+NI_USB_6229(
+    name="NI_USB_02",
+    parent_device=pb0_NI_USB,
+    MAX_name='USB_02',
+    clock_terminal='/USB_02/PFI0',
+)
 ###############################################################################
 #
 # Novatechs
@@ -138,7 +143,7 @@ ls.DigitalOut(name='Power_AMP_DIS_Line_CH4', parent_device=NI_USB_01, connection
 
 NovaTechDDS9M(name='nt_1',
                 parent_device=pb0_nt1,
-                com_port='com6',
+                com_port='com5',
                 baud_rate=115200,
                 default_baud_rate=19200,
                 phase_mode='aligned', # continuous
@@ -249,22 +254,253 @@ Basler_camera_imaqdx_attributes = {
     'CameraAttributes::UserSets::UserSetSelector': 'Default Configuration Set',
 }
 
+Mako_camera_imaqdx_attributes = {
+    'AcquisitionAttributes::AdvancedEthernet::BandwidthControl::DesiredPeakBandwidth': 1000,
+    'AcquisitionAttributes::AdvancedEthernet::Controller::DestinationMode': 'Unicast',
+    'AcquisitionAttributes::AdvancedEthernet::Controller::DestinationMulticastAddress': '239.192.0.1',
+    'AcquisitionAttributes::AdvancedEthernet::EventParameters::MaxOutstandingEvents': 50,
+    'AcquisitionAttributes::AdvancedEthernet::FirewallTraversal::Enabled': 1,
+    'AcquisitionAttributes::AdvancedEthernet::FirewallTraversal::KeepAliveTime': 30,
+    'AcquisitionAttributes::AdvancedEthernet::PacketReceptionParameters::KernelReceiveBufferSizeRequested': 2000000,
+    'AcquisitionAttributes::AdvancedEthernet::PacketReceptionParameters::MaximumPacketsPerReception': 100,
+    'AcquisitionAttributes::AdvancedEthernet::PacketReceptionParameters::PacketReceptionTimeout': 450,
+    'AcquisitionAttributes::AdvancedEthernet::PacketReceptionParameters::ThreadPriority': 1,
+    'AcquisitionAttributes::AdvancedEthernet::ResendParameters::MaxResendsPerPacket': 25,
+    'AcquisitionAttributes::AdvancedEthernet::ResendParameters::MemoryWindowSize': 1024,
+    'AcquisitionAttributes::AdvancedEthernet::ResendParameters::MissingPacketTimeout': 2,
+    'AcquisitionAttributes::AdvancedEthernet::ResendParameters::NewPacketTimeout': 100,
+    'AcquisitionAttributes::AdvancedEthernet::ResendParameters::ResendBatchingPercentage': 10,
+    'AcquisitionAttributes::AdvancedEthernet::ResendParameters::ResendResponseTimeout': 2,
+    'AcquisitionAttributes::AdvancedEthernet::ResendParameters::ResendsEnabled': 1,
+    'AcquisitionAttributes::AdvancedEthernet::ResendParameters::ResendThresholdPercentage': 5,
+    'AcquisitionAttributes::AdvancedEthernet::ResendParameters::ResendTimerResolution': 1,
+    'AcquisitionAttributes::AdvancedEthernet::TestPacketParameters::MaxTestPacketRetries': 1,
+    'AcquisitionAttributes::AdvancedEthernet::TestPacketParameters::TestPacketEnabled': 1,
+    'AcquisitionAttributes::AdvancedEthernet::TestPacketParameters::TestPacketTimeout': 250,
+    'AcquisitionAttributes::AdvancedGenicam::CommandTimeout': 100,
+    'AcquisitionAttributes::AdvancedGenicam::EventsEnabled': 1,
+    'AcquisitionAttributes::AdvancedGenicam::IgnoreCameraValidationErrors': 0,
+    'AcquisitionAttributes::AdvancedGenicam::PersistenceAlgorithm': 'Auto',
+    'AcquisitionAttributes::Bayer::Algorithm': 'Bilinear',
+    'AcquisitionAttributes::Bayer::GainB': 1,
+    'AcquisitionAttributes::Bayer::GainG': 1,
+    'AcquisitionAttributes::Bayer::GainR': 1,
+    'AcquisitionAttributes::Bayer::Pattern': 'Use hardware value',
+    'AcquisitionAttributes::BitsPerPixel': 'Use hardware value',
+    'AcquisitionAttributes::ChunkDataDecoding::ChunkDataDecodingEnabled': 0,
+    'AcquisitionAttributes::ChunkDataDecoding::MaximumChunkCopySize': 64,
+    'AcquisitionAttributes::HardwareMaximumQueuedBufferCount': 1000,
+    'AcquisitionAttributes::HardwareRequeueBufferListThreshold': 50,
+    'AcquisitionAttributes::IgnoreFirstFrame': 0,
+    'AcquisitionAttributes::ImageDecoderCopyMode': 'Auto',
+    'AcquisitionAttributes::IncompleteBufferMode': 'Ignore',
+    'AcquisitionAttributes::OutputImageType': 'Auto',
+    'AcquisitionAttributes::OverwriteMode': 'Get Newest',
+    'AcquisitionAttributes::PacketSize': 1500,
+    'AcquisitionAttributes::PixelSignedness': 'Use hardware value',
+    'AcquisitionAttributes::ReceiveTimestampMode': 'None',
+    'AcquisitionAttributes::ShiftPixelBits': 0,
+    'AcquisitionAttributes::SwapPixelBytes': 0,
+    'AcquisitionAttributes::Timeout': 5000,
+    'CameraAttributes::Controls::Exposure::ExposureTimeAbs': 15000.0,
+    'CameraAttributes::Acquisition::AcquisitionMode': 'Continuous',
+    'CameraAttributes::Acquisition::AcquisitionFrameCount': 1,
+    'CameraAttributes::Acquisition::AcquisitionFrameRateAbs': 229.41,
+    'CameraAttributes::Acquisition::RecorderPreEventCount': 0,
+    'CameraAttributes::Acquisition::Trigger::TriggerSelector': 'FrameStart',
+    'CameraAttributes::Acquisition::Trigger::TriggerSelector': 'FrameStart',
+    'CameraAttributes::Acquisition::Trigger::TriggerMode': 'On',
+    'CameraAttributes::Acquisition::Trigger::TriggerSelector': 'AcquisitionStart',
+    'CameraAttributes::Acquisition::Trigger::TriggerMode': 'Off',
+    'CameraAttributes::Acquisition::Trigger::TriggerSelector': 'AcquisitionEnd',
+    'CameraAttributes::Acquisition::Trigger::TriggerMode': 'Off',
+    'CameraAttributes::Acquisition::Trigger::TriggerSelector': 'AcquisitionRecord',
+    'CameraAttributes::Acquisition::Trigger::TriggerMode': 'On',
+    'CameraAttributes::Acquisition::Trigger::TriggerSelector': 'FrameStart',
+    'CameraAttributes::Acquisition::Trigger::TriggerSelector': 'FrameStart',
+    'CameraAttributes::Acquisition::Trigger::TriggerSource': 'Freerun',
+    'CameraAttributes::Acquisition::Trigger::TriggerSelector': 'AcquisitionStart',
+    'CameraAttributes::Acquisition::Trigger::TriggerSource': 'Line1',
+    'CameraAttributes::Acquisition::Trigger::TriggerSelector': 'AcquisitionEnd',
+    'CameraAttributes::Acquisition::Trigger::TriggerSource': 'Line1',
+    'CameraAttributes::Acquisition::Trigger::TriggerSelector': 'AcquisitionRecord',
+    'CameraAttributes::Acquisition::Trigger::TriggerSource': 'Line1',
+    'CameraAttributes::Acquisition::Trigger::TriggerSelector': 'FrameStart',
+    'CameraAttributes::Acquisition::Trigger::TriggerSelector': 'FrameStart',
+    'CameraAttributes::Acquisition::Trigger::TriggerActivation': 'RisingEdge',
+    'CameraAttributes::Acquisition::Trigger::TriggerSelector': 'AcquisitionStart',
+    'CameraAttributes::Acquisition::Trigger::TriggerActivation': 'RisingEdge',
+    'CameraAttributes::Acquisition::Trigger::TriggerSelector': 'AcquisitionEnd',
+    'CameraAttributes::Acquisition::Trigger::TriggerActivation': 'RisingEdge',
+    'CameraAttributes::Acquisition::Trigger::TriggerSelector': 'AcquisitionRecord',
+    'CameraAttributes::Acquisition::Trigger::TriggerActivation': 'RisingEdge',
+    'CameraAttributes::Acquisition::Trigger::TriggerSelector': 'FrameStart',
+    'CameraAttributes::Acquisition::Trigger::TriggerSelector': 'FrameStart',
+    'CameraAttributes::Acquisition::Trigger::TriggerOverlap': 'Off',
+    'CameraAttributes::Acquisition::Trigger::TriggerSelector': 'FrameStart',
+    'CameraAttributes::Acquisition::Trigger::TriggerSelector': 'FrameStart',
+    'CameraAttributes::Acquisition::Trigger::TriggerDelayAbs': 0,
+    'CameraAttributes::Acquisition::Trigger::TriggerSelector': 'FrameStart',
+    'CameraAttributes::DeviceStatus::DeviceTemperatureSelector': 'Main',
+    'CameraAttributes::GigE::StreamBytesPerSecond': 115000000,
+    'CameraAttributes::GigE::BandwidthControlMode': 'StreamBytesPerSecond',
+    'CameraAttributes::GigE::GevSCPSPacketSize': 1500,
+    'CameraAttributes::GigE::ChunkModeActive': 0,
+    'CameraAttributes::GigE::StreamFrameRateConstrain': 1,
+    'CameraAttributes::GigE::StreamHold::StreamHoldEnable': 'Off',
+    'CameraAttributes::ImageMode::DecimationHorizontal': 1,
+    'CameraAttributes::ImageMode::DecimationVertical': 1,
+    'CameraAttributes::ImageMode::ReverseX': 0,
+    'CameraAttributes::ImageMode::ReverseY': 0,
+    'CameraAttributes::ImageFormat::PixelFormat': 'Mono12Packed',
+    'CameraAttributes::ImageFormat::Width': 644,
+    'CameraAttributes::ImageFormat::Height': 484,
+    'CameraAttributes::ImageFormat::OffsetX': 0,
+    'CameraAttributes::ImageFormat::OffsetY': 0,
+    'CameraAttributes::Controls::Gamma': 1,
+    'CameraAttributes::Controls::DefectMaskEnable': 1,
+    'CameraAttributes::Controls::DSPSubregion::DSPSubregionLeft': 0,
+    'CameraAttributes::Controls::DSPSubregion::DSPSubregionTop': 0,
+    'CameraAttributes::Controls::DSPSubregion::DSPSubregionRight': 644,
+    'CameraAttributes::Controls::DSPSubregion::DSPSubregionBottom': 484,
+    'CameraAttributes::Controls::Exposure::ExposureAuto': 'Off',
+    'CameraAttributes::Controls::Exposure::ExposureTimeAbs': 15000,
+    'CameraAttributes::Controls::Exposure::ExposureTimePWL1': 15000,
+    'CameraAttributes::Controls::Exposure::ExposureTimePWL2': 15000,
+    'CameraAttributes::Controls::Exposure::ExposureAutoControl::ExposureAutoTarget': 50,
+    'CameraAttributes::Controls::Exposure::ExposureAutoControl::ExposureAutoAlg': 'Mean',
+    'CameraAttributes::Controls::Exposure::ExposureAutoControl::ExposureAutoMin': 83,
+    'CameraAttributes::Controls::Exposure::ExposureAutoControl::ExposureAutoMax': 500000,
+    'CameraAttributes::Controls::Exposure::ExposureAutoControl::ExposureAutoRate': 100,
+    'CameraAttributes::Controls::Exposure::ExposureAutoControl::ExposureAutoOutliers': 0,
+    'CameraAttributes::Controls::Exposure::ExposureAutoControl::ExposureAutoAdjustTol': 5,
+    'CameraAttributes::Controls::GainControl::GainSelector': 'All',
+    'CameraAttributes::Controls::GainControl::Gain': 26,
+    'CameraAttributes::Controls::GainControl::GainSelector': 'All',
+    'CameraAttributes::Controls::GainControl::GainSelector': 'All',
+    'CameraAttributes::Controls::GainControl::GainRaw': 26,
+    'CameraAttributes::Controls::GainControl::GainSelector': 'All',
+    'CameraAttributes::Controls::GainControl::GainSelector': 'All',
+    'CameraAttributes::Controls::GainControl::GainAuto': 'Off',
+    'CameraAttributes::Controls::GainControl::GainSelector': 'All',
+    'CameraAttributes::Controls::GainControl::GainAutoControl::GainAutoTarget': 50,
+    'CameraAttributes::Controls::GainControl::GainAutoControl::GainAutoMin': 0,
+    'CameraAttributes::Controls::GainControl::GainAutoControl::GainAutoMax': 26,
+    'CameraAttributes::Controls::GainControl::GainAutoControl::GainAutoRate': 100,
+    'CameraAttributes::Controls::GainControl::GainAutoControl::GainAutoOutliers': 0,
+    'CameraAttributes::Controls::GainControl::GainAutoControl::GainAutoAdjustTol': 5,
+    'CameraAttributes::Controls::BlackLevelControl::BlackLevel': 4,
+    'CameraAttributes::IO::SyncIn::SyncInSelector': 'SyncIn1',
+    'CameraAttributes::IO::SyncIn::SyncInSelector': 'SyncIn1',
+    'CameraAttributes::IO::SyncIn::SyncInGlitchFilter': 0,
+    'CameraAttributes::IO::SyncIn::SyncInSelector': 'SyncIn1',
+    'CameraAttributes::IO::SyncOut::SyncOutSelector': 'SyncOut1',
+    'CameraAttributes::IO::SyncOut::SyncOutSelector': 'SyncOut1',
+    'CameraAttributes::IO::SyncOut::SyncOutSource': 'Exposing',
+    'CameraAttributes::IO::SyncOut::SyncOutSelector': 'SyncOut2',
+    'CameraAttributes::IO::SyncOut::SyncOutSource': 'Exposing',
+    'CameraAttributes::IO::SyncOut::SyncOutSelector': 'SyncOut3',
+    'CameraAttributes::IO::SyncOut::SyncOutSource': 'Exposing',
+    'CameraAttributes::IO::SyncOut::SyncOutSelector': 'SyncOut1',
+    'CameraAttributes::IO::SyncOut::SyncOutSelector': 'SyncOut1',
+    'CameraAttributes::IO::SyncOut::SyncOutPolarity': 'Normal',
+    'CameraAttributes::IO::SyncOut::SyncOutSelector': 'SyncOut2',
+    'CameraAttributes::IO::SyncOut::SyncOutPolarity': 'Normal',
+    'CameraAttributes::IO::SyncOut::SyncOutSelector': 'SyncOut3',
+    'CameraAttributes::IO::SyncOut::SyncOutPolarity': 'Normal',
+    'CameraAttributes::IO::SyncOut::SyncOutSelector': 'SyncOut1',
+    'CameraAttributes::IO::Strobe::StrobeSource': 'FrameTrigger',
+    'CameraAttributes::IO::Strobe::StrobeDurationMode': 'Source',
+    'CameraAttributes::IO::Strobe::StrobeDelay': 0,
+    'CameraAttributes::IO::Strobe::StrobeDuration': 0,
+    'CameraAttributes::SavedUserSets::UserSetSelector': 'Default',
+    'CameraAttributes::SavedUserSets::UserSetDefaultSelector': 'Default',
+    'CameraAttributes::EventControl::EventSelector': 'AcquisitionStart',
+    'CameraAttributes::EventControl::EventSelector': 'AcquisitionStart',
+    'CameraAttributes::EventControl::EventNotification': 'Off',
+    'CameraAttributes::EventControl::EventSelector': 'AcquisitionEnd',
+    'CameraAttributes::EventControl::EventNotification': 'Off',
+    'CameraAttributes::EventControl::EventSelector': 'FrameTrigger',
+    'CameraAttributes::EventControl::EventNotification': 'Off',
+    'CameraAttributes::EventControl::EventSelector': 'ExposureEnd',
+    'CameraAttributes::EventControl::EventNotification': 'Off',
+    'CameraAttributes::EventControl::EventSelector': 'AcquisitionRecordTrigger',
+    'CameraAttributes::EventControl::EventNotification': 'Off',
+    'CameraAttributes::EventControl::EventSelector': 'Line1RisingEdge',
+    'CameraAttributes::EventControl::EventNotification': 'Off',
+    'CameraAttributes::EventControl::EventSelector': 'Line1FallingEdge',
+    'CameraAttributes::EventControl::EventNotification': 'Off',
+    'CameraAttributes::EventControl::EventSelector': 'FrameTriggerReady',
+    'CameraAttributes::EventControl::EventNotification': 'Off',
+    'CameraAttributes::EventControl::EventSelector': 'ExposureStart',
+    'CameraAttributes::EventControl::EventNotification': 'Off',
+    'CameraAttributes::EventControl::EventSelector': 'AcquisitionStart',
+    'CameraAttributes::EventControl::EventsEnable1': 0,
+    'CameraAttributes::Controls::LUTControl::LUTSelector': 'LUT1',
+    'CameraAttributes::Controls::LUTControl::LUTEnable': 0,
+    'CameraAttributes::Controls::LUTControl::LUTSelector': 'LUT1',
+
+}
+
 Basler_manual_mode_imaqdx_attributes = {
     'CameraAttributes::AcquisitionTrigger::AcquisitionMode': 'Continuous',
     'CameraAttributes::AcquisitionTrigger::TriggerMode': 'Off',
     'CameraAttributes::AcquisitionTrigger::ExposureMode': 'Timed',
-#    'CameraAttributes::AcquisitionTrigger::ExposeTimeRaw': 8000,
+    'CameraAttributes::AnalogControls::GainRaw': 300,
+    }
+
+Mako_manual_mode_imaqdx_attributes = {
+    'CameraAttributes::Acquisition::AcquisitionMode': 'Continuous',
+    'CameraAttributes::Acquisition::Trigger::TriggerMode': 'Off',
+    'CameraAttributes::Controls::GainControl::Gain': 0,
+    #'CameraAttributes::Controls::Exposure::ExposureTimeAbs': 1500.0,
     }
 
 #'MOT_x' camera
-IMAQdxCamera(name='MOT_x', 
+IMAQdxCamera(name='MOT_x',
     parent_device=MOT_Camera_Trigger,
-    connection='trigger', 
+    connection='trigger',
     trigger_edge_type='rising',
-    orientation = 'MOT_x', 
-    serial_number=0x3053162459, 
+    orientation = 'MOT_x',
+    serial_number=0x3053162459,
     camera_attributes=Basler_camera_imaqdx_attributes,
     manual_mode_camera_attributes=Basler_manual_mode_imaqdx_attributes,
+    stop_acquisition_timeout=10,
+    exception_on_failed_shot=False)
+
+#'MOT_x' camera
+IMAQdxCamera(name='Mako1',
+    parent_device=MOT_Camera_Trigger,
+    connection='trigger',
+    trigger_edge_type='rising',
+    orientation = 'Mako1',
+    serial_number=0xF315C0B0B,
+    camera_attributes=Mako_camera_imaqdx_attributes,
+    manual_mode_camera_attributes=Mako_manual_mode_imaqdx_attributes,
+    stop_acquisition_timeout=10,
+    exception_on_failed_shot=False)
+
+#'MOT_x' camera
+IMAQdxCamera(name='Mako2',
+    parent_device=MOT_Camera_Trigger,
+    connection='trigger',
+    trigger_edge_type='rising',
+    orientation = 'Mako2',
+    serial_number=0xF315D2ACE,
+    camera_attributes=Mako_camera_imaqdx_attributes,
+    manual_mode_camera_attributes=Mako_manual_mode_imaqdx_attributes,
+    stop_acquisition_timeout=10,
+    exception_on_failed_shot=False)
+
+#'MOT_x' camera
+IMAQdxCamera(name='Mako3',
+    parent_device=MOT_Camera_Trigger,
+    connection='trigger',
+    trigger_edge_type='rising',
+    orientation = 'Mako3',
+    serial_number=0xF315D2ACF,
+    camera_attributes=Mako_camera_imaqdx_attributes,
+    manual_mode_camera_attributes=Mako_manual_mode_imaqdx_attributes,
     stop_acquisition_timeout=10,
     exception_on_failed_shot=False)
 
