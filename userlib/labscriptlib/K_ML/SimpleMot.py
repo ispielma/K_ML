@@ -11,6 +11,12 @@ from  labscript_utils import import_or_reload
 import_or_reload('labscriptlib.K_ML.connection_table')  
 
 def SetDefaults(t):
+    """
+    Here we  set the default starting and ending state for the experiment.
+    
+    Note that we use a keep warm protocol for the high power AOMs
+
+    """
     ScopeTrigger.go_low(t)
     
     # The TTL like for the satspec lock (repumper): needs to be always high
@@ -22,16 +28,15 @@ def SetDefaults(t):
     ni_pci_01_ao0.constant(t, 1.0)
     ni_pci_01_ao0.constant(t+1e-3, 0.0)
         
-        
     # NI_PCI_02
-    D2_Repump_AO.constant(t, 0.0)
+    D2_Repump_AO.constant(t, D2_Repump_Volts)
     D2_Repump_FM.constant(t, D2_Repump_Default_Shift, units='MHz')
-    D2_Cooling_AO.constant(t, 0.0)
+    D2_Cooling_AO.constant(t, D2_Cooling_Volts)
     D2_Probe_OP_AO.constant(t, 0.0)
     
-    D2_Repump_DO.go_low(t)
+    D2_Repump_DO.go_high(t)
     D2_Repump_Sh.go_low(t)
-    D2_Cooling_DO.go_low(t)
+    D2_Cooling_DO.go_high(t)
     D2_Cooling_Sh.go_low(t)
     D2_Probe_OP_DO.go_low(t)
     D2_Probe_1_Sh.go_low(t)    
@@ -75,15 +80,16 @@ t += 10*ms
 # Get all MOT stuff on except fields (should be a function!)
 #
 
-# MOT_Quad.constant(t, 0.0)
-D2_Repump_AO.constant(t, 1.2)
-D2_Cooling_AO.constant(t, 1.2)
-D2_Probe_OP_AO.constant(t, 1.2)
+# Turn on MOT beam.
+D2_Repump_DO.go_low(t)
+D2_Cooling_DO.go_low(t)
+D2_Repump_Sh.go_high(t)
+D2_Cooling_Sh.go_high(t)
+ 
+t += 10e-3
 
 D2_Repump_DO.go_high(t)
-D2_Repump_Sh.go_high(t)
 D2_Cooling_DO.go_high(t)
-D2_Cooling_Sh.go_high(t)
 
 #
 # Snap a dark frame
