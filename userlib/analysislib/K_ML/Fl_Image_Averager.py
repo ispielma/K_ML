@@ -1,8 +1,9 @@
 import lyse
 import numpy as np
 import os
-from pathlib import Path
 import matplotlib.pyplot as plt
+
+DISABLE_AVERAGE = True
 
 # Is this script being run from within an interactive lyse session?
 if lyse.spinning_top:
@@ -25,6 +26,8 @@ run_globals = run.get_globals()
 dark, bright = run.get_images('MOT_x', 'fluorescence', 'dark', 'bright')
 
 hist, bin_edges = np.histogram(bright)
+
+
 print(bright.min(), bright.max())
 
 # Compute the difference of the two images, after casting them to signed integers
@@ -41,13 +44,23 @@ else:
 if ShotId == LastShotId:
     # We are averaging!
     lyse.routine_storage.shots += 1
-    lyse.routine_storage.sum += diff
+    
+    if DISABLE_AVERAGE:
+        lyse.routine_storage.sum = diff.copy()
+    else:
+        lyse.routine_storage.sum += diff
 else:
     # We are resetting
     lyse.routine_storage.shots = 1
     lyse.routine_storage.sum = diff.copy()
 
 lyse.routine_storage.LastShotId = ShotId
+
+
+# Compute a result based on the image processing and save it to the 'results' group of
+# the shot file
+result = diff.sum()
+run.save_result('MOT_Counts', result)
 
 #
 # Now plot the current image as well as the running average
@@ -81,7 +94,3 @@ ax.set_xlabel('X pixel coordinate')
 # Show the plot
 plt.show()
 
-# Compute a result based on the image processing and save it to the 'results' group of
-# the shot file
-# result = diff.std()
-# run.save_result('foobar', result)
