@@ -44,9 +44,9 @@ def SetDefaults(t):
     D2_OP_Sh.go_low(t)    
     
     # NI_USB_01
-    MOT_y_Bias.constant(t, 0.0)
-    MOT_x_z_Bias.constant(t, 0.0)
-    MOT_x_mz_Bias.constant(t, 0.0)
+    MOT_y_Bias.constant(t, MOT_y_Bias_0)
+    MOT_x_z_Bias.constant(t, MOT_x_z_Bias_0)
+    MOT_x_mz_Bias.constant(t, MOT_x_mz_Bias_0)
     MOT_Quad.constant(t, 0.0)
     
     MOT_y_Bias_Disable.go_high(t)
@@ -61,11 +61,33 @@ def SetDefaults(t):
     ni_usb_02_ao0.constant(t+0.001, 0.0)
 
     # NT_1
-    D2_Lock_DDS.setfreq(t, D2_Lock_Freq)
+    D2_Lock_DDS.setfreq(t, D2_Lock_Freq_MOT)
     D2_Lock_DDS.setamp(t, 1.0) # -80dBm
 
+def PrepMOT(t,
+            MOT_y_Bias_Prep,
+            MOT_x_z_Bias_Prep,
+            MOT_x_mz_Bias_Prep,
+            MOT_Quad_Prep,
+            D2_Lock_Freq_Prep,
+            D2_Repump_Default_Shift_Prep):
+        
+    MOT_y_Bias.constant(t, MOT_y_Bias_Prep + MOT_y_Bias_0)
+    MOT_x_z_Bias.constant(t, MOT_x_z_Bias_Prep + MOT_x_z_Bias_0)
+    MOT_x_mz_Bias.constant(t, MOT_x_mz_Bias_Prep + MOT_x_mz_Bias_0)
+    MOT_Quad.constant(t, MOT_Quad_Prep)
     
-# Begin issuing labscript primitives
+    MOT_y_Bias_Disable.go_low(t)
+    MOT_x_z_Bias_Disable.go_low(t)
+    MOT_x_mz_Bias_Disable.go_low(t)
+    MOT_Quad_Disable.go_low(t)
+
+    print(D2_Lock_Freq_Prep, D2_Repump_Default_Shift_Prep)
+
+    D2_Lock_DDS.setfreq(t, D2_Lock_Freq_Prep)
+    D2_Repump_FM.constant(t, D2_Repump_Default_Shift_Prep, units='MHz')
+  
+  
 t = 0
 ls.start()
 
@@ -79,6 +101,14 @@ t += 10*ms
 #
 # Get all MOT stuff on except fields (should be a function!)
 #
+
+PrepMOT(t,
+        MOT_y_Bias_Prep=MOT_y_Bias_MOT,
+        MOT_x_z_Bias_Prep=MOT_x_z_Bias_MOT,
+        MOT_x_mz_Bias_Prep=MOT_x_mz_Bias_MOT,
+        MOT_Quad_Prep=MOT_Quad_MOT,
+        D2_Lock_Freq_Prep=D2_Lock_Freq_MOT,
+        D2_Repump_Default_Shift_Prep=D2_Repump_Default_Shift)
 
 # Turn on MOT beam.
 D2_Repump_DO.go_low(t)
@@ -97,11 +127,8 @@ D2_Cooling_DO.go_high(t)
 ls.add_time_marker(t, "Snap dark frame", verbose=True)
 ScopeTrigger.go_high(t)
 ScopeTrigger.go_low(t+1*ms)
-MOT_x.expose(t, 'fluorescence', frametype='dark', trigger_duration=1000e-6)
+MOT_x.expose(t, 'fluorescence', frametype='dark', trigger_duration=MOT_Fl_Exposure)
 t += 10*ms
-
-MOT_Quad.constant(t, 5.0)
-MOT_Quad_Disable.go_low(t)
 
 
 #
@@ -118,7 +145,18 @@ MOT_Quad_Disable.go_low(t)
 # UV_DO.go_low(t)
 t += MOT_Load_Time
 
-MOT_x.expose(t, 'fluorescence', frametype='bright', trigger_duration=1000e-6)
+# Switch to detection MOT
+PrepMOT(t,
+        MOT_y_Bias_Prep=0,
+        MOT_x_z_Bias_Prep=0,
+        MOT_x_mz_Bias_Prep=0,
+        MOT_Quad_Prep=MOT_Quad_MOT_Fl,
+        D2_Lock_Freq_Prep=D2_Lock_Freq_MOT_Fl,
+        D2_Repump_Default_Shift_Prep=D2_Repump_Default_Shift_Fl)
+
+t += 50*ms
+
+MOT_x.expose(t, 'fluorescence', frametype='bright', trigger_duration=MOT_Fl_Exposure)
 t+= 20*ms
 
 #
