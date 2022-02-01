@@ -82,12 +82,22 @@ def PrepMOT(t,
     MOT_x_mz_Bias_Disable.go_low(t)
     MOT_Quad_Disable.go_low(t)
 
-    print(D2_Lock_Freq_Prep, D2_Repump_Default_Shift_Prep)
-
     D2_Lock_DDS.setfreq(t, D2_Lock_Freq_Prep)
     D2_Repump_FM.constant(t, D2_Repump_Default_Shift_Prep, units='MHz')
-  
-  
+
+def cMOT(t):
+        
+    MOT_y_Bias.constant(t, MOT_y_Bias_cMOT + MOT_y_Bias_0)
+    MOT_x_z_Bias.constant(t, MOT_x_z_Bias_cMOT + MOT_x_z_Bias_0)
+    MOT_x_mz_Bias.constant(t, MOT_x_mz_Bias_cMOT + MOT_x_mz_Bias_0)
+    MOT_Quad.constant(t, MOT_Quad_cMOT)
+
+    D2_Lock_DDS.setfreq(t, D2_Lock_Freq_cMOT)
+    D2_Repump_FM.constant(t, D2_Repump_Default_Shift_cMOT, units='MHz')
+    D2_Repump_AO.constant(t, D2_Repump_Volts_cMOT)
+
+    return Load_Time_MOT
+
 t = 0
 ls.start()
 
@@ -106,7 +116,7 @@ PrepMOT(t,
         MOT_y_Bias_Prep=MOT_y_Bias_MOT,
         MOT_x_z_Bias_Prep=MOT_x_z_Bias_MOT,
         MOT_x_mz_Bias_Prep=MOT_x_mz_Bias_MOT,
-        MOT_Quad_Prep=MOT_Quad_MOT,
+        MOT_Quad_Prep=0,
         D2_Lock_Freq_Prep=D2_Lock_Freq_MOT,
         D2_Repump_Default_Shift_Prep=D2_Repump_Default_Shift)
 
@@ -121,6 +131,8 @@ t += 10e-3
 D2_Repump_DO.go_high(t)
 D2_Cooling_DO.go_high(t)
 
+t += 10e-3
+
 #
 # Snap a dark frame
 #
@@ -130,34 +142,53 @@ ScopeTrigger.go_low(t+1*ms)
 MOT_x.expose(t, 'fluorescence', frametype='dark', trigger_duration=MOT_Fl_Exposure)
 t += 10*ms
 
+PrepMOT(t,
+        MOT_y_Bias_Prep=MOT_y_Bias_MOT,
+        MOT_x_z_Bias_Prep=MOT_x_z_Bias_MOT,
+        MOT_x_mz_Bias_Prep=MOT_x_mz_Bias_MOT,
+        MOT_Quad_Prep=MOT_Quad_MOT,
+        D2_Lock_Freq_Prep=D2_Lock_Freq_MOT,
+        D2_Repump_Default_Shift_Prep=D2_Repump_Default_Shift)
 
 #
 # Apply UV
 #
 # ls.add_time_marker(t, "UV on", verbose=True)
 # UV_DO.go_high(t)
-# t += 1
-
-#
-# Acquire bright frame post UV
-#
-
+t += Load_Time_MOT
 # UV_DO.go_low(t)
-t += MOT_Load_Time
 
-# Switch to detection MOT
+#
+# cMOT
+#
+
+t += cMOT(t)
+
+#
+# Optical Molassas (sub Doppler cooling!)
+#
+
+
+# Fl imaging
+D2_Repump_DO.go_low(t)
+D2_Cooling_DO.go_low(t)
 PrepMOT(t,
-        MOT_y_Bias_Prep=0,
-        MOT_x_z_Bias_Prep=0,
-        MOT_x_mz_Bias_Prep=0,
-        MOT_Quad_Prep=MOT_Quad_MOT_Fl,
-        D2_Lock_Freq_Prep=D2_Lock_Freq_MOT_Fl,
-        D2_Repump_Default_Shift_Prep=D2_Repump_Default_Shift_Fl)
+        MOT_y_Bias_Prep=MOT_y_Bias_MOT,
+        MOT_x_z_Bias_Prep=MOT_x_z_Bias_MOT,
+        MOT_x_mz_Bias_Prep=MOT_x_mz_Bias_MOT,
+        MOT_Quad_Prep=0,
+        D2_Lock_Freq_Prep=D2_Lock_Freq_MOT,
+        D2_Repump_Default_Shift_Prep=D2_Repump_Default_Shift)
 
-t += 50*ms
+# TOF!
+t += TOF_Time
+
+# Image!
+D2_Repump_DO.go_high(t)
+D2_Cooling_DO.go_high(t)
 
 MOT_x.expose(t, 'fluorescence', frametype='bright', trigger_duration=MOT_Fl_Exposure)
-t+= 20*ms
+t+= 1*ms
 
 #
 # Set Dafault state

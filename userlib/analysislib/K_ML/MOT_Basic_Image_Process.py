@@ -25,23 +25,31 @@ run_globals = run.get_globals()
 # Extract the images 'before' and 'after' generated from camera.expose
 dark, bright = run.get_images('MOT_x', 'fluorescence', 'dark', 'bright')
 
-hist, bin_edges = np.histogram(bright)
-
-
-print(bright.min(), bright.max())
-
 # Compute the difference of the two images, after casting them to signed integers
 # (otherwise negative differences wrap to 2**16 - 1 - diff)
 diff = bright.astype(float) - dark.astype(float)
 
-# Compute a result based on the image processing and save it to the 'results' group of
-# the shot file
+# Compute a result based on the image processing and save it to the 'results' group
 
-result = diff.sum()
-run.save_result('MOT_Counts', result)
+def GetWidth(dist):
+    """
+    Get the width of a distribution 
+    """
+    length = dist.shape[0]
+    xvals = np.arange(length)
+    norm = dist.sum()
+    
+    x_bar = np.sum(dist*xvals) / norm    
+    x2_bar = np.sum(dist*xvals**2) / norm
+    
+    return np.sqrt(np.abs(x2_bar - x_bar**2))
 
-result = diff.sum()
-run.save_result('MOT_MaxCounts', diff.max())
+run.save_result('Counts', diff.sum())
+run.save_result('MaxCounts', diff.max())
+run.save_result('xWidth', GetWidth( diff.sum(axis=0)) ) 
+run.save_result('yWidth', GetWidth( diff.sum(axis=1)) ) 
+
+print( GetWidth( diff.sum(axis=0))) 
 
 #
 # Now plot the current image as well as the running average
