@@ -1,9 +1,10 @@
 import lyse
 import numpy as np
+import lmfit
 import os
 import matplotlib.pyplot as plt
 
-DISABLE_AVERAGE = True
+FIT = True
 
 # Is this script being run from within an interactive lyse session?
 if lyse.spinning_top:
@@ -31,25 +32,38 @@ diff = bright.astype(float) - dark.astype(float)
 
 # Compute a result based on the image processing and save it to the 'results' group
 
-def GetWidth(dist):
-    """
-    Get the width of a distribution 
-    """
-    length = dist.shape[0]
-    xvals = np.arange(length)
-    norm = dist.sum()
+xpts = diff.shape[0]
+ypts = diff.shape[1]
+
+xvals = np.linspace(-xpts/2, xpts/2, xpts)
+yvals = np.linspace(-ypts/2, ypts/2, ypts)
+xy_grids = np.meshgrid(xvals, yvals)
+
+if FIT:
+    # Now fit to an 2D gauss
     
-    x_bar = np.sum(dist*xvals) / norm    
-    x2_bar = np.sum(dist*xvals**2) / norm
+
     
-    return np.sqrt(np.abs(x2_bar - x_bar**2))
+    model = lmfit.models.ExpressionModel("offset + A*exp(-((x-x0)/xWidth)**2 - ((y-y0)/yWidth)**2)")
+    result = model.fit(diff, 
+                        x=xy_grids[0], 
+                        y=xy_grids[1], 
+                        x0=0,
+                        y0=0,
+                        offset=0, 
+                        xWidth=200,
+                        yWidth=200)
+    
+    xWidth = result.params['xWidth'].value
+    yWidth = result.params['yWidth'].value
+else:
+    xWidth = 0
+    yWidth = 0
 
 run.save_result('Counts', diff.sum())
 run.save_result('MaxCounts', diff.max())
-run.save_result('xWidth', GetWidth( diff.sum(axis=0)) ) 
-run.save_result('yWidth', GetWidth( diff.sum(axis=1)) ) 
-
-print( GetWidth( diff.sum(axis=0))) 
+run.save_result('xWidth', xWidth) 
+run.save_result('yWidth', yWidth) 
 
 #
 # Now plot the current image as well as the running average
@@ -62,7 +76,11 @@ gs.update(left=0.12, bottom=0.1, top=0.93, wspace=0.2, hspace=0.4, right=0.99)
     
 ax = fig.add_subplot(gs[0,0])
 ax.set_title(r'Current Image', loc='center', fontsize=8, x=0.5, pad=4)
-im = ax.imshow(diff.T)
+im = ax.imshow(diff.T, 
+               origin='lower',
+               extent=[[-xpts/2,xpts/2], [-ypts/2,ypts/2]])
+ax.contour(xvals, yvals, model.eval(x=xy_grids[0], y=xy_grids[1]) )
+           
 ax.set_xlabel('X pixel coordinate')
 ax.set_ylabel('Y pixel coordinate')
 
