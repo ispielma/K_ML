@@ -84,6 +84,7 @@ run.save_result('xWidth', xWidth)
 run.save_result('yWidth', yWidth) 
 run.save_result('x0', xWidth) 
 run.save_result('y0', yWidth) 
+
 #
 # Now plot the current image as well as the running average
 #
