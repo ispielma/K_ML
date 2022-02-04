@@ -14,7 +14,7 @@ df = lyse.data(n_sequences=1)
 
 
 FIT = False
-X_LABEL = 'Repump AOM (V)'
+X_LABEL = 'cMOT time'
 scan = df['scan']
 
 # Let's obtain the dataframe for all of lyse's currently loaded shots:
@@ -24,6 +24,8 @@ scan = df['scan']
 Counts = df['MOT_Basic_Image_Process', 'Counts']
 xWidth = df['MOT_Basic_Image_Process', 'xWidth']
 yWidth = df['MOT_Basic_Image_Process', 'yWidth']
+x0 = df['MOT_Basic_Image_Process', 'x0']
+y0 = df['MOT_Basic_Image_Process', 'y0']
 
 if FIT:
     # Now fit to an exponential
@@ -43,7 +45,7 @@ if FIT:
 # Let's plot them against each other:
 
 fig = plt.figure(0,figsize=(7, 3.5))
-gs = fig.add_gridspec(1, 2)
+gs = fig.add_gridspec(2, 2)
 gs.update(left=0.12, bottom=0.15, top=0.93, wspace=0.2, hspace=0.8, right=0.99) 
 
 ax = fig.add_subplot(gs[0,0])
@@ -60,15 +62,21 @@ ax = fig.add_subplot(gs[0,1])
 ax.plot(scan, xWidth,'bo', label='xWidth')
 ax.plot(scan, yWidth,'ro', label='yWidth')
 
-if FIT:
-    ax.set_title(r'$\tau = {:1.3f}$ s'.format(result.params['tau'].value))
-    ax.plot(scan_Smooth, MOT_Counts_Smooth, "-")
-
 ax.set_xlabel(X_LABEL)
 ax.set_ylabel('RMS width (pixels)')
-ax.set_ylim([0,640])
+ax.set_ylim([None,None])
 
 ax.legend()
+
+ax = fig.add_subplot(gs[1,1])
+ax.plot(scan, x0, 'bo', label='x0')
+ax.plot(scan, y0, 'ro', label='y0')
+
+ax.set_xlabel(X_LABEL)
+ax.set_ylabel('position (pixels)')
+
+ax.legend()
+
 
 #To save this result to the output hdf5 file, we have to instantiate a
 #Sequence object:

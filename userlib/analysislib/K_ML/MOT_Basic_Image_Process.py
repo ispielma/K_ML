@@ -33,6 +33,7 @@ diff = bright.astype(float) - dark.astype(float)
 
 # Compute a result based on the image processing and save it to the 'results' group
 
+
 xpts = diff.shape[1]
 ypts = diff.shape[0]
 
@@ -57,21 +58,21 @@ if FIT:
     try:
         model = lmfit.Model(gauss2d, independent_vars=['x', 'y'])
         params = model.make_params()
-        params['offset'].set(value=diff.max(), min=0, max=4096)
-        params['centerx'].set(0, min=xvals.min(), max=xvals.max())
-        params['centery'].set(0, min=yvals.min(), max=yvals.max())
+        params['offset'].set(value=diff.max(), min=-5, max=5)
+        params['centerx'].set(0, min=1.5*xvals.min(), max=1.5*xvals.max())
+        params['centery'].set(0, min=1.5*yvals.min(), max=1.5*yvals.max())
         
         params['amplitude'].set(value=diff.max(), min=0, max=4096)
                 
-        params['sigmax'].set(value=100, min=10, max=2*xvals.max())
-        params['sigmay'].set(value=100, min=10, max=2*yvals.max())
+        params['sigmax'].set(value=200, min=10, max=2*xvals.max())
+        params['sigmay'].set(value=200, min=10, max=2*yvals.max())
 
         result = model.fit(diff.ravel(), x=xy_grids[1].ravel(), y=xy_grids[0].ravel(), 
                            params=params)   
-        print(result.params)
     
         xWidth = result.params['sigmax'].value
         yWidth = result.params['sigmay'].value
+        
         x0 = result.params['centerx'].value
         y0 = result.params['centery'].value
     except ValueError as err:
@@ -82,8 +83,8 @@ run.save_result('Counts', diff.sum())
 run.save_result('MaxCounts', diff.max())
 run.save_result('xWidth', xWidth) 
 run.save_result('yWidth', yWidth) 
-run.save_result('x0', xWidth) 
-run.save_result('y0', yWidth) 
+run.save_result('x0', x0) 
+run.save_result('y0', y0) 
 
 #
 # Now plot the current image as well as the running average
@@ -96,12 +97,15 @@ gs.update(left=0.12, bottom=0.1, top=0.93, wspace=0.2, hspace=0.4, right=0.99)
     
 ax = fig.add_subplot(gs[0,0])
 ax.set_title(r'Current Image', loc='center', fontsize=8, x=0.5, pad=4)
-im = ax.imshow(diff.T, 
+im = ax.imshow(diff, 
                origin='lower',
-               extent=[-xpts/2,xpts/2, -ypts/2,ypts/2])
+               extent=[-xpts/2,xpts/2, -ypts/2,ypts/2]
+               )
 
 if FIT:
-    ax.contour(xvals, yvals, model.eval(x=xy_grids[0], y=xy_grids[1],  params=result.params) )
+    ax.contour(xvals, yvals, 
+               model.eval(x=xy_grids[1], y=xy_grids[0],  params=result.params),
+               levels=3, colors='r')
            
 ax.set_xlabel('X pixel coordinate')
 ax.set_ylabel('Y pixel coordinate')

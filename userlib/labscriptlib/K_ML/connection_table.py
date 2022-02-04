@@ -16,7 +16,7 @@ from labscript_devices.NI_DAQmx.labscript_devices import NI_PCI_6733, NI_USB_622
 from labscript_devices.NovaTechDDS9M import NovaTechDDS9M
 from labscript_devices.IMAQdxCamera.labscript_devices import IMAQdxCamera
 
-from labscript_utils.unitconversions import IntraAction
+import pythonlib.IntraAction as IntraAction
 
 ###############################################################################
 #
