@@ -15,6 +15,7 @@ from labscript_devices.PulseBlasterUSB import PulseBlasterUSB
 from labscript_devices.NI_DAQmx.labscript_devices import NI_PCI_6733, NI_USB_6229, NI_USB_6343
 from labscript_devices.NovaTechDDS9M import NovaTechDDS9M
 from labscript_devices.IMAQdxCamera.labscript_devices import IMAQdxCamera
+from labscript_devices.TekScope.labscript_devices import TekScope
 
 import pythonlib.IntraAction as IntraAction
 import pythonlib.CurrentSupply as CurrentSupply
@@ -78,7 +79,8 @@ ls.AnalogOut(name='ni_pci_01_ao6', parent_device=NI_PCI_01, connection='ao6')
 ls.AnalogOut(name='ni_pci_01_ao7', parent_device=NI_PCI_01, connection='ao7')
 
 
-ls.DigitalOut(name='ScopeTrigger', parent_device=NI_PCI_01, connection='port0/line0')
+ls.Trigger(name='ScopeTrigger', parent_device=NI_PCI_01, connection='port0/line0', 
+           trigger_edge_type='rising')
 ls.DigitalOut(name='UV_DO', parent_device=NI_PCI_01, connection='port0/line1')
 ls.DigitalOut(name='ni_pci_01_do2', parent_device=NI_PCI_01, connection='port0/line2')
 ls.DigitalOut(name='ni_pci_01_do3', parent_device=NI_PCI_01, connection='port0/line3')
@@ -633,6 +635,12 @@ IMAQdxCamera(name='Mako3',
     manual_mode_camera_attributes=Mako_manual_mode_imaqdx_attributes,
     stop_acquisition_timeout=10,
     exception_on_failed_shot=False)
+
+
+TekScope(name='ComputerScope1', 
+         addr='USB0::0x0699::0x03A4::C010346::INSTR', 
+         preamble_string='WFMP')
+
 
 if __name__ == '__main__':
     # Begin issuing labscript primitives

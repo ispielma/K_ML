@@ -44,7 +44,6 @@ class CurrentSupply(UnitConversion):
 
         amps = (volts - self.parameters['V_0']) * self.parameters['A_per_V']
         return amps 
-
     
 class CurrentSupplyBias(CurrentSupply):
     
@@ -56,6 +55,7 @@ class CurrentSupplyBias(CurrentSupply):
             
         if calibration_parameters is None:
             calibration_parameters = {}
+            
         self.parameters = calibration_parameters
         
 

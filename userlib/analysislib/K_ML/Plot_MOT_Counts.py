@@ -13,8 +13,8 @@ import lmfit
 df = lyse.data(n_sequences=1)
 
 
-FIT = True
-X_LABEL = 'time'
+FIT = False # 'exp' # 'loading'
+X_LABEL = 'UV'
 scan = df['scan']
 
 # Let's obtain the dataframe for all of lyse's currently loaded shots:
@@ -27,7 +27,7 @@ yWidth = df['MOT_Basic_Image_Process', 'yWidth']
 x0 = df['MOT_Basic_Image_Process', 'x0']
 y0 = df['MOT_Basic_Image_Process', 'y0']
 
-if FIT:
+if FIT == 'Loading':
     # Now fit to an exponential
     model = lmfit.models.ExpressionModel("amp * (1 - exp(-x / tau))")
     result = model.fit(Counts, 
@@ -41,12 +41,26 @@ if FIT:
                             128)
     
     MOT_Counts_Smooth = model.eval(x=scan_Smooth)
-
+elif FIT == 'exp':
+    # Now fit to an exponential
+    model = lmfit.models.ExpressionModel("amp * exp(-x / tau) + offset")
+    result = model.fit(Counts, 
+                        x=scan, 
+                        amp=Counts.max(), 
+                        offset=0,
+                        tau=1)
+    
+    scan_Smooth = np.linspace(
+                            scan.min(), 
+                            scan.max(), 
+                            128)
+    
+    MOT_Counts_Smooth = model.eval(x=scan_Smooth)
 # Let's plot them against each other:
 
 fig = plt.figure(0,figsize=(7, 3.5))
 gs = fig.add_gridspec(2, 2)
-gs.update(left=0.12, bottom=0.15, top=0.93, wspace=0.2, hspace=0.8, right=0.99) 
+gs.update(left=0.12, bottom=0.15, top=0.93, wspace=0.4, hspace=0.8, right=0.99) 
 
 ax = fig.add_subplot(gs[0,0])
 ax.plot(scan, Counts,'bo')
