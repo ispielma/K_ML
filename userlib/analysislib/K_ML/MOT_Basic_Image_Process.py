@@ -37,8 +37,8 @@ diff = bright.astype(float) - dark.astype(float)
 xpts = diff.shape[1]
 ypts = diff.shape[0]
 
-xvals = np.linspace(-xpts/2, xpts/2, xpts)
-yvals = np.linspace(-ypts/2, ypts/2, ypts)
+xvals = np.linspace(-xpts/2, xpts/2, xpts)*run_globals['Camera_MOT_x_pixel_size']
+yvals = np.linspace(-ypts/2, ypts/2, ypts)*run_globals['Camera_MOT_x_pixel_size']
 xy_grids = np.meshgrid(xvals, yvals)
 
 xWidth = 0
@@ -64,8 +64,8 @@ if FIT:
         
         params['amplitude'].set(value=diff.max(), min=0, max=4096)
                 
-        params['sigmax'].set(value=200, min=10, max=2*xvals.max())
-        params['sigmay'].set(value=200, min=10, max=2*yvals.max())
+        params['sigmax'].set(value=3000, min=100, max=4*xvals.max())
+        params['sigmay'].set(value=3000, min=100, max=4*yvals.max())
 
         result = model.fit(diff.ravel(), x=xy_grids[1].ravel(), y=xy_grids[0].ravel(), 
                            params=params)   
@@ -99,7 +99,7 @@ ax = fig.add_subplot(gs[0,0])
 ax.set_title(r'Current Image', loc='center', fontsize=8, x=0.5, pad=4)
 im = ax.imshow(diff, 
                origin='lower',
-               extent=[-xpts/2,xpts/2, -ypts/2,ypts/2]
+               extent=[xvals.min(),xvals.max(),yvals.min(),yvals.max()]
                )
 
 if FIT:
@@ -107,8 +107,8 @@ if FIT:
                model.eval(x=xy_grids[1], y=xy_grids[0],  params=result.params),
                levels=3, colors='r')
            
-ax.set_xlabel('X pixel coordinate')
-ax.set_ylabel('Y pixel coordinate')
+ax.set_xlabel('X position (um)')
+ax.set_ylabel('Y position (um)')
 
 # Color bar
 ax = fig.add_subplot(gs[0,1])

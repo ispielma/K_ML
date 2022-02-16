@@ -17,6 +17,7 @@ from labscript_devices.NovaTechDDS9M import NovaTechDDS9M
 from labscript_devices.IMAQdxCamera.labscript_devices import IMAQdxCamera
 
 import pythonlib.IntraAction as IntraAction
+import pythonlib.CurrentSupply as CurrentSupply
 
 ###############################################################################
 #
@@ -97,7 +98,8 @@ NI_PCI_6733(
 ls.AnalogOut(name='D2_Repump_AO', parent_device=NI_PCI_02, connection='ao0')
 ls.AnalogOut(name='D2_Repump_FM', parent_device=NI_PCI_02, connection='ao1',
              unit_conversion_class=IntraAction.IntraAction_FM,
-             unit_conversion_parameters={'f_0': 80.23, 'MHz_per_V': 30.49}
+             unit_conversion_parameters={'f_0': D2_Repump_FM_UC_f0, 
+                                         'MHz_per_V': D2_Repump_FM_UC_MHz_per_V}
              )
 ls.AnalogOut(name='D2_Cooling_AO', parent_device=NI_PCI_02, connection='ao2')
 ls.AnalogOut(name='D2_Probe_OP_AO', parent_device=NI_PCI_02, connection='ao3')
@@ -122,10 +124,29 @@ NI_USB_6229(
     clock_terminal='/USB_01/PFI0',
 )
 
-ls.AnalogOut(name='MOT_y_Bias', parent_device=NI_USB_01, connection='ao0')
-ls.AnalogOut(name='MOT_x_z_Bias', parent_device=NI_USB_01, connection='ao1')
-ls.AnalogOut(name='MOT_x_mz_Bias', parent_device=NI_USB_01, connection='ao2')
-ls.AnalogOut(name='MOT_Quad', parent_device=NI_USB_01, connection='ao3')
+ls.AnalogOut(name='MOT_y_Bias', parent_device=NI_USB_01, connection='ao0',
+             unit_conversion_class=CurrentSupply.CurrentSupplyBias,
+             unit_conversion_parameters={'V_0': MOT_y_Bias_UC_V_0, 
+                                         'A_per_V': MOT_y_Bias_UC_A_per_V,
+                                         'G_per_V': MOT_y_Bias_UC_G_per_V}
+             )
+ls.AnalogOut(name='MOT_x_z_Bias', parent_device=NI_USB_01, connection='ao1',
+             unit_conversion_class=CurrentSupply.CurrentSupplyBias,
+             unit_conversion_parameters={'V_0':MOT_x_z_Bias_UC_V_0, 
+                                         'A_per_V': MOT_x_z_Bias_UC_A_per_V,
+                                         'G_per_V': MOT_x_z_Bias_UC_G_per_V}
+             )
+ls.AnalogOut(name='MOT_x_mz_Bias', parent_device=NI_USB_01, connection='ao2',
+             unit_conversion_class=CurrentSupply.CurrentSupplyBias,
+             unit_conversion_parameters={'V_0': MOT_x_mz_Bias_UC_V_0, 
+                                         'A_per_V': MOT_x_mz_Bias_UC_A_per_V,
+                                         'G_per_V':MOT_x_mz_Bias_UC_G_per_V}
+             )
+ls.AnalogOut(name='MOT_Quad', parent_device=NI_USB_01, connection='ao3',
+             unit_conversion_class=CurrentSupply.CurrentSupplyGradient,
+             unit_conversion_parameters={'A_per_V': MOT_Quad_UC_A_per_V,
+                                         'G_per_cm_per_V': MOT_Quad_UC_G_per_cm_per_V}
+             )
 ls.DigitalOut(name='MOT_y_Bias_Disable', parent_device=NI_USB_01, connection='port0/line0')
 ls.DigitalOut(name='MOT_x_z_Bias_Disable', parent_device=NI_USB_01, connection='port0/line1')
 ls.DigitalOut(name='MOT_x_mz_Bias_Disable', parent_device=NI_USB_01, connection='port0/line2')
@@ -153,8 +174,8 @@ NovaTechDDS9M(name='NT_1',
                 com_port='com5',
                 baud_rate=115200,
                 default_baud_rate=19200,
-                phase_mode='aligned', # continuous
-                update_mode='synchronous', # asynchronous
+                phase_mode='aligned', # continuous aligned
+                update_mode='asynchronous', # asynchronous synchronous
                 synchronous_first_line_repeat=False # True
                 )
 

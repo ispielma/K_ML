@@ -34,7 +34,7 @@ def SetDefaults(t):
 
     # NI_PCI_02
     D2_Repump_AO.constant(t, D2_Repump_Volts)
-    D2_Repump_FM.constant(t, D2_Repump_Freq, units='MHz')
+    D2_Repump_FM.constant(t, D2_Repump_Default_Shift, units='MHz')
     D2_Cooling_AO.constant(t, D2_Cooling_Volts)
     D2_Probe_OP_AO.constant(t, 0.0)
 
@@ -67,8 +67,6 @@ def SetDefaults(t):
     # NT_1
     D2_Lock_DDS.setfreq(t, D2_Lock_Freq_MOT)
     D2_Lock_DDS.setamp(t, 1.0) # -80dBm
-    nt1_1.frequency.constant(t, 1e3)
-    nt1_1.amplitude.constant(t, 1.0)
 
 def PrepMOT(t,
             MOT_y_Bias_Prep,
@@ -76,7 +74,7 @@ def PrepMOT(t,
             MOT_x_mz_Bias_Prep,
             MOT_Quad_Prep,
             D2_Lock_Freq_Prep,
-            D2_Repump_Freq_Prep):
+            D2_Repump_Default_Shift_Prep):
 
     MOT_y_Bias.constant(t, MOT_y_Bias_Prep + MOT_y_Bias_0)
     MOT_x_z_Bias.constant(t, MOT_x_z_Bias_Prep + MOT_x_z_Bias_0)
@@ -89,43 +87,28 @@ def PrepMOT(t,
     MOT_Quad_Disable.go_low(t)
 
     D2_Lock_DDS.setfreq(t, D2_Lock_Freq_Prep)
-    D2_Repump_FM.constant(t, D2_Repump_Freq_Prep, units='MHz')
+    D2_Repump_FM.constant(t, D2_Repump_Default_Shift_Prep, units='MHz')
 
     return Time_MOT
 
 def cMOT(t):
 
-    MOT_y_Bias.ramp(t, Time_cMOT, 
-                    MOT_y_Bias_cMOT_Start + MOT_y_Bias_0, 
+    MOT_y_Bias.ramp(t, Time_cMOT, MOT_y_Bias_cMOT_Start + MOT_y_Bias_0, 
                     MOT_y_Bias_cMOT_Stop + MOT_y_Bias_0, RampRate_cMOT)
-    MOT_x_z_Bias.ramp(t, Time_cMOT, 
-                      MOT_x_z_Bias_cMOT_Start + MOT_x_z_Bias_0,  
+    MOT_x_z_Bias.ramp(t, Time_cMOT, MOT_x_z_Bias_cMOT_Start + MOT_x_z_Bias_0,  
                       MOT_x_z_Bias_cMOT_Stop + MOT_x_z_Bias_0, RampRate_cMOT)
-    MOT_x_mz_Bias.ramp(t, Time_cMOT, 
-                       MOT_x_mz_Bias_cMOT_Start + MOT_x_mz_Bias_0, 
+    MOT_x_mz_Bias.ramp(t, Time_cMOT, MOT_x_mz_Bias_cMOT_Start + MOT_x_mz_Bias_0, 
                        MOT_x_mz_Bias_cMOT_Stop + MOT_x_mz_Bias_0, RampRate_cMOT)
     
-    MOT_Quad.ramp(t, Time_cMOT,
-                  MOT_Quad_cMOT_Start,
-                  MOT_Quad_cMOT_Stop,
-                  RampRate_cMOT)
+    MOT_Quad.constant(t, MOT_Quad_cMOT)
 
-    D2_Repump_FM.ramp(t, Time_cMOT, 
-                      D2_Repump_Freq_cMOT_Start, 
-                      D2_Repump_Freq_cMOT_Stop, 
-                      RampRate_cMOT, units='MHz')
+    D2_Repump_FM.constant(t, D2_Repump_Default_Shift_cMOT, units='MHz')
 
     # Cooling Detuning ramp
-    D2_Lock_DDS.frequency.ramp(t, Time_cMOT,
-                               D2_Lock_Freq_cMOT_Start, 
-                               D2_Lock_Freq_cMOT_Stop, 
-                               RampRate_cMOT)
+    D2_Lock_DDS.frequency.ramp(t, Time_cMOT, D2_Lock_Freq_cMOT_Start, D2_Lock_Freq_cMOT_Stop, RampRate_cMOT)
 
     # Repump intensity ramp
-    D2_Repump_AO.ramp(t, Time_cMOT, 
-                      D2_Repump_Volts_cMOT_Start, 
-                      D2_Repump_Volts_cMOT_Stop, 
-                      RampRate_cMOT)
+    D2_Repump_AO.ramp(t, Time_cMOT, D2_Repump_Volts_cMOT_Start, D2_Repump_Volts_cMOT_Start, RampRate_cMOT)
 
 
     return Time_cMOT
@@ -135,32 +118,21 @@ def Molasses(t):
     MOT_y_Bias.constant(t, MOT_y_Bias_Mol + MOT_y_Bias_0)
     MOT_x_z_Bias.constant(t, MOT_x_z_Bias_Mol + MOT_x_z_Bias_0)
     MOT_x_mz_Bias.constant(t,MOT_x_mz_Bias_Mol + MOT_x_mz_Bias_0)
-    MOT_Quad.ramp(t, Time_Mol/10, MOT_Quad_cMOT_Stop, 
-                  0, RampRate_Mol)
-    # MOT_Quad_Disable.go_high(t+Time_Mol/10)
+    MOT_Quad.constant(t, 0)
 
     # Cooling Detuning ramp
-    D2_Lock_DDS.frequency.ramp(t, Time_Mol, 
-                               D2_Lock_Freq_Mol_Start, 
-                               D2_Lock_Freq_Mol_Stop, 
-                               RampRate_Mol)
+    D2_Lock_DDS.frequency.ramp(t, Time_Mol, D2_Lock_Freq_Mol_Start, D2_Lock_Freq_Mol_Stop, RampRate_Mol)
 
     # Cooling intensity ramp
-    D2_Cooling_AO.ramp(t, Time_Mol, 
-                       D2_Cooling_Volts_Mol_Start, 
-                       D2_Cooling_Volts_Mol_Stop,
-                       RampRate_Mol)
+    D2_Cooling_AO.ramp(t, Time_Mol, D2_Cooling_Volts_Mol_Start, D2_Cooling_Volts_Mol_Stop, RampRate_Mol)
 
     # Repump Detuning ramp
-    D2_Repump_FM.ramp(t, Time_Mol, 
-                      D2_Repump_Freq_Mol_Start,
-                      D2_Repump_Freq_Mol_Stop, RampRate_Mol, units='MHz')
+    D2_Repump_FM.ramp(t, Time_Mol, D2_Repump_Default_Shift_Mol_Start, D2_Repump_Default_Shift_Mol_Stop, RampRate_Mol, units='MHz')
 
     # Repump intensity ramp
-    D2_Repump_AO.ramp(t, Time_Mol,
-                      D2_Repump_Volts_Mol_Start,
-                      D2_Repump_Volts_Mol_Stop, 
-                      RampRate_Mol)
+    D2_Repump_AO.ramp(t, Time_Mol, D2_Repump_Volts_Mol_Start, D2_Repump_Volts_Mol_Start, RampRate_Mol)
+
+
 
     return Time_Mol
 
@@ -184,7 +156,7 @@ PrepMOT(t,
         MOT_x_mz_Bias_Prep=MOT_x_mz_Bias_MOT,
         MOT_Quad_Prep=0,
         D2_Lock_Freq_Prep=D2_Lock_Freq_MOT,
-        D2_Repump_Freq_Prep=D2_Repump_Freq)
+        D2_Repump_Default_Shift_Prep=D2_Repump_Default_Shift)
 
 # Turn on MOT beam.
 D2_Repump_DO.go_low(t)
@@ -199,13 +171,15 @@ D2_Cooling_DO.go_high(t)
 
 t += 10e-3
 
+
+ls.add_time_marker(t, "Load MOT", verbose=True)
 t += PrepMOT(t,
         MOT_y_Bias_Prep=MOT_y_Bias_MOT,
         MOT_x_z_Bias_Prep=MOT_x_z_Bias_MOT,
         MOT_x_mz_Bias_Prep=MOT_x_mz_Bias_MOT,
         MOT_Quad_Prep=MOT_Quad_MOT,
         D2_Lock_Freq_Prep=D2_Lock_Freq_MOT,
-        D2_Repump_Freq_Prep=D2_Repump_Freq)
+        D2_Repump_Default_Shift_Prep=D2_Repump_Default_Shift)
 
 #
 # Apply UV
@@ -218,87 +192,78 @@ t += PrepMOT(t,
 # cMOT
 #
 
-t += cMOT(t)
+# t += cMOT(t)
 
 #
 # Optical Molassas (sub Doppler cooling!)
 #
 
-ScopeTrigger.go_high(t)
-t += Molasses(t)
-ScopeTrigger.go_low(t)
+# t += Molasses(t)
 
-# Get ready for imaging
 
 # Fl imaging
 D2_Repump_DO.go_low(t)
 D2_Cooling_DO.go_low(t)
-D2_Cooling_AO.constant(t, 0.0)
+D2_Cooling_AO.constant(t, 0)
 
 D2_Probe_1_Sh.go_high(t-5e-3)
 D2_Probe_OP_DO.go_low(t)
 D2_Probe_OP_AO.constant(t, 0)
 
 PrepMOT(t,
-        MOT_y_Bias_Prep=MOT_y_Bias_Imaging,
-        MOT_x_z_Bias_Prep=MOT_x_z_Bias_Imaging,
-        MOT_x_mz_Bias_Prep=MOT_x_mz_Bias_Imaging,
+        MOT_y_Bias_Prep=0,
+        MOT_x_z_Bias_Prep=0,
+        MOT_x_mz_Bias_Prep=0,
         MOT_Quad_Prep=0,
         D2_Lock_Freq_Prep=D2_Lock_Freq_Imaging,
-        D2_Repump_Freq_Prep=D2_Repump_Freq_Imaging)
+        D2_Repump_Default_Shift_Prep=D2_Repump_Default_Shift)
 
-# TOF!
-
-MOT_Quad_Disable.go_high(t)
-
+# # TOF!
 t += TOF_Time
 
 # Image!
-ls.add_time_marker(t, "Snap bright frame", verbose=True)
+ls.add_time_marker(t, "Image", verbose=True)
 
+# Turn on Probe
 D2_Repump_DO.go_high(t)
-D2_Cooling_DO.go_high(t)
 D2_Repump_AO.constant(t, D2_Repump_Volts_Imaging)
-D2_Cooling_AO.constant(t, D2_Cooling_Volts)
 D2_Probe_OP_DO.go_high(t)
-D2_Probe_OP_AO.constant(t, D2_Cooling_Volts_Imaging)
+D2_Probe_OP_AO.constant(t, 0.1)
 
 MOT_x.expose(t, 'fluorescence', frametype='bright', trigger_duration=MOT_Fl_Exposure)
-t+= MOT_Fl_Exposure
 
-D2_Repump_DO.go_low(t)
-D2_Cooling_DO.go_low(t)
-D2_Repump_AO.constant(t, 0)
-D2_Cooling_AO.constant(t, 0)
+# Turn off probe beam
 D2_Probe_OP_DO.go_low(t)
 D2_Probe_OP_AO.constant(t, 0.0)
+D2_Probe_1_Sh.go_low(t)
 
-t += 30*ms
+
+t+= 30*ms
 
 #
 # Snap a dark frame
 #
 ls.add_time_marker(t, "Snap dark frame", verbose=True)
 
+# Turn on Probe
 D2_Repump_DO.go_high(t)
-D2_Cooling_DO.go_high(t)
 D2_Repump_AO.constant(t, D2_Repump_Volts_Imaging)
-D2_Cooling_AO.constant(t, D2_Cooling_Volts)
 D2_Probe_OP_DO.go_high(t)
-D2_Probe_OP_AO.constant(t, D2_Cooling_Volts_Imaging)
+D2_Probe_OP_AO.constant(t, 0.1)
 
 MOT_x.expose(t, 'fluorescence', frametype='dark', trigger_duration=MOT_Fl_Exposure)
-t += MOT_Fl_Exposure
-
-D2_Repump_DO.go_low(t)
-D2_Cooling_DO.go_low(t)
-D2_Repump_AO.constant(t, 0)
-D2_Cooling_AO.constant(t, 0)
+# Turn off probe beam
 D2_Probe_OP_DO.go_low(t)
 D2_Probe_OP_AO.constant(t, 0.0)
+D2_Probe_1_Sh.go_low(t)
+
 
 t += 30*ms
 
+# Turn off probe beam
+D2_Probe_OP_DO.go_low(t)
+D2_Probe_OP_AO.constant(t, 0.0)
+D2_Probe_1_Sh.go_low(t)
 
 #
 # Set Dafault state
