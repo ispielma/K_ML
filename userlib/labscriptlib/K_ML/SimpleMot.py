@@ -19,13 +19,11 @@ t = ls.start()
 #
 # Set Dafault state
 #
-
 t += st.SetDefaults(t)
 
 #
 # UV MOT
 #
-
 t += st.MOT(t, Time_UV_MOT,
         MOT_y_Bias_MOT,
         MOT_x_z_Bias_MOT,
@@ -34,12 +32,12 @@ t += st.MOT(t, Time_UV_MOT,
         D2_Lock_Freq_MOT,
         D2_Repump_Freq,
         UV=MOT_UV,
-        DelayLight=10e-3)
+        DelayLight=10e-3,
+        stage_label='UV')
 
 #
 # MOT
 #
-
 t += st.MOT(t, Time_MOT,
         MOT_y_Bias_MOT,
         MOT_x_z_Bias_MOT,
@@ -53,13 +51,11 @@ t += st.MOT(t, Time_MOT,
 #
 # cMOT
 #
-
 t += st.cMOT(t)
 
 #
 # Optical Molassas (sub Doppler cooling!)
 #
-
 ScopeTrigger.trigger(t, 1e-3)
 t += st.Molasses(t)
 
@@ -82,7 +78,7 @@ t += st.MOT_Cell_TOF(t)
 #
 # With atoms imaging
 #
-t += FloImage(t,
+t += st.FloImage(t,
         MOT_x,
         MOT_Fl_Exposure,
         Mako_Download_Time,
@@ -96,7 +92,7 @@ t += FloImage(t,
 #
 # No atoms imaging
 #
-t += FloImage(t,
+t += st.FloImage(t,
         MOT_x,
         MOT_Fl_Exposure,
         Mako_Download_Time,

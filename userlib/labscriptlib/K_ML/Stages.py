@@ -7,7 +7,7 @@ Created on Wed Feb 16 11:04:54 2022
 
 from labscriptlib.common.utilities import stage
 
-def SetDefaults(t, mode='Startup'):
+def SetDefaults(t, mode='Startup', **kwargs):
     """
     Here we  set the default starting and ending state for the experiment.
 
@@ -80,7 +80,8 @@ def MOT(t, duration,
             D2_Lock_Freq,
             D2_Repump_Freq,
             UV=False,
-            DelayLight=0):
+            DelayLight=0,
+            **kwargs):
     """
     This function will run a basic MOT with a range of settings
     """
@@ -115,7 +116,7 @@ def MOT(t, duration,
     return duration
 
 @stage
-def cMOT(t):
+def cMOT(t, **kwargs):
 
     MOT_y_Bias.ramp(t, Time_cMOT, 
                     MOT_y_Bias_cMOT_Start, 
@@ -153,7 +154,7 @@ def cMOT(t):
     return Time_cMOT
 
 @stage
-def Molasses(t):
+def Molasses(t, **kwargs):
 
     MOT_y_Bias.constant(t, MOT_y_Bias_Mol, units='A')
     MOT_x_z_Bias.constant(t, MOT_x_z_Bias_Mol, units='A')
@@ -188,7 +189,7 @@ def Molasses(t):
     return Time_Mol
 
 @stage
-def OpticalPump(t):
+def OpticalPump(t, **kwargs):
     """
     Optical pumping between Molasses and magnetic trapping
     """
@@ -197,7 +198,7 @@ def OpticalPump(t):
     return Time_OP
 
 @stage
-def MagneticTrapCapture(t):
+def MagneticTrapCapture(t, **kwargs):
     MOT_Quad_Disable.go_low(t)
     MOT_Quad.constant(t, MOT_Quad_Capture, units='A')
     
@@ -212,7 +213,7 @@ def MagneticTrapCapture(t):
     return Capture_Hold_Time
 
 @stage
-def MOT_Cell_TOF(t):
+def MOT_Cell_TOF(t, **kwargs):
 
     # Get fields ready for TOF
     MOT_y_Bias.constant(t, MOT_y_Bias_Imaging, units='A')
@@ -243,7 +244,8 @@ def FloImage(t,
                 AnalogDevices=[],
                 AnalogValues=[],
                 CloseShutters=True,
-                frametype='bright'):
+                frametype='bright',
+                **kwargs):
     """
     General use function for Fluorescence imaging
     
