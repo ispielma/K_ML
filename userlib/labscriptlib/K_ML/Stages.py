@@ -235,7 +235,7 @@ def MOT_Cell_TOF(t, **kwargs):
     return TOF_Time
 
 @stage 
-def FloImage(t,
+def SimpleImage(t,
                 cameras,
                 trigger_duration,
                 download_time,
@@ -244,10 +244,11 @@ def FloImage(t,
                 AnalogDevices=[],
                 AnalogValues=[],
                 CloseShutters=True,
+                mode='fluorescence',
                 frametype='bright',
                 **kwargs):
     """
-    General use function for Fluorescence imaging
+    General use function for simple imaging
     
     In many cases set CloseShutters=False until the last image.
     """
@@ -262,7 +263,7 @@ def FloImage(t,
         Device.constant(t, Value)
     
     for camera in cameras:
-        camera.expose(t, 'fluorescence', 
+        camera.expose(t, mode, 
                       frametype=frametype, 
                       trigger_duration=trigger_duration)
         
