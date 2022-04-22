@@ -27,6 +27,13 @@ run_globals = run.get_globals()
 # Extract the images 'before' and 'after' generated from camera.expose
 dark, bright = run.get_images('MOT_x', 'fluorescence', 'dark', 'bright')
 
+# Try to get scope traces
+try:
+    ScopeTraces = run.get_trace('ComputerScope1', raw_data=True)
+    print('GotScope')
+except:
+    ScopeTraces = None
+
 # Compute the difference of the two images, after casting them to signed integers
 # (otherwise negative differences wrap to 2**16 - 1 - diff)
 diff = bright.astype(float) - dark.astype(float)

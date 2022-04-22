@@ -16,6 +16,7 @@ from labscript_devices.NI_DAQmx.labscript_devices import NI_PCI_6733, NI_USB_622
 from labscript_devices.NovaTechDDS9M import NovaTechDDS9M
 from labscript_devices.IMAQdxCamera.labscript_devices import IMAQdxCamera
 from labscript_devices.TekScope.labscript_devices import TekScope
+from user_devices.Arduino_Interlock.labscript_user_devices import Arduino_Interlock
 
 import pythonlib.IntraAction as IntraAction
 import pythonlib.CurrentSupply as CurrentSupply
@@ -84,9 +85,9 @@ ls.Trigger(name='ScopeTrigger', parent_device=NI_PCI_01, connection='port0/line0
 ls.DigitalOut(name='UV_DO', parent_device=NI_PCI_01, connection='port0/line1')
 ls.DigitalOut(name='ni_pci_01_do2', parent_device=NI_PCI_01, connection='port0/line2')
 ls.DigitalOut(name='ni_pci_01_do3', parent_device=NI_PCI_01, connection='port0/line3')
-ls.DigitalOut(name='ni_pci_01_do4', parent_device=NI_PCI_01, connection='port0/line4')
 
-ls.Trigger(name='MOT_Camera_Trigger', parent_device=NI_PCI_01, connection='port0/line5')
+ls.Trigger(name='MOT_Camera_Trigger', parent_device=NI_PCI_01, connection='port0/line4')
+ls.Trigger(name='MOT_z_Camera_Trigger', parent_device=NI_PCI_01, connection='port0/line5')
 ls.Trigger(name='MOT_x_Camera_Trigger', parent_device=NI_PCI_01, connection='port0/line6')
 ls.Trigger(name='MOT_y_Camera_Trigger', parent_device=NI_PCI_01, connection='port0/line7')
 
@@ -164,6 +165,8 @@ ls.AnalogOut(name='ni_usb_02_ao0', parent_device=NI_USB_02, connection='ao0')
 ls.AnalogOut(name='ni_usb_02_ao1', parent_device=NI_USB_02, connection='ao1')
 ls.DigitalOut(name='ni_usb_02_do0', parent_device=NI_USB_02, connection='port0/line0')
 ls.DigitalOut(name='ni_usb_02_d01', parent_device=NI_USB_02, connection='port0/line1')
+ls.DigitalOut(name='ni_usb_02_d02', parent_device=NI_USB_02, connection='port0/line2')
+ls.DigitalOut(name='ni_usb_02_d03', parent_device=NI_USB_02, connection='port0/line3')
 
 ###############################################################################
 #
@@ -613,8 +616,8 @@ IMAQdxCamera(name='MOT_x',
     exception_on_failed_shot=False)
 
 #'MOT_???' camera
-IMAQdxCamera(name='Mako2',
-    parent_device=MOT_Camera_Trigger,
+IMAQdxCamera(name='MOT_z',
+    parent_device=MOT_z_Camera_Trigger,
     connection='trigger',
     trigger_edge_type='rising',
     orientation = 'Mako2',
@@ -637,9 +640,13 @@ IMAQdxCamera(name='Mako3',
     exception_on_failed_shot=False)
 
 
-TekScope(name='ComputerScope1', 
-         addr='USB0::0x0699::0x03A4::C010346::INSTR', 
-         preamble_string='WFMP')
+# TekScope(name='ComputerScope1', 
+#          addr='USB0::0x0699::0x03A4::C010346::INSTR', 
+#          preamble_string='WFMP')
+
+Arduino_Interlock( name = 'Arduino_Interlock',
+          addr='ASRL20::INSTR', 
+          timeout = 10)
 
 
 if __name__ == '__main__':

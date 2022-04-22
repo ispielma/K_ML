@@ -236,7 +236,7 @@ def MOT_Cell_TOF(t, **kwargs):
 
 @stage 
 def FloImage(t,
-                camera,
+                cameras,
                 trigger_duration,
                 download_time,
                 ShutterDevices=[],
@@ -261,9 +261,11 @@ def FloImage(t,
     for (Device, Value) in zip(AnalogDevices, AnalogValues):
         Device.constant(t, Value)
     
-    camera.expose(t, 'fluorescence', 
-                  frametype=frametype, 
-                  trigger_duration=trigger_duration)
+    for camera in cameras:
+        camera.expose(t, 'fluorescence', 
+                      frametype=frametype, 
+                      trigger_duration=trigger_duration)
+        
     t += trigger_duration
     
     if CloseShutters:

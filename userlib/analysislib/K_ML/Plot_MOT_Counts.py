@@ -13,7 +13,7 @@ import lmfit
 df = lyse.data(n_sequences=1)
 
 
-FIT = False # 'exp' # 'loading'
+FIT = 'exp' # 'exp' # 'loading'
 X_LABEL = 'UV'
 scan = df['scan']
 

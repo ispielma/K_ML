@@ -68,7 +68,7 @@ t += st.OpticalPump(t)
 # Capture in quadrupole trap!
 #
 
-# t += st.MagneticTrapCapture(t)
+t += st.MagneticTrapCapture(t)
 
 #
 # TOF
@@ -79,7 +79,7 @@ t += st.MOT_Cell_TOF(t)
 # With atoms imaging
 #
 t += st.FloImage(t,
-        MOT_x,
+        [MOT_x, MOT_z],
         MOT_Fl_Exposure,
         Mako_Download_Time,
         ShutterDevices=[D2_Repump_Sh, D2_Cooling_Sh, D2_Probe_1_Sh],
@@ -93,7 +93,7 @@ t += st.FloImage(t,
 # No atoms imaging
 #
 t += st.FloImage(t,
-        MOT_x,
+        [MOT_x, MOT_z],
         MOT_Fl_Exposure,
         Mako_Download_Time,
         ShutterDevices=[D2_Repump_Sh, D2_Cooling_Sh, D2_Probe_1_Sh],
@@ -102,6 +102,10 @@ t += st.FloImage(t,
         AnalogValues=[D2_Repump_Volts_Imaging, D2_Cooling_Volts_Imaging, D2_Cooling_Volts_Imaging],
         CloseShutters=True,
         frametype='dark')
+
+# Plan: rewrite so as to do absorption imaging after TOF and to grab two FL images
+# at the end of the MOT loading for number diagnostic.
+
 
 #
 # Set Dafault state
