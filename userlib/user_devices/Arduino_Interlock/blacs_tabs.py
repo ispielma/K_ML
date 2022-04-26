@@ -12,10 +12,12 @@ from blacs.tab_base_classes import define_state
 from blacs.tab_base_classes import MODE_MANUAL, MODE_TRANSITION_TO_BUFFERED, MODE_TRANSITION_TO_MANUAL, MODE_BUFFERED  
 
 import os
+import sys
 import threading, time
 from qtutils import UiLoader#, inmain_decorator
 import qtutils.icons
 from qtutils.qt import QtWidgets, QtGui, QtCore
+import pyqtgraph as pg
 
 class Arduino_Interlock_Tab(DeviceTab):
 
@@ -24,7 +26,7 @@ class Arduino_Interlock_Tab(DeviceTab):
 
          # # Load monitor UI
          ui_filepath = os.path.join(
-             os.path.dirname(os.path.realpath(__file__)), 'interlock.ui'
+             os.path.dirname(os.path.realpath(__file__)), 'interlock_graph.ui'
          )
          self.ui = UiLoader().load(ui_filepath)
          
@@ -32,14 +34,59 @@ class Arduino_Interlock_Tab(DeviceTab):
          self.contin_on = False
          self.shot_read = False
          self.temp_check_flag = False
+         self.con_toggle = True
+         self.mon_toggle = True
+         self.gra_toggle = True
          self.loop_time = 0
          self.set_setpoint_vals = []
          self.adjust = []
          self.setpoint = []
          self.temp = []
+         self.plot_temp_ch1 = []
+         self.plot_temp_ch2 = []
+         self.plot_temp_ch3 = []
+         self.plot_temp_ch4 = []
+         self.plot_temp_ch5 = []
+         self.plot_time = []
+         self.plot_start = 0
+         
          layout.addWidget(self.ui)
+         self.graph_widget = self.ui.graph_widget
+         #layout.addWidget(self.graphWidget)
+         #self.setCentralWidget(self.graphWidget)
+         #self.graphWidget.plot([1,2,3,4,5], [16.5,17.5,18,16,17])
+         
+         # define the data
+         title = "Temperature Graph"
+         # y values to plot by line 1
+         y = [1,1,1,1,1,1,1,1,1,1]
+         # y values to plot by line 2
+         #y2 = [3, 1, 5, 8, 9, 11, 16, 17, 14, 16]
+         x = range(10)
+         
+         # create plot window object
+         plt = self.graph_widget 
+         plt.showGrid(x = True, y = True)
+         plt.addLegend()
+         plt.setLabel('left', 'Temperature', units ='degC')
+         plt.setLabel('bottom', 'Time', units ='sec')
+         plt.setTitle(title)
+         self.ch_1_ref = self.graph_widget.plot(self.plot_time, self.plot_temp_ch1, pen ='r',# symbol = 'o', symbolPen = 'r', symbolBrush = 0.05, 
+                                name ='Ch_1')
+         self.ch_2_ref = self.graph_widget.plot(self.plot_time, self.plot_temp_ch2, pen ='y',# symbol = 'o', symbolPen = 'y', symbolBrush = 0.05, 
+                                name ='Ch_2')
+         self.ch_3_ref = self.graph_widget.plot(self.plot_time, self.plot_temp_ch3, pen ='g',# symbol = 'o', symbolPen = 'g', symbolBrush = 0.05,
+                                name ='Ch_3')
+         self.ch_4_ref = self.graph_widget.plot(self.plot_time, self.plot_temp_ch4, pen ='c',# symbol = 'o', symbolPen = 'c', symbolBrush = 0.05,
+                                name ='Ch_4')
+         self.ch_5_ref = self.graph_widget.plot(self.plot_time, self.plot_temp_ch5, pen ='b',# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
+                                name ='Ch_5')
          
          # # Connect signals for buttons
+         self.ui.interlock_controls.clicked.connect(self.interlock_controls_clicked)
+         self.ui.channel_monitor.clicked.connect(self.channel_monitor_clicked)
+         self.ui.temp_graph.clicked.connect(self.temp_graph_clicked)
+         
          self.ui.digital_lock.clicked.connect(self.lock_clicked)    
          self.ui.digital_reset.clicked.connect(self.reset_clicked)
          
@@ -65,7 +112,13 @@ class Arduino_Interlock_Tab(DeviceTab):
          self.ui.start_continuous.setToolTip('Periodic Updating of the Interlock Status and Thermocouple Temps')
          self.ui.stop_continuous.setIcon(QtGui.QIcon(':/qtutils/fugue/control-stop-square'))
          self.ui.start_continuous.setToolTip('Will Cease Periodic Updating of the Interlock Status and Thermocouple Temps')
-  
+         self.ui.interlock_controls.setIcon(QtGui.QIcon(':/qtutils/fugue/toggle-small'))
+         self.ui.interlock_controls.setToolTip('Click to hide')
+         self.ui.channel_monitor.setIcon(QtGui.QIcon(':/qtutils/fugue/toggle-small'))
+         self.ui.channel_monitor.setToolTip('Click to hide')
+         self.ui.temp_graph.setIcon(QtGui.QIcon(':/qtutils/fugue/toggle-small'))
+         self.ui.temp_graph.setToolTip('Click to hide')
+    
          #Adds the temperature channel labels as items in a list for convenient calling
          self.temp.append(self.ui.chan_1_temp)
          self.temp.append(self.ui.chan_2_temp)
@@ -151,6 +204,7 @@ class Arduino_Interlock_Tab(DeviceTab):
              self.adjust[ch].hide()
          
          self.ui.stop_continuous.hide()
+         self.ui.push_widg.hide()
          
          #since labels have no attribute "label.setIcon", create a pixelmap of the desired icon and set pixelmap 
          icon = QtGui.QIcon(':/qtutils/fugue/question')
@@ -198,6 +252,47 @@ class Arduino_Interlock_Tab(DeviceTab):
         # time.sleep(2)
         # self.initial_grab()
 
+
+    def plot(self, time, temp):    
+        self.graphWidget.plot(time, temp)
+
+    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+    def interlock_controls_clicked(self, button):
+        if self.con_toggle:
+            self.ui.control_box.hide()
+            self.con_toggle = False
+            self.ui.interlock_controls.setToolTip('Click to show')
+        else:
+            self.ui.control_box.show()
+            self.con_toggle = True
+            self.ui.interlock_controls.setToolTip('Click to hide')
+
+
+    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+    def channel_monitor_clicked(self, button):
+        if self.mon_toggle:
+            self.ui.monitor_box.hide()
+            self.mon_toggle = False
+            self.ui.channel_monitor.setToolTip('Click to show')
+        else:
+            self.ui.monitor_box.show()
+            self.mon_toggle = True
+            self.ui.channel_monitor.setToolTip('Click to hide')
+       
+
+    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+    def temp_graph_clicked(self, button):
+        if self.gra_toggle:
+            self.ui.graph_widget.hide()
+            self.ui.push_widg.show()
+            self.gra_toggle = False
+            self.ui.temp_graph.setToolTip('Click to show')
+        else:
+            self.ui.graph_widget.show()
+            self.ui.push_widg.hide()
+            self.gra_toggle = True
+            self.ui.temp_graph.setToolTip('Click to hide')
+             
         
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
     def lock_clicked(self, button):
@@ -416,43 +511,7 @@ class Arduino_Interlock_Tab(DeviceTab):
     def send_new_setpoints(self):
         print('Sending New Setpoints...')
         set_send = yield(self.queue_work(self._primary_worker,'set_setpoints', self.set_setpoint_vals))
-        
-        # for ch in range(self.numSensors):
-        #     chName = ch+1
-        #     self.setpoint[ch].setText('%s C' %(set_send[str(chName)]))
-        # self.ui.chan_1_setpoint.setText('%s C' %(set_update['1']))
-        # self.ui.chan_2_setpoint.setText('%s C' %(set_update['2']))
-        # self.ui.chan_3_setpoint.setText('%s C' %(set_update['3']))
-        # self.ui.chan_4_setpoint.setText('%s C' %(set_update['4']))
-        # self.ui.chan_5_setpoint.setText('%s C' %(set_update['5']))
-        # self.ui.chan_6_setpoint.setText('%s C' %(set_update['6']))
-        # self.ui.chan_7_setpoint.setText('%s C' %(set_update['7']))
-        # self.ui.chan_8_setpoint.setText('%s C' %(set_update['8']))
-        # self.ui.chan_9_setpoint.setText('%s C' %(set_update['9']))
-        # self.ui.chan_10_setpoint.setText('%s C' %(set_update['10']))
-        # self.ui.chan_11_setpoint.setText('%s C' %(set_update['11']))
-        # self.ui.chan_12_setpoint.setText('%s C' %(set_update['12']))
-        # self.ui.chan_13_setpoint.setText('%s C' %(set_update['13']))
-        # self.ui.chan_14_setpoint.setText('%s C' %(set_update['14']))
-        # self.ui.chan_15_setpoint.setText('%s C' %(set_update['15']))
-        # self.ui.chan_16_setpoint.setText('%s C' %(set_update['16']))
-        
-        # self.ui.chan_1_adjust.setValue(set_update['1'])
-        # self.ui.chan_2_adjust.setValue(set_update['2'])
-        # self.ui.chan_3_adjust.setValue(set_update['3'])
-        # self.ui.chan_4_adjust.setValue(set_update['4'])
-        # self.ui.chan_5_adjust.setValue(set_update['5'])
-        # self.ui.chan_6_adjust.setValue(set_update['6'])
-        # self.ui.chan_7_adjust.setValue(set_update['7'])
-        # self.ui.chan_8_adjust.setValue(set_update['8'])
-        # self.ui.chan_9_adjust.setValue(set_update['9'])
-        # self.ui.chan_10_adjust.setValue(set_update['10'])
-        # self.ui.chan_11_adjust.setValue(set_update['11'])
-        # self.ui.chan_12_adjust.setValue(set_update['12'])
-        # self.ui.chan_13_adjust.setValue(set_update['13'])
-        # self.ui.chan_14_adjust.setValue(set_update['14'])
-        # self.ui.chan_15_adjust.setValue(set_update['15'])
-        # self.ui.chan_16_adjust.setValue(set_update['16'])    
+           
 
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
     def send_default_setpoints(self):
@@ -487,6 +546,18 @@ class Arduino_Interlock_Tab(DeviceTab):
             pixmap = icon.pixmap(QtCore.QSize(16, 16))
             self.ui.status_icon.setPixmap(pixmap)
             self.ui.status_update.setText('%s' %(intlock_trigger))
+        #create plot of ch1-ch5 temp    
+        self.plot_temp_ch1.append(temp_up['1'])
+        self.plot_temp_ch2.append(temp_up['2'])
+        self.plot_temp_ch3.append(temp_up['3'])
+        self.plot_temp_ch4.append(temp_up['4'])
+        self.plot_temp_ch5.append(temp_up['5'])
+        self.plot_time.append(int(time.time()-self.plot_start))
+        self.ch_1_ref.setData(self.plot_time, self.plot_temp_ch1)
+        self.ch_2_ref.setData(self.plot_time, self.plot_temp_ch2)
+        self.ch_3_ref.setData(self.plot_time, self.plot_temp_ch3)
+        self.ch_4_ref.setData(self.plot_time, self.plot_temp_ch4)
+        self.ch_5_ref.setData(self.plot_time, self.plot_temp_ch5)
     
 
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)
@@ -520,7 +591,7 @@ class Arduino_Interlock_Tab(DeviceTab):
         self.start_continuous()
         self.contin_on = True
         if self.temp_check_flag == False:
-           # self.initial_grab()
+            self.initial_grab()
             self.check_thread = threading.Thread(
                 target=self.continuous_loop, args=(), daemon=True
                 )
@@ -544,10 +615,6 @@ class Arduino_Interlock_Tab(DeviceTab):
     @define_state(MODE_MANUAL, True)
     def start_continuous(self):
         yield(self.queue_work(self._primary_worker,'start_continuous'))
-        # while self.contin_on:
-        #     if self.temp_check_flag:
-        #         self.temp_update()
-        #         self.temp_check_flag = False
     
     
     @define_state(MODE_MANUAL|MODE_BUFFERED|MODE_TRANSITION_TO_BUFFERED|MODE_TRANSITION_TO_MANUAL, True)
@@ -557,6 +624,7 @@ class Arduino_Interlock_Tab(DeviceTab):
     
     def continuous_loop(self):
         interval=5
+        self.plot_start = time.time()
         while True:
             self.shot_read_check()
             #if (time.time() - self.loop_time) > interval:
