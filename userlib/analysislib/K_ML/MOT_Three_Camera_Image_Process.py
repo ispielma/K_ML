@@ -5,6 +5,15 @@ import os
 import matplotlib.pyplot as plt
 import traceback
 
+def AbsImg(atoms, bright, dark):
+    a = atoms - dark
+    b = bright - dark
+    
+    a[a<1] = 1
+    b[b<1] = 1
+    
+    return -np.log(a/b)
+
 FIT = True
 
 # Is this script being run from within an interactive lyse session?
@@ -49,8 +58,7 @@ MOT_x_images['cMOT_diff'] = MOT_x_images['cMOT'].astype(float) - MOT_x_images['c
 MOT_z_images['MOT_diff'] = MOT_z_images['MOT'].astype(float) - MOT_z_images['MOT_dark'].astype(float)
 MOT_z_images['cMOT_diff'] = MOT_z_images['cMOT'].astype(float) - MOT_z_images['cMOT_dark'].astype(float)
 
-MOT_y_images['MOT_TOF_OD'] = -np.log((MOT_y_images['MOT_TOF'].astype(float) - MOT_y_images['MOT_TOF_dark'].astype(float)) / 
-                                     (MOT_y_images['MOT_TOF_probe'].astype(float) - MOT_y_images['MOT_TOF_dark'].astype(float)) )
+MOT_y_images['MOT_TOF_OD'] = AbsImg(MOT_y_images['MOT_TOF'].astype(float), MOT_y_images['MOT_TOF_probe'].astype(float), MOT_y_images['MOT_TOF_dark'].astype(float) )
 
 
 #
@@ -68,9 +76,9 @@ im = ax.imshow(MOT_x_images['MOT_diff'],
                origin='lower',
                # extent=[xvals.min(),xvals.max(),yvals.min(),yvals.max()]
                )
-ax.set_xlabel('X position (um)'); ax.set_ylabel('Y position (um)')
+ax.set_ylabel('Y position (um)')
 
-ax = fig.add_subplot(gs[0,1])
+ax = fig.add_subplot(gs[1,0])
 ax.set_title(r'x cMOT', loc='center', fontsize=8, x=0.5, pad=4)
 im = ax.imshow(MOT_x_images['cMOT_diff'], 
                origin='lower',
@@ -78,13 +86,12 @@ im = ax.imshow(MOT_x_images['cMOT_diff'],
                )
 ax.set_xlabel('X position (um)'); ax.set_ylabel('Y position (um)')
 
-ax = fig.add_subplot(gs[1,0])
+ax = fig.add_subplot(gs[0,1])
 ax.set_title(r'z MOT', loc='center', fontsize=8, x=0.5, pad=4)
 im = ax.imshow(MOT_z_images['MOT_diff'], 
                origin='lower',
                # extent=[xvals.min(),xvals.max(),yvals.min(),yvals.max()]
                )
-ax.set_xlabel('X position (um)'); ax.set_ylabel('Y position (um)')
 
 ax = fig.add_subplot(gs[1,1])
 ax.set_title(r'z cMOT', loc='center', fontsize=8, x=0.5, pad=4)
@@ -92,15 +99,15 @@ im = ax.imshow(MOT_z_images['cMOT_diff'],
                origin='lower',
                # extent=[xvals.min(),xvals.max(),yvals.min(),yvals.max()]
                )
-ax.set_xlabel('X position (um)'); ax.set_ylabel('Y position (um)')
+ax.set_xlabel('X position (um)'); 
 
-ax = fig.add_subplot(gs[2,0])
+ax = fig.add_subplot(gs[0,2])
 ax.set_title(r'y MOT TOF', loc='center', fontsize=8, x=0.5, pad=4)
 im = ax.imshow(MOT_y_images['MOT_TOF_OD'], 
                origin='lower',
                # extent=[xvals.min(),xvals.max(),yvals.min(),yvals.max()]
                )
-ax.set_xlabel('X position (um)'); ax.set_ylabel('Y position (um)')
+ax.set_xlabel('X position (um)');
 
 
 # Show the plot
