@@ -13,6 +13,7 @@ from blacs.tab_base_classes import MODE_MANUAL, MODE_TRANSITION_TO_BUFFERED, MOD
 
 import os
 import sys
+import numpy as np
 import threading, time
 from qtutils import UiLoader#, inmain_decorator
 import qtutils.icons
@@ -42,28 +43,29 @@ class Arduino_Interlock_Tab(DeviceTab):
          self.adjust = []
          self.setpoint = []
          self.temp = []
-         self.plot_temp_ch1 = []
-         self.plot_temp_ch2 = []
-         self.plot_temp_ch3 = []
-         self.plot_temp_ch4 = []
-         self.plot_temp_ch5 = []
-         self.plot_time = []
+         
+         self.iter_count = 0
+         self.max_graph_points = 1440
+         self.plot_temp = np.zeros([6, 1])
+         # self.plot_temp_ch1 = np.zeros(1)
+         # self.plot_temp_ch2 = np.zeros(1)
+         # self.plot_temp_ch3 = np.zeros(1)
+         # self.plot_temp_ch4 = np.zeros(1)
+         # self.plot_temp_ch5 = np.zeros(1)
+         # self.plot_temp_ch9 = []
+         # self.plot_temp_ch10 = []
+         # self.plot_temp_ch11 = []
+         # self.plot_temp_ch12 = []
+         # self.plot_temp_ch13 = []
+         # self.plot_temp_ch16 = []
+         #self.plot_time = np.empty(1)
          self.plot_start = 0
          
          layout.addWidget(self.ui)
          self.graph_widget = self.ui.graph_widget
-         #layout.addWidget(self.graphWidget)
-         #self.setCentralWidget(self.graphWidget)
-         #self.graphWidget.plot([1,2,3,4,5], [16.5,17.5,18,16,17])
-         
+
          # define the data
          title = "Temperature Graph"
-         # y values to plot by line 1
-         y = [1,1,1,1,1,1,1,1,1,1]
-         # y values to plot by line 2
-         #y2 = [3, 1, 5, 8, 9, 11, 16, 17, 14, 16]
-         x = range(10)
-         
          # create plot window object
          plt = self.graph_widget 
          plt.showGrid(x = True, y = True)
@@ -71,16 +73,28 @@ class Arduino_Interlock_Tab(DeviceTab):
          plt.setLabel('left', 'Temperature', units ='degC')
          plt.setLabel('bottom', 'Time', units ='sec')
          plt.setTitle(title)
-         self.ch_1_ref = self.graph_widget.plot(self.plot_time, self.plot_temp_ch1, pen ='r',# symbol = 'o', symbolPen = 'r', symbolBrush = 0.05, 
+         self.ch_1_ref = self.graph_widget.plot(self.plot_temp[5], self.plot_temp[0], pen ='r',# symbol = 'o', symbolPen = 'r', symbolBrush = 0.05, 
                                 name ='Ch_1')
-         self.ch_2_ref = self.graph_widget.plot(self.plot_time, self.plot_temp_ch2, pen ='y',# symbol = 'o', symbolPen = 'y', symbolBrush = 0.05, 
+         self.ch_2_ref = self.graph_widget.plot(self.plot_temp[5], self.plot_temp[1], pen ='y',# symbol = 'o', symbolPen = 'y', symbolBrush = 0.05, 
                                 name ='Ch_2')
-         self.ch_3_ref = self.graph_widget.plot(self.plot_time, self.plot_temp_ch3, pen ='g',# symbol = 'o', symbolPen = 'g', symbolBrush = 0.05,
+         self.ch_3_ref = self.graph_widget.plot(self.plot_temp[5], self.plot_temp[2], pen ='g',# symbol = 'o', symbolPen = 'g', symbolBrush = 0.05,
                                 name ='Ch_3')
-         self.ch_4_ref = self.graph_widget.plot(self.plot_time, self.plot_temp_ch4, pen ='c',# symbol = 'o', symbolPen = 'c', symbolBrush = 0.05,
+         self.ch_4_ref = self.graph_widget.plot(self.plot_temp[5], self.plot_temp[3], pen ='c',# symbol = 'o', symbolPen = 'c', symbolBrush = 0.05,
                                 name ='Ch_4')
-         self.ch_5_ref = self.graph_widget.plot(self.plot_time, self.plot_temp_ch5, pen ='b',# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
+         self.ch_5_ref = self.graph_widget.plot(self.plot_temp[5], self.plot_temp[4], pen ='b',# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
                                 name ='Ch_5')
+         # self.ch_9_ref = self.graph_widget.plot(self.plot_time, self.plot_temp_ch9, pen =[248, 187, 208],# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
+         #                        name ='Ch_9')
+         # self.ch_10_ref = self.graph_widget.plot(self.plot_time, self.plot_temp_ch10, pen =[184, 104, 200],# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
+         #                        name ='Ch_10')
+         # self.ch_11_ref = self.graph_widget.plot(self.plot_time, self.plot_temp_ch11, pen =[255, 136, 0],# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
+         #                        name ='Ch_11')
+         # self.ch_12_ref = self.graph_widget.plot(self.plot_time, self.plot_temp_ch12, pen =[204, 255, 144],# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
+         #                        name ='Ch_12')
+         # self.ch_13_ref = self.graph_widget.plot(self.plot_time, self.plot_temp_ch13, pen =[215, 204, 200],# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
+         #                        name ='Ch_13')
+         # self.ch_16_ref = self.graph_widget.plot(self.plot_time, self.plot_temp_ch16, pen ='[250, 250, 250]',# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
+         #                        name ='Ch_16')
          
          # # Connect signals for buttons
          self.ui.interlock_controls.clicked.connect(self.interlock_controls_clicked)
@@ -547,18 +561,48 @@ class Arduino_Interlock_Tab(DeviceTab):
             self.ui.status_icon.setPixmap(pixmap)
             self.ui.status_update.setText('%s' %(intlock_trigger))
         #create plot of ch1-ch5 temp    
-        self.plot_temp_ch1.append(temp_up['1'])
-        self.plot_temp_ch2.append(temp_up['2'])
-        self.plot_temp_ch3.append(temp_up['3'])
-        self.plot_temp_ch4.append(temp_up['4'])
-        self.plot_temp_ch5.append(temp_up['5'])
-        self.plot_time.append(int(time.time()-self.plot_start))
-        self.ch_1_ref.setData(self.plot_time, self.plot_temp_ch1)
-        self.ch_2_ref.setData(self.plot_time, self.plot_temp_ch2)
-        self.ch_3_ref.setData(self.plot_time, self.plot_temp_ch3)
-        self.ch_4_ref.setData(self.plot_time, self.plot_temp_ch4)
-        self.ch_5_ref.setData(self.plot_time, self.plot_temp_ch5)
-    
+        # self.plot_temp_ch1.append(temp_up['1'])
+        # self.plot_temp_ch2.append(temp_up['2'])
+        # self.plot_temp_ch3.append(temp_up['3'])
+        # self.plot_temp_ch4.append(temp_up['4'])
+        # self.plot_temp_ch5.append(temp_up['5'])
+        # self.plot_time.append(int(time.time()-self.plot_start))
+        # if self.iter_count > self.graph_points:
+        #     self.iter_count = 1440
+        #     self.plot_temp_ch1 = np.roll(self.plot_temp_ch1, -1)
+        #     self.plot_temp_ch2 = np.roll(self.plot_temp_ch2, -1)
+        #     self.plot_temp_ch3 = np.roll(self.plot_temp_ch3, -1)
+        #     self.plot_temp_ch4 = np.roll(self.plot_temp_ch4, -1)
+        #     self.plot_temp_ch5 = np.roll(self.plot_temp_ch5, -1)
+        #     self.plot_time = np.insert(self.plot_time, -1)
+        if self.iter_count > (self.max_graph_points):
+            self.iter_count = self.max_graph_points
+            self.plot_temp = np.delete(self.plot_temp, [0], axis = 1)
+            
+        self.plot_temp = np.insert(self.plot_temp, self.iter_count, [temp_up["1"],
+                                                                     temp_up["2"],
+                                                                     temp_up["3"],
+                                                                     temp_up["4"], 
+                                                                     temp_up["5"], 
+                                                                     int(time.time()-self.plot_start)], axis=1)
+        # self.plot_temp[0] = np.insert(self.plot_temp, [0, self.iter_count], temp_up['1'])
+        # self.plot_temp[1] = np.insert(self.plot_temp, [1, self.iter_count], temp_up['2'])
+        # self.plot_temp[2] = np.insert(self.plot_temp, [2, self.iter_count], temp_up['3'])
+        # self.plot_temp[3] = np.insert(self.plot_temp, [3, self.iter_count], temp_up['4'])
+        # self.plot_temp[4] = np.insert(self.plot_temp, [4, self.iter_count], temp_up['5'])
+        # self.plot_temp[5] = np.insert(self.plot_temp, [5, self.iter_count], int(time.time()-self.plot_start))
+        # self.plot_temp_ch1 = np.insert(self.plot_temp_ch1, self.iter_count, temp_up['1'])
+        # self.plot_temp_ch2 = np.insert(self.plot_temp_ch2, self.iter_count, temp_up['2'])
+        # self.plot_temp_ch3 = np.insert(self.plot_temp_ch3, self.iter_count, temp_up['3'])
+        # self.plot_temp_ch4 = np.insert(self.plot_temp_ch4, self.iter_count, temp_up['4'])
+        # self.plot_temp_ch5 = np.insert(self.plot_temp_ch5, self.iter_count, temp_up['5'])
+        # self.plot_time = np.insert(self.plot_time, self.iter_count, int(time.time()-self.plot_start))
+        self.ch_1_ref.setData(self.plot_temp[5, 0:self.iter_count], self.plot_temp[0, 0:self.iter_count])
+        self.ch_2_ref.setData(self.plot_temp[5, 0:self.iter_count], self.plot_temp[1, 0:self.iter_count])
+        self.ch_3_ref.setData(self.plot_temp[5, 0:self.iter_count], self.plot_temp[2, 0:self.iter_count])
+        self.ch_4_ref.setData(self.plot_temp[5, 0:self.iter_count], self.plot_temp[3, 0:self.iter_count])
+        self.ch_5_ref.setData(self.plot_temp[5, 0:self.iter_count], self.plot_temp[4, 0:self.iter_count])
+        self.iter_count += 1
 
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)
     def temp_callout(self, button):
