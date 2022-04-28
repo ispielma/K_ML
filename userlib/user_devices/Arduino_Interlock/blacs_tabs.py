@@ -27,7 +27,7 @@ class Arduino_Interlock_Tab(DeviceTab):
 
          # # Load monitor UI
          ui_filepath = os.path.join(
-             os.path.dirname(os.path.realpath(__file__)), 'interlock_graph.ui'
+             os.path.dirname(os.path.realpath(__file__)), 'interlock.ui'
          )
          self.ui = UiLoader().load(ui_filepath)
          
@@ -43,22 +43,12 @@ class Arduino_Interlock_Tab(DeviceTab):
          self.adjust = []
          self.setpoint = []
          self.temp = []
+         self.chan_tog = [True, True, True, True, True, True, True, True, 
+                          True, True, True, True, True, True, True, True]
          
          self.iter_count = 0
          self.max_graph_points = 1440
-         self.plot_temp = np.zeros([6, 1])
-         # self.plot_temp_ch1 = np.zeros(1)
-         # self.plot_temp_ch2 = np.zeros(1)
-         # self.plot_temp_ch3 = np.zeros(1)
-         # self.plot_temp_ch4 = np.zeros(1)
-         # self.plot_temp_ch5 = np.zeros(1)
-         # self.plot_temp_ch9 = []
-         # self.plot_temp_ch10 = []
-         # self.plot_temp_ch11 = []
-         # self.plot_temp_ch12 = []
-         # self.plot_temp_ch13 = []
-         # self.plot_temp_ch16 = []
-         #self.plot_time = np.empty(1)
+         self.plot_temp = np.zeros([17, 1])
          self.plot_start = 0
          
          layout.addWidget(self.ui)
@@ -73,28 +63,28 @@ class Arduino_Interlock_Tab(DeviceTab):
          plt.setLabel('left', 'Temperature', units ='degC')
          plt.setLabel('bottom', 'Time', units ='sec')
          plt.setTitle(title)
-         self.ch_1_ref = self.graph_widget.plot(self.plot_temp[5], self.plot_temp[0], pen ='r',# symbol = 'o', symbolPen = 'r', symbolBrush = 0.05, 
+         self.ch_1_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[0], pen ='r',# symbol = 'o', symbolPen = 'r', symbolBrush = 0.05, 
                                 name ='Ch_1')
-         self.ch_2_ref = self.graph_widget.plot(self.plot_temp[5], self.plot_temp[1], pen ='y',# symbol = 'o', symbolPen = 'y', symbolBrush = 0.05, 
+         self.ch_2_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[1], pen ='y',# symbol = 'o', symbolPen = 'y', symbolBrush = 0.05, 
                                 name ='Ch_2')
-         self.ch_3_ref = self.graph_widget.plot(self.plot_temp[5], self.plot_temp[2], pen ='g',# symbol = 'o', symbolPen = 'g', symbolBrush = 0.05,
+         self.ch_3_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[2], pen ='g',# symbol = 'o', symbolPen = 'g', symbolBrush = 0.05,
                                 name ='Ch_3')
-         self.ch_4_ref = self.graph_widget.plot(self.plot_temp[5], self.plot_temp[3], pen ='c',# symbol = 'o', symbolPen = 'c', symbolBrush = 0.05,
+         self.ch_4_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[3], pen ='c',# symbol = 'o', symbolPen = 'c', symbolBrush = 0.05,
                                 name ='Ch_4')
-         self.ch_5_ref = self.graph_widget.plot(self.plot_temp[5], self.plot_temp[4], pen ='b',# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
+         self.ch_5_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[4], pen ='b',# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
                                 name ='Ch_5')
-         # self.ch_9_ref = self.graph_widget.plot(self.plot_time, self.plot_temp_ch9, pen =[248, 187, 208],# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
-         #                        name ='Ch_9')
-         # self.ch_10_ref = self.graph_widget.plot(self.plot_time, self.plot_temp_ch10, pen =[184, 104, 200],# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
-         #                        name ='Ch_10')
-         # self.ch_11_ref = self.graph_widget.plot(self.plot_time, self.plot_temp_ch11, pen =[255, 136, 0],# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
-         #                        name ='Ch_11')
-         # self.ch_12_ref = self.graph_widget.plot(self.plot_time, self.plot_temp_ch12, pen =[204, 255, 144],# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
-         #                        name ='Ch_12')
-         # self.ch_13_ref = self.graph_widget.plot(self.plot_time, self.plot_temp_ch13, pen =[215, 204, 200],# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
-         #                        name ='Ch_13')
-         # self.ch_16_ref = self.graph_widget.plot(self.plot_time, self.plot_temp_ch16, pen ='[250, 250, 250]',# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
-         #                        name ='Ch_16')
+         self.ch_9_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[8], pen =[248, 187, 208],# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
+                                name ='Ch_9')
+         self.ch_10_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[9], pen =[184, 104, 200],# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
+                                name ='Ch_10')
+         self.ch_11_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[10], pen =[255, 136, 0],# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
+                                name ='Ch_11')
+         self.ch_12_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[11], pen =[204, 255, 144],# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
+                                name ='Ch_12')
+         self.ch_13_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[12], pen =[215, 204, 200],# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
+                                name ='Ch_13')
+         self.ch_16_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[15], pen =[250, 250, 250],# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
+                                name ='Ch_16')
          
          # # Connect signals for buttons
          self.ui.interlock_controls.clicked.connect(self.interlock_controls_clicked)
@@ -120,6 +110,18 @@ class Arduino_Interlock_Tab(DeviceTab):
          self.ui.release_setpoints.clicked.connect(self.release_setpoints_clicked)
          
          self.ui.status_update.clicked.connect(self.status_update_clicked)
+         
+         self.ui.channel_1_button.clicked.connect(self.channel_1_clicked)
+         self.ui.channel_2_button.clicked.connect(self.channel_2_clicked)
+         self.ui.channel_3_button.clicked.connect(self.channel_3_clicked)
+         self.ui.channel_4_button.clicked.connect(self.channel_4_clicked)
+         self.ui.channel_5_button.clicked.connect(self.channel_5_clicked)
+         self.ui.channel_9_button.clicked.connect(self.channel_9_clicked)
+         self.ui.channel_10_button.clicked.connect(self.channel_10_clicked)
+         self.ui.channel_11_button.clicked.connect(self.channel_11_clicked)
+         self.ui.channel_12_button.clicked.connect(self.channel_12_clicked)
+         self.ui.channel_13_button.clicked.connect(self.channel_13_clicked)
+         self.ui.channel_16_button.clicked.connect(self.channel_16_clicked)
          
          #Sets icons for start and stop continuous
          self.ui.start_continuous.setIcon(QtGui.QIcon(':/qtutils/fugue/control'))
@@ -237,20 +239,6 @@ class Arduino_Interlock_Tab(DeviceTab):
              chName = ch+1
              self.temp[ch].setText('%s C' %(temp_init[str(chName)]))
              self.setpoint[ch].setText('%s C' %(set_init[str(chName)]))
-        # intlock_trigger = str(stat_init)[0:4]
-        # if intlock_trigger == "Fals":
-        #     icon = QtGui.QIcon(':/qtutils/fugue/tick-circle')
-        #     pixmap = icon.pixmap(QtCore.QSize(16, 16))
-        #     self.ui.status_icon.setPixmap(pixmap)
-        # elif intlock_trigger == "True":
-        #     icon = QtGui.QIcon(':/qtutils/fugue/cross-circle')
-        #     pixmap = icon.pixmap(QtCore.QSize(16, 16))
-        #     self.ui.status_icon.setPixmap(pixmap)
-        # else:
-        #     icon = QtGui.QIcon(':/qtutils/fugue/question')
-        #     pixmap = icon.pixmap(QtCore.QSize(16, 16))
-        #     self.ui.status_icon.setPixmap(pixmap)
-        #     self.ui.status_update.setText('%s' %(intlock_trigger))
             
 
     def initialise_workers(self):
@@ -262,13 +250,11 @@ class Arduino_Interlock_Tab(DeviceTab):
             worker_initialisation_kwargs,
         )
         self.primary_worker = 'main_worker'
-        
-        # time.sleep(2)
-        # self.initial_grab()
 
 
     def plot(self, time, temp):    
-        self.graphWidget.plot(time, temp)
+        self.graph_widget.plot(time, temp)
+
 
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
     def interlock_controls_clicked(self, button):
@@ -430,6 +416,117 @@ class Arduino_Interlock_Tab(DeviceTab):
             self.adjust[ch].hide() 
             self.setpoint[ch].show()
 
+
+    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+    def channel_1_clicked(self, button):
+        if self.chan_tog[0]:
+            self.chan_tog[0] = False
+            self.ch_1_ref.setData([],[])
+        else:
+            self.chan_tog[0] = True
+            # self.ch_1_ref = self.graph_widget.plot(self.plot_temp[5], self.plot_temp[0], pen ='r',# symbol = 'o', symbolPen = 'r', symbolBrush = 0.05, 
+            #                        name ='Ch_1')
+            self.ch_1_ref.setData(self.plot_temp[16, 0:self.iter_count-1], self.plot_temp[0, 0:self.iter_count-1])    
+    
+    
+    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+    def channel_2_clicked(self, button):
+        if self.chan_tog[1]:
+            self.chan_tog[1] = False
+            self.ch_2_ref.setData([],[])
+        else:
+            self.chan_tog[1] = True
+            self.ch_2_ref.setData(self.plot_temp[16, 0:self.iter_count-1], self.plot_temp[1, 0:self.iter_count-1])    
+    
+    
+    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+    def channel_3_clicked(self, button):
+        if self.chan_tog[2]:
+            self.chan_tog[2] = False
+            self.ch_3_ref.setData([],[])
+        else:
+            self.chan_tog[2] = True
+            self.ch_3_ref.setData(self.plot_temp[16, 0:self.iter_count-1], self.plot_temp[2, 0:self.iter_count-1])    
+    
+    
+    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+    def channel_4_clicked(self, button):
+        if self.chan_tog[3]:
+            self.chan_tog[3] = False
+            self.ch_4_ref.setData([],[])
+        else:
+            self.chan_tog[3] = True
+            self.ch_4_ref.setData(self.plot_temp[16, 0:self.iter_count-1], self.plot_temp[3, 0:self.iter_count-1])    
+    
+    
+    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+    def channel_5_clicked(self, button):
+        if self.chan_tog[4]:
+            self.chan_tog[4] = False
+            self.ch_5_ref.setData([],[])
+        else:
+            self.chan_tog[4] = True
+            self.ch_5_ref.setData(self.plot_temp[16, 0:self.iter_count-1], self.plot_temp[4, 0:self.iter_count-1])    
+            
+            
+    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+    def channel_9_clicked(self, button):
+        if self.chan_tog[8]:
+            self.chan_tog[8] = False
+            self.ch_9_ref.setData([],[])
+        else:
+            self.chan_tog[8] = True
+            self.ch_9_ref.setData(self.plot_temp[16, 0:self.iter_count-1], self.plot_temp[8, 0:self.iter_count-1])  
+            
+
+    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+    def channel_10_clicked(self, button):
+        if self.chan_tog[9]:
+            self.chan_tog[9] = False
+            self.ch_10_ref.setData([],[])
+        else:
+            self.chan_tog[9] = True
+            self.ch_10_ref.setData(self.plot_temp[16, 0:self.iter_count-1], self.plot_temp[9, 0:self.iter_count-1])  
+            
+
+    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+    def channel_11_clicked(self, button):
+        if self.chan_tog[10]:
+            self.chan_tog[10] = False
+            self.ch_11_ref.setData([],[])
+        else:
+            self.chan_tog[10] = True
+            self.ch_11_ref.setData(self.plot_temp[16, 0:self.iter_count-1], self.plot_temp[10, 0:self.iter_count-1])  
+            
+    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+    def channel_12_clicked(self, button):
+        if self.chan_tog[11]:
+            self.chan_tog[11] = False
+            self.ch_12_ref.setData([],[])
+        else:
+            self.chan_tog[11] = True
+            self.ch_12_ref.setData(self.plot_temp[16, 0:self.iter_count-1], self.plot_temp[11, 0:self.iter_count-1])  
+            
+            
+    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+    def channel_13_clicked(self, button):
+        if self.chan_tog[12]:
+            self.chan_tog[12] = False
+            self.ch_13_ref.setData([],[])
+        else:
+            self.chan_tog[12] = True
+            self.ch_13_ref.setData(self.plot_temp[16, 0:self.iter_count-1], self.plot_temp[12, 0:self.iter_count-1])  
+
+
+    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+    def channel_16_clicked(self, button):
+        if self.chan_tog[15]:
+            self.chan_tog[15] = False
+            self.ch_16_ref.setData([],[])
+        else:
+            self.chan_tog[15] = True
+            self.ch_16_ref.setData(self.plot_temp[16, 0:self.iter_count-1], self.plot_temp[15, 0:self.iter_count-1])  
+            
     
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
     def grab_temp_update(self):
@@ -583,37 +680,53 @@ class Arduino_Interlock_Tab(DeviceTab):
                                                                      temp_up["2"],
                                                                      temp_up["3"],
                                                                      temp_up["4"], 
-                                                                     temp_up["5"], 
+                                                                     temp_up["5"],
+                                                                     temp_up["6"], 
+                                                                     temp_up["7"], 
+                                                                     temp_up["8"], 
+                                                                     temp_up["9"], 
+                                                                     temp_up["10"], 
+                                                                     temp_up["11"], 
+                                                                     temp_up["12"],
+                                                                     temp_up["13"], 
+                                                                     temp_up["14"], 
+                                                                     temp_up["15"], 
+                                                                     temp_up["16"], 
                                                                      int(time.time()-self.plot_start)], axis=1)
-        # self.plot_temp[0] = np.insert(self.plot_temp, [0, self.iter_count], temp_up['1'])
-        # self.plot_temp[1] = np.insert(self.plot_temp, [1, self.iter_count], temp_up['2'])
-        # self.plot_temp[2] = np.insert(self.plot_temp, [2, self.iter_count], temp_up['3'])
-        # self.plot_temp[3] = np.insert(self.plot_temp, [3, self.iter_count], temp_up['4'])
-        # self.plot_temp[4] = np.insert(self.plot_temp, [4, self.iter_count], temp_up['5'])
-        # self.plot_temp[5] = np.insert(self.plot_temp, [5, self.iter_count], int(time.time()-self.plot_start))
-        # self.plot_temp_ch1 = np.insert(self.plot_temp_ch1, self.iter_count, temp_up['1'])
-        # self.plot_temp_ch2 = np.insert(self.plot_temp_ch2, self.iter_count, temp_up['2'])
-        # self.plot_temp_ch3 = np.insert(self.plot_temp_ch3, self.iter_count, temp_up['3'])
-        # self.plot_temp_ch4 = np.insert(self.plot_temp_ch4, self.iter_count, temp_up['4'])
-        # self.plot_temp_ch5 = np.insert(self.plot_temp_ch5, self.iter_count, temp_up['5'])
-        # self.plot_time = np.insert(self.plot_time, self.iter_count, int(time.time()-self.plot_start))
-        self.ch_1_ref.setData(self.plot_temp[5, 0:self.iter_count], self.plot_temp[0, 0:self.iter_count])
-        self.ch_2_ref.setData(self.plot_temp[5, 0:self.iter_count], self.plot_temp[1, 0:self.iter_count])
-        self.ch_3_ref.setData(self.plot_temp[5, 0:self.iter_count], self.plot_temp[2, 0:self.iter_count])
-        self.ch_4_ref.setData(self.plot_temp[5, 0:self.iter_count], self.plot_temp[3, 0:self.iter_count])
-        self.ch_5_ref.setData(self.plot_temp[5, 0:self.iter_count], self.plot_temp[4, 0:self.iter_count])
+        if self.chan_tog[0]:
+            self.ch_1_ref.setData(self.plot_temp[16, 0:self.iter_count], self.plot_temp[0, 0:self.iter_count])
+        if self.chan_tog[1]:
+            self.ch_2_ref.setData(self.plot_temp[16, 0:self.iter_count], self.plot_temp[1, 0:self.iter_count])
+        if self.chan_tog[2]:
+            self.ch_3_ref.setData(self.plot_temp[16, 0:self.iter_count], self.plot_temp[2, 0:self.iter_count])
+        if self.chan_tog[3]:
+            self.ch_4_ref.setData(self.plot_temp[16, 0:self.iter_count], self.plot_temp[3, 0:self.iter_count])
+        if self.chan_tog[4]:
+            self.ch_5_ref.setData(self.plot_temp[16, 0:self.iter_count], self.plot_temp[4, 0:self.iter_count])
+        
+        if self.chan_tog[8]:
+            self.ch_9_ref.setData(self.plot_temp[16, 0:self.iter_count], self.plot_temp[8, 0:self.iter_count])
+        if self.chan_tog[9]:
+            self.ch_10_ref.setData(self.plot_temp[16, 0:self.iter_count], self.plot_temp[9, 0:self.iter_count])
+        if self.chan_tog[10]:
+            self.ch_11_ref.setData(self.plot_temp[16, 0:self.iter_count], self.plot_temp[10, 0:self.iter_count])
+        if self.chan_tog[11]:
+            self.ch_12_ref.setData(self.plot_temp[16, 0:self.iter_count], self.plot_temp[11, 0:self.iter_count])
+        if self.chan_tog[12]:
+            self.ch_13_ref.setData(self.plot_temp[16, 0:self.iter_count], self.plot_temp[12, 0:self.iter_count])
+        
+        if self.chan_tog[15]:
+            self.ch_16_ref.setData(self.plot_temp[16, 0:self.iter_count], self.plot_temp[15, 0:self.iter_count])
         self.iter_count += 1
 
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)
     def temp_callout(self, button):
-        #self.ui.digital_reset.setEnabled(False)
         print('Calling for New Temperatures...')
         yield(self.queue_work(self._primary_worker,'new_temps'))
     
     
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)    
     def temp_zero(self, button):
-        #self.ui.digital_reset.setEnabled(False)
         print('Returning Temperatures to Zero...')
         for ch in range(self.numSensors):
             self.temp[ch].setText('0.00 C ')
@@ -621,14 +734,12 @@ class Arduino_Interlock_Tab(DeviceTab):
     
     @define_state(MODE_MANUAL|MODE_BUFFERED|MODE_TRANSITION_TO_BUFFERED|MODE_TRANSITION_TO_MANUAL,True)    
     def shot_read_check(self):
-        #self.ui.digital_reset.setEnabled(False)
         #print('Checking for shots...')
         self.shot_read = yield(self.queue_work(self._primary_worker,'shot_check'))
    
         
     @define_state(MODE_MANUAL,True)
     def on_const_temps(self, button):
-        #self.ui.start_continuous.setEnabled(True)
         print('Constant Temperature Acquisition Strarting...')  
         self.ui.start_continuous.hide()
         self.ui.stop_continuous.show()
@@ -671,15 +782,12 @@ class Arduino_Interlock_Tab(DeviceTab):
         self.plot_start = time.time()
         while True:
             self.shot_read_check()
-            #if (time.time() - self.loop_time) > interval:
             if self.shot_read:
                 #self.packet_update
                 self.temp_shot_update()
                 self.stat_shot_update()
             elif self.contin_on:
                 self.grab_packet_update()
-                #self.grab_temp_update()
-                #self.grab_status_update()
             time.sleep(interval)
 
             

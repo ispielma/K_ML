@@ -19,6 +19,11 @@
     <height>0</height>
    </size>
   </property>
+  <property name="font">
+   <font>
+    <underline>false</underline>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
@@ -35,10 +40,10 @@
     <property name="sizeConstraint">
      <enum>QLayout::SetMinimumSize</enum>
     </property>
-    <item row="3" column="0">
-     <widget class="PlotWidget" name="graph_widget" native="true">
+    <item row="4" column="0">
+     <widget class="QWidget" name="push_widg" native="true">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -49,6 +54,49 @@
         <height>0</height>
        </size>
       </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QGroupBox" name="graph_box">
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QPushButton" name="temp_graph">
+         <property name="maximumSize">
+          <size>
+           <width>125</width>
+           <height>21</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <underline>false</underline>
+          </font>
+         </property>
+         <property name="text">
+          <string>Temperature Graph</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="PlotWidget" name="graph_widget" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>90</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </item>
     <item row="0" column="0">
@@ -72,6 +120,9 @@
        </size>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_21">
+       <property name="spacing">
+        <number>0</number>
+       </property>
        <item>
         <spacer name="horizontalSpacer_4">
          <property name="orientation">
@@ -87,11 +138,22 @@
        </item>
        <item>
         <widget class="QPushButton" name="interlock_controls">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="maximumSize">
           <size>
            <width>111</width>
            <height>21</height>
           </size>
+         </property>
+         <property name="font">
+          <font>
+           <underline>false</underline>
+          </font>
          </property>
          <property name="text">
           <string>Interlock Controls</string>
@@ -186,6 +248,7 @@
                     <font>
                      <weight>75</weight>
                      <bold>true</bold>
+                     <underline>false</underline>
                     </font>
                    </property>
                    <property name="text">
@@ -235,6 +298,11 @@
                    <layout class="QHBoxLayout" name="horizontalLayout_4">
                     <item>
                      <widget class="QPushButton" name="call_temps">
+                      <property name="font">
+                       <font>
+                        <underline>false</underline>
+                       </font>
+                      </property>
                       <property name="text">
                        <string>Call</string>
                       </property>
@@ -242,6 +310,11 @@
                     </item>
                     <item>
                      <widget class="QPushButton" name="update_temps">
+                      <property name="font">
+                       <font>
+                        <underline>false</underline>
+                       </font>
+                      </property>
                       <property name="text">
                        <string>Update</string>
                       </property>
@@ -249,6 +322,11 @@
                     </item>
                     <item>
                      <widget class="QPushButton" name="zero_temps">
+                      <property name="font">
+                       <font>
+                        <underline>false</underline>
+                       </font>
+                      </property>
                       <property name="text">
                        <string>Zero</string>
                       </property>
@@ -267,6 +345,11 @@
                      <layout class="QVBoxLayout" name="verticalLayout_2">
                       <item>
                        <widget class="QPushButton" name="show_setpoints">
+                        <property name="font">
+                         <font>
+                          <underline>false</underline>
+                         </font>
+                        </property>
                         <property name="text">
                          <string>Show</string>
                         </property>
@@ -274,6 +357,11 @@
                       </item>
                       <item>
                        <widget class="QPushButton" name="hide_setpoints">
+                        <property name="font">
+                         <font>
+                          <underline>false</underline>
+                         </font>
+                        </property>
                         <property name="text">
                          <string>Hide</string>
                         </property>
@@ -281,6 +369,11 @@
                       </item>
                       <item>
                        <widget class="QPushButton" name="send_setpoints">
+                        <property name="font">
+                         <font>
+                          <underline>false</underline>
+                         </font>
+                        </property>
                         <property name="text">
                          <string>Send</string>
                         </property>
@@ -292,6 +385,11 @@
                      <layout class="QVBoxLayout" name="verticalLayout_3">
                       <item>
                        <widget class="QPushButton" name="set_setpoints">
+                        <property name="font">
+                         <font>
+                          <underline>false</underline>
+                         </font>
+                        </property>
                         <property name="text">
                          <string>Set</string>
                         </property>
@@ -299,6 +397,11 @@
                       </item>
                       <item>
                        <widget class="QPushButton" name="default_setpoints">
+                        <property name="font">
+                         <font>
+                          <underline>false</underline>
+                         </font>
+                        </property>
                         <property name="text">
                          <string>Default</string>
                         </property>
@@ -308,6 +411,11 @@
                     </item>
                     <item>
                      <widget class="QPushButton" name="release_setpoints">
+                      <property name="font">
+                       <font>
+                        <underline>false</underline>
+                       </font>
+                      </property>
                       <property name="text">
                        <string>Release</string>
                       </property>
@@ -324,6 +432,11 @@
                    <layout class="QHBoxLayout" name="horizontalLayout_5">
                     <item>
                      <widget class="QPushButton" name="digital_lock">
+                      <property name="font">
+                       <font>
+                        <underline>false</underline>
+                       </font>
+                      </property>
                       <property name="text">
                        <string>Lock</string>
                       </property>
@@ -331,6 +444,11 @@
                     </item>
                     <item>
                      <widget class="QPushButton" name="digital_reset">
+                      <property name="font">
+                       <font>
+                        <underline>false</underline>
+                       </font>
+                      </property>
                       <property name="text">
                        <string>Reset</string>
                       </property>
@@ -345,6 +463,7 @@
                     <font>
                      <weight>75</weight>
                      <bold>true</bold>
+                     <underline>false</underline>
                     </font>
                    </property>
                    <property name="text">
@@ -494,7 +613,13 @@
         <height>180</height>
        </size>
       </property>
+      <property name="title">
+       <string/>
+      </property>
       <layout class="QVBoxLayout" name="channel_monitor_layout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
        <item>
         <spacer name="horizontalSpacer_6">
          <property name="orientation">
@@ -510,11 +635,22 @@
        </item>
        <item>
         <widget class="QPushButton" name="channel_monitor">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="maximumSize">
           <size>
            <width>111</width>
            <height>21</height>
           </size>
+         </property>
+         <property name="font">
+          <font>
+           <underline>false</underline>
+          </font>
          </property>
          <property name="text">
           <string>Channel Monitor</string>
@@ -542,134 +678,10 @@
           </size>
          </property>
          <layout class="QGridLayout" name="channel_temps">
-          <item row="8" column="5">
-           <widget class="QLabel" name="chan_12_temp">
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="4">
-           <widget class="QLabel" name="chan_3_temp">
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="2">
-           <widget class="QLabel" name="chan_9_temp">
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="9">
-           <widget class="QLabel" name="chan_8_temp">
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="7">
-           <widget class="QLabel" name="chan_6_temp">
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <spacer name="verticalSpacer_9">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="7" column="6">
-           <widget class="QLabel" name="channel_13_marker">
-            <property name="font">
-             <font>
-              <underline>true</underline>
-             </font>
-            </property>
-            <property name="text">
-             <string>Chan 13</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="2">
-           <widget class="QLabel" name="chan_1_temp">
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="8">
-           <widget class="QLabel" name="chan_7_temp">
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="6">
-           <widget class="QLabel" name="chan_5_temp">
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="3">
-           <widget class="QLabel" name="chan_2_temp">
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="8">
-           <widget class="QLabel" name="channel_15_marker">
-            <property name="font">
-             <font>
-              <underline>true</underline>
-             </font>
-            </property>
-            <property name="text">
-             <string>Chan 15</string>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="7">
-           <widget class="QLabel" name="channel_14_marker">
-            <property name="font">
-             <font>
-              <underline>true</underline>
-             </font>
-            </property>
-            <property name="text">
-             <string>Chan 14</string>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="9">
-           <widget class="QLabel" name="channel_16_marker">
-            <property name="font">
-             <font>
-              <underline>true</underline>
-             </font>
-            </property>
-            <property name="text">
-             <string>Chan 16</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="2">
-           <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item row="9" column="9">
+           <layout class="QVBoxLayout" name="verticalLayout_20">
             <item>
-             <widget class="QLabel" name="chan_1_setpoint">
+             <widget class="QLabel" name="chan_16_setpoint">
               <property name="font">
                <font>
                 <family>Yu Gothic UI Semibold</family>
@@ -680,32 +692,17 @@
               <property name="text">
                <string>TextLabel</string>
               </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="chan_1_adjust"/>
-            </item>
-           </layout>
-          </item>
-          <item row="3" column="3">
-           <layout class="QVBoxLayout" name="verticalLayout_6">
-            <item>
-             <widget class="QLabel" name="chan_2_setpoint">
-              <property name="font">
-               <font>
-                <family>Yu Gothic UI Semibold</family>
-                <weight>75</weight>
-                <italic>false</italic>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="chan_2_adjust"/>
+             <widget class="QSpinBox" name="chan_16_adjust">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -723,17 +720,107 @@
               <property name="text">
                <string>TextLabel</string>
               </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="chan_3_adjust"/>
+             <widget class="QSpinBox" name="chan_3_adjust">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
-          <item row="3" column="5">
-           <layout class="QVBoxLayout" name="verticalLayout_8">
+          <item row="3" column="3">
+           <layout class="QVBoxLayout" name="verticalLayout_6">
             <item>
-             <widget class="QLabel" name="chan_4_setpoint">
+             <widget class="QLabel" name="chan_2_setpoint">
+              <property name="font">
+               <font>
+                <family>Yu Gothic UI Semibold</family>
+                <weight>75</weight>
+                <italic>false</italic>
+                <bold>true</bold>
+                <underline>false</underline>
+               </font>
+              </property>
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="chan_2_adjust">
+              <property name="font">
+               <font>
+                <underline>false</underline>
+               </font>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="3" column="2">
+           <layout class="QVBoxLayout" name="verticalLayout_5">
+            <item>
+             <widget class="QLabel" name="chan_1_setpoint">
+              <property name="font">
+               <font>
+                <family>Yu Gothic UI Semibold</family>
+                <underline>false</underline>
+               </font>
+              </property>
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="chan_1_adjust">
+              <property name="font">
+               <font>
+                <underline>false</underline>
+               </font>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="7" column="1">
+           <spacer name="verticalSpacer_11">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="9" column="4">
+           <layout class="QVBoxLayout" name="verticalLayout_15">
+            <item>
+             <widget class="QLabel" name="chan_11_setpoint">
               <property name="font">
                <font>
                 <family>Yu Gothic UI Semibold</family>
@@ -744,10 +831,239 @@
               <property name="text">
                <string>TextLabel</string>
               </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="chan_4_adjust"/>
+             <widget class="QSpinBox" name="chan_11_adjust">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="8" column="2">
+           <widget class="QLabel" name="chan_9_temp">
+            <property name="font">
+             <font>
+              <underline>false</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="9">
+           <widget class="QLabel" name="chan_8_temp">
+            <property name="font">
+             <font>
+              <underline>false</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="5">
+           <widget class="QLabel" name="chan_12_temp">
+            <property name="font">
+             <font>
+              <underline>false</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="4">
+           <widget class="QLabel" name="chan_3_temp">
+            <property name="font">
+             <font>
+              <underline>false</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QLabel" name="chan_1_temp">
+            <property name="font">
+             <font>
+              <underline>false</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="8">
+           <widget class="QLabel" name="chan_7_temp">
+            <property name="font">
+             <font>
+              <underline>false</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="7">
+           <widget class="QLabel" name="chan_6_temp">
+            <property name="font">
+             <font>
+              <underline>false</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <spacer name="verticalSpacer_9">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="2" column="3">
+           <widget class="QLabel" name="chan_2_temp">
+            <property name="font">
+             <font>
+              <underline>false</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="8">
+           <widget class="QLabel" name="channel_15_marker">
+            <property name="font">
+             <font>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>Chan 15</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="6">
+           <widget class="QLabel" name="chan_5_temp">
+            <property name="font">
+             <font>
+              <underline>false</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="7">
+           <widget class="QLabel" name="channel_14_marker">
+            <property name="font">
+             <font>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>Chan 14</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <spacer name="verticalSpacer_10">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="3" column="9">
+           <layout class="QVBoxLayout" name="verticalLayout_12">
+            <item>
+             <widget class="QLabel" name="chan_8_setpoint">
+              <property name="font">
+               <font>
+                <family>Yu Gothic UI Semibold</family>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="chan_8_adjust">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -765,94 +1081,17 @@
               <property name="text">
                <string>TextLabel</string>
               </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="chan_13_adjust"/>
-            </item>
-           </layout>
-          </item>
-          <item row="9" column="7">
-           <layout class="QVBoxLayout" name="verticalLayout_18">
-            <item>
-             <widget class="QLabel" name="chan_14_setpoint">
-              <property name="font">
-               <font>
-                <family>Yu Gothic UI Semibold</family>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="chan_14_adjust"/>
-            </item>
-           </layout>
-          </item>
-          <item row="9" column="9">
-           <layout class="QVBoxLayout" name="verticalLayout_20">
-            <item>
-             <widget class="QLabel" name="chan_16_setpoint">
-              <property name="font">
-               <font>
-                <family>Yu Gothic UI Semibold</family>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
+             <widget class="QSpinBox" name="chan_13_adjust">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
               </property>
              </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="chan_16_adjust"/>
-            </item>
-           </layout>
-          </item>
-          <item row="9" column="8">
-           <layout class="QVBoxLayout" name="verticalLayout_19">
-            <item>
-             <widget class="QLabel" name="chan_15_setpoint">
-              <property name="font">
-               <font>
-                <family>Yu Gothic UI Semibold</family>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="chan_15_adjust"/>
-            </item>
-           </layout>
-          </item>
-          <item row="3" column="9">
-           <layout class="QVBoxLayout" name="verticalLayout_12">
-            <item>
-             <widget class="QLabel" name="chan_8_setpoint">
-              <property name="font">
-               <font>
-                <family>Yu Gothic UI Semibold</family>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="chan_8_adjust"/>
             </item>
            </layout>
           </item>
@@ -870,17 +1109,24 @@
               <property name="text">
                <string>TextLabel</string>
               </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="chan_9_adjust"/>
+             <widget class="QSpinBox" name="chan_9_adjust">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
-          <item row="9" column="3">
-           <layout class="QVBoxLayout" name="verticalLayout_14">
+          <item row="9" column="7">
+           <layout class="QVBoxLayout" name="verticalLayout_18">
             <item>
-             <widget class="QLabel" name="chan_10_setpoint">
+             <widget class="QLabel" name="chan_14_setpoint">
               <property name="font">
                <font>
                 <family>Yu Gothic UI Semibold</family>
@@ -891,17 +1137,24 @@
               <property name="text">
                <string>TextLabel</string>
               </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="chan_10_adjust"/>
+             <widget class="QSpinBox" name="chan_14_adjust">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
-          <item row="9" column="5">
-           <layout class="QVBoxLayout" name="verticalLayout_16">
+          <item row="3" column="5">
+           <layout class="QVBoxLayout" name="verticalLayout_8">
             <item>
-             <widget class="QLabel" name="chan_12_setpoint">
+             <widget class="QLabel" name="chan_4_setpoint">
               <property name="font">
                <font>
                 <family>Yu Gothic UI Semibold</family>
@@ -912,17 +1165,24 @@
               <property name="text">
                <string>TextLabel</string>
               </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="chan_12_adjust"/>
+             <widget class="QSpinBox" name="chan_4_adjust">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
-          <item row="9" column="4">
-           <layout class="QVBoxLayout" name="verticalLayout_15">
+          <item row="9" column="8">
+           <layout class="QVBoxLayout" name="verticalLayout_19">
             <item>
-             <widget class="QLabel" name="chan_11_setpoint">
+             <widget class="QLabel" name="chan_15_setpoint">
               <property name="font">
                <font>
                 <family>Yu Gothic UI Semibold</family>
@@ -933,62 +1193,62 @@
               <property name="text">
                <string>TextLabel</string>
               </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="chan_11_adjust"/>
+             <widget class="QSpinBox" name="chan_15_adjust">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
             </item>
            </layout>
-          </item>
-          <item row="7" column="5">
-           <widget class="QLabel" name="channel_12_marker">
-            <property name="font">
-             <font>
-              <underline>true</underline>
-             </font>
-            </property>
-            <property name="text">
-             <string>Chan 12</string>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="4">
-           <widget class="QLabel" name="channel_11_marker">
-            <property name="font">
-             <font>
-              <underline>true</underline>
-             </font>
-            </property>
-            <property name="text">
-             <string>Chan 11</string>
-            </property>
-           </widget>
           </item>
           <item row="8" column="6">
            <widget class="QLabel" name="chan_13_temp">
+            <property name="font">
+             <font>
+              <underline>false</underline>
+             </font>
+            </property>
             <property name="text">
              <string>TextLabel</string>
             </property>
-           </widget>
-          </item>
-          <item row="2" column="5">
-           <widget class="QLabel" name="chan_4_temp">
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="3">
-           <widget class="QLabel" name="chan_10_temp">
-            <property name="text">
-             <string>TextLabel</string>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
           <item row="8" column="7">
            <widget class="QLabel" name="chan_14_temp">
+            <property name="font">
+             <font>
+              <underline>false</underline>
+             </font>
+            </property>
             <property name="text">
              <string>TextLabel</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="3">
+           <widget class="QLabel" name="chan_10_temp">
+            <property name="font">
+             <font>
+              <underline>false</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
@@ -1007,8 +1267,31 @@
           </item>
           <item row="8" column="4">
            <widget class="QLabel" name="chan_11_temp">
+            <property name="font">
+             <font>
+              <underline>false</underline>
+             </font>
+            </property>
             <property name="text">
              <string>TextLabel</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="5">
+           <widget class="QLabel" name="chan_4_temp">
+            <property name="font">
+             <font>
+              <underline>false</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
@@ -1027,77 +1310,31 @@
           </item>
           <item row="8" column="9">
            <widget class="QLabel" name="chan_16_temp">
+            <property name="font">
+             <font>
+              <underline>false</underline>
+             </font>
+            </property>
             <property name="text">
              <string>TextLabel</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
           <item row="8" column="8">
            <widget class="QLabel" name="chan_15_temp">
+            <property name="font">
+             <font>
+              <underline>false</underline>
+             </font>
+            </property>
             <property name="text">
              <string>TextLabel</string>
             </property>
-           </widget>
-          </item>
-          <item row="7" column="2">
-           <widget class="QLabel" name="channel_9_marker">
-            <property name="font">
-             <font>
-              <underline>true</underline>
-             </font>
-            </property>
-            <property name="text">
-             <string>Chan 9</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QLabel" name="channel_1_marker">
-            <property name="font">
-             <font>
-              <weight>50</weight>
-              <bold>false</bold>
-              <underline>true</underline>
-             </font>
-            </property>
-            <property name="text">
-             <string>Chan 1</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="4">
-           <widget class="QLabel" name="channel_3_marker">
-            <property name="font">
-             <font>
-              <underline>true</underline>
-             </font>
-            </property>
-            <property name="text">
-             <string>Chan 3</string>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="3">
-           <widget class="QLabel" name="channel_10_marker">
-            <property name="font">
-             <font>
-              <underline>true</underline>
-             </font>
-            </property>
-            <property name="text">
-             <string>Chan 10</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="7">
-           <widget class="QLabel" name="channel_6_marker">
-            <property name="font">
-             <font>
-              <underline>true</underline>
-             </font>
-            </property>
-            <property name="text">
-             <string>Chan 6</string>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
@@ -1111,41 +1348,55 @@
             <property name="text">
              <string>Chan 8</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
            </widget>
           </item>
-          <item row="0" column="6">
-           <widget class="QLabel" name="channel_5_marker">
+          <item row="0" column="7">
+           <widget class="QLabel" name="channel_6_marker">
             <property name="font">
              <font>
               <underline>true</underline>
              </font>
             </property>
             <property name="text">
-             <string>Chan 5</string>
+             <string>Chan 6</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
-          <item row="0" column="3">
-           <widget class="QLabel" name="channel_2_marker">
+          <item row="9" column="1">
+           <widget class="QLabel" name="setpoints_label_2">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+              <underline>false</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>SetPoint:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="8">
+           <widget class="QLabel" name="channel_7_marker">
             <property name="font">
              <font>
               <underline>true</underline>
              </font>
             </property>
             <property name="text">
-             <string>Chan 2</string>
+             <string>Chan 7</string>
             </property>
-           </widget>
-          </item>
-          <item row="0" column="5">
-           <widget class="QLabel" name="channel_4_marker">
-            <property name="font">
-             <font>
-              <underline>true</underline>
-             </font>
-            </property>
-            <property name="text">
-             <string>Chan 4</string>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
@@ -1162,31 +1413,54 @@
             </property>
            </spacer>
           </item>
-          <item row="9" column="1">
-           <widget class="QLabel" name="setpoints_label_2">
+          <item row="8" column="1">
+           <widget class="QLabel" name="temps_label_2">
             <property name="font">
              <font>
               <weight>75</weight>
               <bold>true</bold>
+              <underline>false</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>Temp:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="setpoints_label_1">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+              <underline>false</underline>
              </font>
             </property>
             <property name="text">
              <string>SetPoint:</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
-          <item row="0" column="8">
-           <widget class="QLabel" name="channel_7_marker">
+          <item row="2" column="1">
+           <widget class="QLabel" name="temps_label_1">
             <property name="font">
              <font>
-              <underline>true</underline>
+              <weight>75</weight>
+              <bold>true</bold>
+              <underline>false</underline>
              </font>
             </property>
             <property name="text">
-             <string>Chan 7</string>
+             <string>Temp:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
@@ -1203,54 +1477,6 @@
             </property>
            </spacer>
           </item>
-          <item row="3" column="1">
-           <widget class="QLabel" name="setpoints_label_1">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>SetPoint:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="1">
-           <widget class="QLabel" name="temps_label_2">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Temp:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLabel" name="temps_label_1">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Temp:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
           <item row="3" column="7">
            <layout class="QVBoxLayout" name="verticalLayout_10">
             <item>
@@ -1265,17 +1491,24 @@
               <property name="text">
                <string>TextLabel</string>
               </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="chan_6_adjust"/>
+             <widget class="QSpinBox" name="chan_6_adjust">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
-          <item row="3" column="6">
-           <layout class="QVBoxLayout" name="verticalLayout_9">
+          <item row="9" column="3">
+           <layout class="QVBoxLayout" name="verticalLayout_14">
             <item>
-             <widget class="QLabel" name="chan_5_setpoint">
+             <widget class="QLabel" name="chan_10_setpoint">
               <property name="font">
                <font>
                 <family>Yu Gothic UI Semibold</family>
@@ -1286,10 +1519,17 @@
               <property name="text">
                <string>TextLabel</string>
               </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="chan_5_adjust"/>
+             <widget class="QSpinBox" name="chan_10_adjust">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -1307,12 +1547,210 @@
               <property name="text">
                <string>TextLabel</string>
               </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="chan_7_adjust"/>
+             <widget class="QSpinBox" name="chan_7_adjust">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
             </item>
            </layout>
+          </item>
+          <item row="3" column="6">
+           <layout class="QVBoxLayout" name="verticalLayout_9">
+            <item>
+             <widget class="QLabel" name="chan_5_setpoint">
+              <property name="font">
+               <font>
+                <family>Yu Gothic UI Semibold</family>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="chan_5_adjust">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="0" column="3">
+           <widget class="QPushButton" name="channel_2_button">
+            <property name="font">
+             <font>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>Chan_2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="5">
+           <layout class="QVBoxLayout" name="verticalLayout_16">
+            <item>
+             <widget class="QLabel" name="chan_12_setpoint">
+              <property name="font">
+               <font>
+                <family>Yu Gothic UI Semibold</family>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="chan_12_adjust">
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="0" column="5">
+           <widget class="QPushButton" name="channel_4_button">
+            <property name="font">
+             <font>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>Chan_4</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="4">
+           <widget class="QPushButton" name="channel_3_button">
+            <property name="font">
+             <font>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>Chan_3</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="2">
+           <widget class="QPushButton" name="channel_9_button">
+            <property name="font">
+             <font>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>Chan_9</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="3">
+           <widget class="QPushButton" name="channel_10_button">
+            <property name="font">
+             <font>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>Chan_10</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="6">
+           <widget class="QPushButton" name="channel_5_button">
+            <property name="font">
+             <font>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>Chan_5</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="6">
+           <widget class="QPushButton" name="channel_13_button">
+            <property name="font">
+             <font>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>Chan_13</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="4">
+           <widget class="QPushButton" name="channel_11_button">
+            <property name="font">
+             <font>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>Chan_11</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="9">
+           <widget class="QPushButton" name="channel_16_button">
+            <property name="font">
+             <font>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>Chan_16</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="5">
+           <widget class="QPushButton" name="channel_12_button">
+            <property name="font">
+             <font>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>Chan_12</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QPushButton" name="channel_1_button">
+            <property name="font">
+             <font>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>Hide from Graph</string>
+            </property>
+            <property name="text">
+             <string>Chan 1</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -1321,6 +1759,186 @@
      </widget>
     </item>
    </layout>
+  </widget>
+  <widget class="QLabel" name="channel_2_marker">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>670</y>
+     <width>73</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <underline>true</underline>
+    </font>
+   </property>
+   <property name="text">
+    <string>Chan 2</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="channel_3_marker">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>670</y>
+     <width>72</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <underline>true</underline>
+    </font>
+   </property>
+   <property name="text">
+    <string>Chan 3</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="channel_4_marker">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>670</y>
+     <width>72</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <underline>true</underline>
+    </font>
+   </property>
+   <property name="text">
+    <string>Chan 4</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="channel_5_marker">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>670</y>
+     <width>72</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <underline>true</underline>
+    </font>
+   </property>
+   <property name="text">
+    <string>Chan 5</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="channel_9_marker">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>730</y>
+     <width>75</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <underline>true</underline>
+    </font>
+   </property>
+   <property name="text">
+    <string>Chan 9</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="channel_10_marker">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>730</y>
+     <width>75</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <underline>true</underline>
+    </font>
+   </property>
+   <property name="text">
+    <string>Chan 10</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="channel_11_marker">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>730</y>
+     <width>75</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <underline>true</underline>
+    </font>
+   </property>
+   <property name="text">
+    <string>Chan 11</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="channel_12_marker">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>730</y>
+     <width>75</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <underline>true</underline>
+    </font>
+   </property>
+   <property name="text">
+    <string>Chan 12</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="channel_13_marker">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>730</y>
+     <width>75</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <underline>true</underline>
+    </font>
+   </property>
+   <property name="text">
+    <string>Chan 13</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="channel_16_marker">
+   <property name="geometry">
+    <rect>
+     <x>460</x>
+     <y>730</y>
+     <width>71</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <underline>true</underline>
+    </font>
+   </property>
+   <property name="text">
+    <string>Chan 16</string>
+   </property>
   </widget>
  </widget>
  <customwidgets>
