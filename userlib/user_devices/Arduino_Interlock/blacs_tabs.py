@@ -7,6 +7,7 @@ Created on Thu Mar 24 12:10:25 2022
 Defines the blacs tab class and GUI for the Arduino_Interlock device
 """
 
+from labscript_devices import BLACS_tab#, runviewer_parser
 from blacs.device_base_class import DeviceTab
 from blacs.tab_base_classes import define_state
 from blacs.tab_base_classes import MODE_MANUAL, MODE_TRANSITION_TO_BUFFERED, MODE_TRANSITION_TO_MANUAL, MODE_BUFFERED  
@@ -18,19 +19,82 @@ import threading, time
 from qtutils import UiLoader#, inmain_decorator
 import qtutils.icons
 from qtutils.qt import QtWidgets, QtGui, QtCore
+from labscript_utils.qtwidgets.toolpalette import ToolPaletteGroup
 import pyqtgraph as pg
 
+#@BLACS_tab
 class Arduino_Interlock_Tab(DeviceTab):
 
     def initialise_GUI(self):
          layout = self.get_tab_layout()
-
-         # # Load monitor UI
+         
+         # # dds_prop = {}
+         # # for i in range(2): # 2 is the number of DDS outputs on this device
+         # #     dds_prop['dds %d'%i] = {}
+         # #     for subchnl in ['freq', 'amp', 'phase']:
+         # #         dds_prop['dds %d'%i][subchnl] = {'base_unit':self.base_units[subchnl],
+         # #                                          'min':self.base_min[subchnl],
+         # #                                          'max':self.base_max[subchnl],
+         # #                                          'step':self.base_step[subchnl],
+         # #                                          'decimals':self.base_decimals[subchnl]
+         # #                                         }
+         # #     dds_prop['dds %d'%i]['gate'] = {}
+         
+         # interlock_channels = {}
+         # for i in range(16): # 12 is the maximum number of flags on this device (some only have 4 though)
+         #      interlock_channels['channel %d'%i] = {}
+         
+         # # Create the output objects    
+         # #self.create_dds_outputs(dds_prop)        
+         # self.create_digital_outputs(interlock_channels)        
+         # # # Create widgets for output objects
+         # dds_widgets,ao_widgets,interlock_widgets = self.auto_create_widgets()
+         
+         # # # Define the sort function for the digital outputs
+         # def sort(channel):
+         #      flag = channel.replace('channel ','')
+         #      flag = int(flag)
+         #      return '%02d'%(flag)
+         
+         # # and auto place the widgets in the UI
+         # self.auto_place_widgets(("Channels",interlock_widgets,sort),("Interlock",self.ui))
+         
+          # Load monitor UI
          ui_filepath = os.path.join(
              os.path.dirname(os.path.realpath(__file__)), 'interlock.ui'
          )
          self.ui = UiLoader().load(ui_filepath)
          
+         
+        #  ui_control = os.path.join(
+        #      os.path.dirname(os.path.realpath(__file__)), 'int_controls_widget.ui'
+        #  )
+        #  self.ui_con = UiLoader().load(ui_control)
+
+        #  ui_monitor = os.path.join(
+        #      os.path.dirname(os.path.realpath(__file__)), 'chan_monitor_widget.ui'
+        #  )
+        #  self.ui_mon = UiLoader().load(ui_monitor)
+     
+        #  ui_graph = os.path.join(
+        #      os.path.dirname(os.path.realpath(__file__)), 'temp_graph_widget.ui'
+        #  )
+        #  self.ui_graph = UiLoader().load(ui_graph)
+
+        # # #   and auto place the widgets in the UI
+        # #  self.auto_place_widgets(("Interlock Controls",self.ui_con),("Channel Monitor",self.ui_mon),
+        # #                          ("Temperature Graph",self.ui_graph))
+        #  self.get_tab_layout().addWidget(self.ui_con)
+        #  self.get_tab_layout().addWidget(self.ui_mon)
+        #  self.get_tab_layout().addWidget(self.ui_graph)
+         # layout.addWidget(self.ui)
+         
+         #self.get_tab_layout().addItem(QSpacerItem(0,0,QSizePolicy.Minimum,QSizePolicy.MinimumExpanding))
+         
+         scrollArea = QtWidgets.QScrollArea()
+         #scrollArea.setBackgroundRole(QPalette.Dark)
+         scrollArea.setWidget(self.ui)
+
          self.numSensors = 16
          self.contin_on = False
          self.shot_read = False
@@ -51,7 +115,7 @@ class Arduino_Interlock_Tab(DeviceTab):
          self.plot_temp = np.zeros([17, 1])
          self.plot_start = 0
          
-         layout.addWidget(self.ui)
+         layout.addWidget(scrollArea)
          self.graph_widget = self.ui.graph_widget
 
          # define the data
@@ -85,6 +149,18 @@ class Arduino_Interlock_Tab(DeviceTab):
                                 name ='Ch_13')
          self.ch_16_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[15], pen =[250, 250, 250],# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
                                 name ='Ch_16')
+         
+         self.ui.channel_1_button.setStyleSheet("background-color : red")
+         self.ui.channel_2_button.setStyleSheet("background-color : yellow")
+         self.ui.channel_3_button.setStyleSheet("background-color : lime")
+         self.ui.channel_4_button.setStyleSheet("background-color : cyan")
+         self.ui.channel_5_button.setStyleSheet("background-color : blue")
+         self.ui.channel_9_button.setStyleSheet("background-color : #f8bbd0")      #pink
+         self.ui.channel_10_button.setStyleSheet("background-color : #b868c8")     #violet
+         self.ui.channel_11_button.setStyleSheet("background-color : #ff8800")     #orange
+         self.ui.channel_12_button.setStyleSheet("background-color : #ccff68")        #mint-green
+         self.ui.channel_13_button.setStyleSheet("background-color : #d7ccc8")        #grey
+         self.ui.channel_16_button.setStyleSheet("background-color : #fafafa")        #white
          
          # # Connect signals for buttons
          self.ui.interlock_controls.clicked.connect(self.interlock_controls_clicked)
@@ -227,34 +303,6 @@ class Arduino_Interlock_Tab(DeviceTab):
          pixmap = icon.pixmap(QtCore.QSize(16, 16))
          self.ui.status_icon.setPixmap(pixmap)
 
-          
-         
-         #self.supports_smart_programming(self.use_smart_programming) 
-
-    #grabs the initial packet from the arduino (grabs all channel temperatures, setpoints, and the interlock status)
-    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)
-    def initial_grab(self):
-        temp_init, set_init, stat_init = yield(self.queue_work(self._primary_worker,'initial_packet'))
-        for ch in range(self.numSensors):
-             chName = ch+1
-             self.temp[ch].setText('%s C' %(temp_init[str(chName)]))
-             self.setpoint[ch].setText('%s C' %(set_init[str(chName)]))
-            
-
-    def initialise_workers(self):
-        worker_initialisation_kwargs = self.connection_table.find_by_name(self.device_name).properties
-        worker_initialisation_kwargs['addr'] = self.BLACS_connection
-        self.create_worker(
-            'main_worker',
-            'user_devices.Arduino_Interlock.blacs_workers.Arduino_Interlock_Worker',
-            worker_initialisation_kwargs,
-        )
-        self.primary_worker = 'main_worker'
-
-
-    def plot(self, time, temp):    
-        self.graph_widget.plot(time, temp)
-
 
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
     def interlock_controls_clicked(self, button):
@@ -291,7 +339,71 @@ class Arduino_Interlock_Tab(DeviceTab):
             self.ui.graph_widget.show()
             self.ui.push_widg.hide()
             self.gra_toggle = True
-            self.ui.temp_graph.setToolTip('Click to hide')
+            self.ui.temp_graph.setToolTip('Click to hide')      
+         
+         #self.supports_smart_programming(self.use_smart_programming) 
+
+    #grabs the initial packet from the arduino (grabs all channel temperatures, setpoints, and the interlock status)
+    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)
+    def initial_grab(self):
+        temp_init, set_init, stat_init = yield(self.queue_work(self._primary_worker,'initial_packet'))
+        for ch in range(self.numSensors):
+             chName = ch+1
+             self.temp[ch].setText('%s C' %(temp_init[str(chName)]))
+             self.setpoint[ch].setText('%s C' %(set_init[str(chName)]))
+            
+
+    def initialise_workers(self):
+        worker_initialisation_kwargs = self.connection_table.find_by_name(self.device_name).properties
+        worker_initialisation_kwargs['addr'] = self.BLACS_connection
+        self.create_worker(
+            'main_worker',
+            'user_devices.Arduino_Interlock.blacs_workers.Arduino_Interlock_Worker',
+            worker_initialisation_kwargs,
+        )
+        self.primary_worker = 'main_worker'
+
+
+    def plot(self, time, temp):    
+        self.graph_widget.plot(time, temp)
+
+
+    # @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+    # def interlock_controls_clicked(self, button):
+    #     if self.con_toggle:
+    #         self.ui.control_box.hide()
+    #         self.con_toggle = False
+    #         self.ui.interlock_controls.setToolTip('Click to show')
+    #     else:
+    #         self.ui.control_box.show()
+    #         self.con_toggle = True
+    #         self.ui.interlock_controls.setToolTip('Click to hide')
+
+
+    # @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+    # def channel_monitor_clicked(self, button):
+    #     if self.mon_toggle:
+    #         self.ui.monitor_box.hide()
+    #         self.mon_toggle = False
+    #         self.ui.channel_monitor.setToolTip('Click to show')
+    #     else:
+    #         self.ui.monitor_box.show()
+    #         self.mon_toggle = True
+    #         self.ui.channel_monitor.setToolTip('Click to hide')
+       
+
+    # @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+    # def temp_graph_clicked(self, button):
+    #     if self.gra_toggle:
+    #         self.ui.graph_widget.hide()
+    #         self.ui.push_widg.show()
+    #         self.gra_toggle = False
+    #         self.ui.temp_graph.setToolTip('Click to show')
+    #     else:
+    #         self.ui.graph_widget.show()
+    #         self.ui.push_widg.hide()
+    #         self.gra_toggle = True
+    #         self.ui.temp_graph.setToolTip('Click to hide')
              
         
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
