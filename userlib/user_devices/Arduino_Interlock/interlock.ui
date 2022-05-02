@@ -1099,7 +1099,7 @@
            <widget class="QPushButton" name="channel_2_button">
             <property name="font">
              <font>
-              <underline>true</underline>
+              <underline>false</underline>
              </font>
             </property>
             <property name="text">
@@ -1139,7 +1139,7 @@
            <widget class="QPushButton" name="channel_4_button">
             <property name="font">
              <font>
-              <underline>true</underline>
+              <underline>false</underline>
              </font>
             </property>
             <property name="text">
@@ -1151,7 +1151,7 @@
            <widget class="QPushButton" name="channel_3_button">
             <property name="font">
              <font>
-              <underline>true</underline>
+              <underline>false</underline>
              </font>
             </property>
             <property name="text">
@@ -1163,7 +1163,7 @@
            <widget class="QPushButton" name="channel_9_button">
             <property name="font">
              <font>
-              <underline>true</underline>
+              <underline>false</underline>
              </font>
             </property>
             <property name="text">
@@ -1175,7 +1175,7 @@
            <widget class="QPushButton" name="channel_10_button">
             <property name="font">
              <font>
-              <underline>true</underline>
+              <underline>false</underline>
              </font>
             </property>
             <property name="text">
@@ -1187,7 +1187,7 @@
            <widget class="QPushButton" name="channel_5_button">
             <property name="font">
              <font>
-              <underline>true</underline>
+              <underline>false</underline>
              </font>
             </property>
             <property name="text">
@@ -1199,7 +1199,7 @@
            <widget class="QPushButton" name="channel_13_button">
             <property name="font">
              <font>
-              <underline>true</underline>
+              <underline>false</underline>
              </font>
             </property>
             <property name="text">
@@ -1211,7 +1211,7 @@
            <widget class="QPushButton" name="channel_11_button">
             <property name="font">
              <font>
-              <underline>true</underline>
+              <underline>false</underline>
              </font>
             </property>
             <property name="text">
@@ -1223,7 +1223,7 @@
            <widget class="QPushButton" name="channel_16_button">
             <property name="font">
              <font>
-              <underline>true</underline>
+              <underline>false</underline>
              </font>
             </property>
             <property name="text">
@@ -1235,7 +1235,7 @@
            <widget class="QPushButton" name="channel_12_button">
             <property name="font">
              <font>
-              <underline>true</underline>
+              <underline>false</underline>
              </font>
             </property>
             <property name="text">
@@ -1247,7 +1247,7 @@
            <widget class="QPushButton" name="channel_1_button">
             <property name="font">
              <font>
-              <underline>true</underline>
+              <underline>false</underline>
              </font>
             </property>
             <property name="toolTip">

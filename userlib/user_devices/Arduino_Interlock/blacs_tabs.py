@@ -92,7 +92,6 @@ class Arduino_Interlock_Tab(DeviceTab):
          #self.get_tab_layout().addItem(QSpacerItem(0,0,QSizePolicy.Minimum,QSizePolicy.MinimumExpanding))
          
          scrollArea = QtWidgets.QScrollArea()
-         #scrollArea.setBackgroundRole(QPalette.Dark)
          scrollArea.setWidget(self.ui)
 
          self.numSensors = 16
@@ -107,6 +106,8 @@ class Arduino_Interlock_Tab(DeviceTab):
          self.adjust = []
          self.setpoint = []
          self.temp = []
+         self.chanBut = []
+         self.chanText = []
          self.chan_tog = [True, True, True, True, True, True, True, True, 
                           True, True, True, True, True, True, True, True]
          
@@ -127,40 +128,129 @@ class Arduino_Interlock_Tab(DeviceTab):
          plt.setLabel('left', 'Temperature', units ='degC')
          plt.setLabel('bottom', 'Time', units ='sec')
          plt.setTitle(title)
-         self.ch_1_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[0], pen ='r',# symbol = 'o', symbolPen = 'r', symbolBrush = 0.05, 
+         self.ch_1_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[0], pen ='r',
                                 name ='Ch_1')
-         self.ch_2_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[1], pen ='y',# symbol = 'o', symbolPen = 'y', symbolBrush = 0.05, 
+         self.ch_2_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[1], pen ='y',
                                 name ='Ch_2')
-         self.ch_3_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[2], pen ='g',# symbol = 'o', symbolPen = 'g', symbolBrush = 0.05,
+         self.ch_3_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[2], pen ='g',
                                 name ='Ch_3')
-         self.ch_4_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[3], pen ='c',# symbol = 'o', symbolPen = 'c', symbolBrush = 0.05,
+         self.ch_4_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[3], pen ='c',
                                 name ='Ch_4')
-         self.ch_5_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[4], pen ='b',# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
+         self.ch_5_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[4], pen =[20, 141, 255],
                                 name ='Ch_5')
-         self.ch_9_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[8], pen =[248, 187, 208],# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
+         self.ch_9_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[8], pen =[248, 187, 208],
                                 name ='Ch_9')
-         self.ch_10_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[9], pen =[184, 104, 200],# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
+         self.ch_10_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[9], pen =[184, 104, 200],
                                 name ='Ch_10')
-         self.ch_11_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[10], pen =[255, 136, 0],# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
+         self.ch_11_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[10], pen =[255, 136, 0],
                                 name ='Ch_11')
-         self.ch_12_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[11], pen =[204, 255, 144],# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
+         self.ch_12_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[11], pen =[204, 255, 144],
                                 name ='Ch_12')
-         self.ch_13_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[12], pen =[215, 204, 200],# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
+         self.ch_13_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[12], pen =[215, 204, 200],
                                 name ='Ch_13')
-         self.ch_16_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[15], pen =[250, 250, 250],# symbol = 'o', symbolPen = 'b', symbolBrush = 0.05,
+         self.ch_16_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[15], pen =[250, 250, 250],
                                 name ='Ch_16')
          
-         self.ui.channel_1_button.setStyleSheet("background-color : red")
-         self.ui.channel_2_button.setStyleSheet("background-color : yellow")
-         self.ui.channel_3_button.setStyleSheet("background-color : lime")
-         self.ui.channel_4_button.setStyleSheet("background-color : cyan")
-         self.ui.channel_5_button.setStyleSheet("background-color : blue")
-         self.ui.channel_9_button.setStyleSheet("background-color : #f8bbd0")      #pink
-         self.ui.channel_10_button.setStyleSheet("background-color : #b868c8")     #violet
-         self.ui.channel_11_button.setStyleSheet("background-color : #ff8800")     #orange
-         self.ui.channel_12_button.setStyleSheet("background-color : #ccff68")        #mint-green
-         self.ui.channel_13_button.setStyleSheet("background-color : #d7ccc8")        #grey
-         self.ui.channel_16_button.setStyleSheet("background-color : #fafafa")        #white
+         chan1Text = ("\u0332".join(" Chan 1 "))
+         self.ui.channel_1_button.setText("%s \n 0.00 C" %(chan1Text))
+         self.Chan1Col = "red"
+         self.ui.channel_1_button.setStyleSheet("background-color : %s;"
+                                                "border-style: solid;"
+                                                "border-width: 1px;"
+                                                "border-color: gray;"
+                                                "border-radius: 3px"
+                                                %(self.Chan1Col))
+         chan2Text = ("\u0332".join(" Chan 2 "))
+         self.ui.channel_2_button.setText("%s \n 0.00 C" %(chan2Text))
+         self.Chan2Col = "yellow"
+         self.ui.channel_2_button.setStyleSheet("background-color : %s;"
+                                                "bacjground-style: gradient;"
+                                                "border-style: solid;"
+                                                "border-width: 1px;"
+                                                "border-color: gray;"
+                                                "border-radius: 3px"
+                                                %(self.Chan2Col))
+         chan3Text = ("\u0332".join(" Chan 3 "))
+         self.ui.channel_3_button.setText("%s \n 0.00 C" %(chan3Text))
+         self.Chan3Col = "lime"
+         self.ui.channel_3_button.setStyleSheet("background-color : %s;"
+                                                "border-style: solid;"
+                                                "border-width: 1px;"
+                                                "border-color: gray;"
+                                                "border-radius: 3px"
+                                                %(self.Chan3Col))
+         chan4Text = ("\u0332".join(" Chan 4 "))
+         self.ui.channel_4_button.setText("%s \n 0.00 C" %(chan4Text))
+         self.Chan4Col = "cyan"
+         self.ui.channel_4_button.setStyleSheet("background-color : %s;" 
+                                                "border-style: solid;"
+                                                "border-width: 1px;"
+                                                "border-color: gray;"
+                                                "border-radius: 3px"
+                                                %(self.Chan4Col))
+         chan5Text = ("\u0332".join(" Chan 5 "))
+         self.ui.channel_5_button.setText("%s \n 0.00 C" %(chan5Text))
+         self.Chan5Col = "#148dff" #blue
+         self.ui.channel_5_button.setStyleSheet("background-color : %s;"
+                                                "border-style: solid;"
+                                                "border-width: 1px;"
+                                                "border-color: gray;"
+                                                "border-radius: 3px"
+                                                %(self.Chan5Col))
+         chan9Text = ("\u0332".join(" Chan 9 "))
+         self.ui.channel_9_button.setText("%s \n 0.00 C" %(chan9Text))
+         self.Chan9Col = "#f8bbd0" #pink
+         self.ui.channel_9_button.setStyleSheet("background-color : %s;"
+                                                "border-style: solid;"
+                                                "border-width: 1px;"
+                                                "border-color: gray;"
+                                                "border-radius: 3px"
+                                                %(self.Chan9Col))
+         chan10Text = ("\u0332".join(" Chan 10 "))
+         self.ui.channel_10_button.setText("%s \n 0.00 C" %(chan10Text))
+         self.Chan10Col = "#b868c8" #violet
+         self.ui.channel_10_button.setStyleSheet("background-color : %s;"
+                                                "border-style: solid;"
+                                                "border-width: 1px;"
+                                                "border-color: gray;"
+                                                "border-radius: 3px"
+                                                %(self.Chan10Col))
+         chan11Text = ("\u0332".join(" Chan 11 "))
+         self.ui.channel_11_button.setText("%s \n 0.00 C" %(chan11Text))
+         self.Chan11Col = "#ff8800" #orange
+         self.ui.channel_11_button.setStyleSheet("background-color : %s;"
+                                                "border-style: solid;"
+                                                "border-width: 1px;"
+                                                "border-color: gray;"
+                                                "border-radius: 3px"
+                                                %(self.Chan11Col))
+         chan12Text = ("\u0332".join(" Chan 12 "))
+         self.ui.channel_12_button.setText("%s \n 0.00 C" %(chan12Text))
+         self.Chan12Col = "#b3ffcb" #mint-green
+         self.ui.channel_12_button.setStyleSheet("background-color : %s;"
+                                                "border-style: solid;"
+                                                "border-width: 1px;"
+                                                "border-color: gray;"
+                                                "border-radius: 3px"
+                                                %(self.Chan12Col))
+         chan13Text = ("\u0332".join(" Chan 13 "))
+         self.ui.channel_13_button.setText("%s \n 0.00 C" %(chan13Text))
+         self.Chan13Col = "#d7ccc8" #grey
+         self.ui.channel_13_button.setStyleSheet("background-color : %s;"
+                                                "border-style: solid;"
+                                                "border-width: 1px;"
+                                                "border-color: gray;"
+                                                "border-radius: 3px"
+                                                %(self.Chan13Col))
+         chan16Text = ("\u0332".join(" Chan 16 "))
+         self.ui.channel_16_button.setText("%s \n 0.00 C" %(chan16Text))
+         self.Chan16Col = "#fafafa" #white
+         self.ui.channel_16_button.setStyleSheet("background-color : %s;"
+                                                "border-style: solid;"
+                                                "border-width: 1px;"
+                                                "border-color: gray;"
+                                                "border-radius: 3px"
+                                                %(self.Chan16Col))
          
          # # Connect signals for buttons
          self.ui.interlock_controls.clicked.connect(self.interlock_controls_clicked)
@@ -201,15 +291,51 @@ class Arduino_Interlock_Tab(DeviceTab):
          
          #Sets icons for start and stop continuous
          self.ui.start_continuous.setIcon(QtGui.QIcon(':/qtutils/fugue/control'))
-         self.ui.start_continuous.setToolTip('Periodic Updating of the Interlock Status and Thermocouple Temps')
+         self.ui.start_continuous.setToolTip('Starts Automatic Updating of Temperatures, Graph, and Status')
          self.ui.stop_continuous.setIcon(QtGui.QIcon(':/qtutils/fugue/control-stop-square'))
-         self.ui.start_continuous.setToolTip('Will Cease Periodic Updating of the Interlock Status and Thermocouple Temps')
+         self.ui.stop_continuous.setToolTip('Ends Automatic Updating of Temperatures, Graph, and Status')
          self.ui.interlock_controls.setIcon(QtGui.QIcon(':/qtutils/fugue/toggle-small'))
          self.ui.interlock_controls.setToolTip('Click to hide')
          self.ui.channel_monitor.setIcon(QtGui.QIcon(':/qtutils/fugue/toggle-small'))
          self.ui.channel_monitor.setToolTip('Click to hide')
          self.ui.temp_graph.setIcon(QtGui.QIcon(':/qtutils/fugue/toggle-small'))
          self.ui.temp_graph.setToolTip('Click to hide')
+    
+         #Adds the channel buttons as items in a list for convenient calling
+         self.chanBut.append(self.ui.channel_1_button)
+         self.chanBut.append(self.ui.channel_2_button)
+         self.chanBut.append(self.ui.channel_3_button)
+         self.chanBut.append(self.ui.channel_4_button)
+         self.chanBut.append(self.ui.channel_5_button)
+         self.chanBut.append(self.ui.channel_6_marker)
+         self.chanBut.append(self.ui.channel_7_marker)
+         self.chanBut.append(self.ui.channel_8_marker)
+         self.chanBut.append(self.ui.channel_9_button)
+         self.chanBut.append(self.ui.channel_10_button)
+         self.chanBut.append(self.ui.channel_11_button)
+         self.chanBut.append(self.ui.channel_12_button)
+         self.chanBut.append(self.ui.channel_13_button)
+         self.chanBut.append(self.ui.channel_14_marker)
+         self.chanBut.append(self.ui.channel_15_marker)
+         self.chanBut.append(self.ui.channel_16_button)
+    
+         #Adds the channel names as items in a list for convenient calling
+         self.chanText.append(chan1Text)
+         self.chanText.append(chan2Text)
+         self.chanText.append(chan3Text)
+         self.chanText.append(chan4Text)
+         self.chanText.append(chan5Text)
+         self.chanText.append("Chan_6")
+         self.chanText.append("Chan_7")
+         self.chanText.append("Chan_8")
+         self.chanText.append(chan9Text)
+         self.chanText.append(chan10Text)
+         self.chanText.append(chan11Text)
+         self.chanText.append(chan12Text)
+         self.chanText.append(chan13Text)
+         self.chanText.append("Chan_14")
+         self.chanText.append("Chan_15")
+         self.chanText.append(chan16Text)    
     
          #Adds the temperature channel labels as items in a list for convenient calling
          self.temp.append(self.ui.chan_1_temp)
@@ -534,41 +660,60 @@ class Arduino_Interlock_Tab(DeviceTab):
         if self.chan_tog[0]:
             self.chan_tog[0] = False
             self.ch_1_ref.setData([],[])
+            self.ui.channel_1_button.setStyleSheet("background-color : #8c0000;" "border-style: solid;"
+                            "border-width: 1px;" "border-color: gray;" "border-radius: 3px")
+            self.ui.channel_1_button.setToolTip('Click to Show on Graph')                                                   
         else:
             self.chan_tog[0] = True
-            # self.ch_1_ref = self.graph_widget.plot(self.plot_temp[5], self.plot_temp[0], pen ='r',# symbol = 'o', symbolPen = 'r', symbolBrush = 0.05, 
-            #                        name ='Ch_1')
-            self.ch_1_ref.setData(self.plot_temp[16, 0:self.iter_count-1], self.plot_temp[0, 0:self.iter_count-1])    
-    
+            self.ch_1_ref.setData(self.plot_temp[16, 0:self.iter_count-1], self.plot_temp[0, 0:self.iter_count-1])
+            self.ui.channel_1_button.setStyleSheet("background-color : %s;" "border-style: solid;"
+                            "border-width: 1px;" "border-color: gray;" "border-radius: 3px" %(self.Chan1Col))
+            self.ui.channel_1_button.setToolTip('Click to Hide from Graph')
     
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
     def channel_2_clicked(self, button):
         if self.chan_tog[1]:
             self.chan_tog[1] = False
             self.ch_2_ref.setData([],[])
+            self.ui.channel_2_button.setStyleSheet("background-color : #9a9a00;" "border-style: solid;"
+                            "border-width: 1px;" "border-color: gray;" "border-radius: 3px")
+            self.ui.channel_2_button.setToolTip('Click to Show on Graph')
         else:
             self.chan_tog[1] = True
             self.ch_2_ref.setData(self.plot_temp[16, 0:self.iter_count-1], self.plot_temp[1, 0:self.iter_count-1])    
-    
+            self.ui.channel_2_button.setStyleSheet("background-color : %s;" "border-style: solid;"
+                            "border-width: 1px;" "border-color: gray;" "border-radius: 3px" %(self.Chan2Col))
+            self.ui.channel_2_button.setToolTip('Click to Hide from Graph')
     
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
     def channel_3_clicked(self, button):
         if self.chan_tog[2]:
             self.chan_tog[2] = False
             self.ch_3_ref.setData([],[])
+            self.ui.channel_3_button.setStyleSheet("background-color : #008800;" "border-style: solid;"
+                            "border-width: 1px;" "border-color: gray;" "border-radius: 3px")
+            self.ui.channel_3_button.setToolTip('Click to Show on Graph')
         else:
             self.chan_tog[2] = True
             self.ch_3_ref.setData(self.plot_temp[16, 0:self.iter_count-1], self.plot_temp[2, 0:self.iter_count-1])    
-    
+            self.ui.channel_3_button.setStyleSheet("background-color : %s;" "border-style: solid;"
+                            "border-width: 1px;" "border-color: gray;" "border-radius: 3px" %(self.Chan3Col))
+            self.ui.channel_3_button.setToolTip('Click to Hide from Graph')
     
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
     def channel_4_clicked(self, button):
         if self.chan_tog[3]:
             self.chan_tog[3] = False
             self.ch_4_ref.setData([],[])
+            self.ui.channel_4_button.setStyleSheet("background-color : #009999;" "border-style: solid;"
+                            "border-width: 1px;" "border-color: gray;" "border-radius: 3px")
+            self.ui.channel_4_button.setToolTip('Click to Show on Graph')
         else:
             self.chan_tog[3] = True
-            self.ch_4_ref.setData(self.plot_temp[16, 0:self.iter_count-1], self.plot_temp[3, 0:self.iter_count-1])    
+            self.ch_4_ref.setData(self.plot_temp[16, 0:self.iter_count-1], self.plot_temp[3, 0:self.iter_count-1]) 
+            self.ui.channel_4_button.setStyleSheet("background-color : %s;" "border-style: solid;"
+                            "border-width: 1px;" "border-color: gray;" "border-radius: 3px" %(self.Chan4Col))
+            self.ui.channel_4_button.setToolTip('Click to Hide from Graph')
     
     
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
@@ -576,9 +721,15 @@ class Arduino_Interlock_Tab(DeviceTab):
         if self.chan_tog[4]:
             self.chan_tog[4] = False
             self.ch_5_ref.setData([],[])
+            self.ui.channel_5_button.setStyleSheet("background-color : #094175;" "border-style: solid;"
+                            "border-width: 1px;" "border-color: gray;" "border-radius: 3px")
+            self.ui.channel_5_button.setToolTip('Click to Show on Graph')
         else:
             self.chan_tog[4] = True
             self.ch_5_ref.setData(self.plot_temp[16, 0:self.iter_count-1], self.plot_temp[4, 0:self.iter_count-1])    
+            self.ui.channel_5_button.setStyleSheet("background-color : %s;" "border-style: solid;"
+                            "border-width: 1px;" "border-color: gray;" "border-radius: 3px" %(self.Chan5Col))
+            self.ui.channel_5_button.setToolTip('Click to Hide from Graph')
             
             
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
@@ -586,38 +737,63 @@ class Arduino_Interlock_Tab(DeviceTab):
         if self.chan_tog[8]:
             self.chan_tog[8] = False
             self.ch_9_ref.setData([],[])
+            self.ui.channel_9_button.setStyleSheet("background-color : #987380;" "border-style: solid;"
+                            "border-width: 1px;" "border-color: gray;" "border-radius: 3px")
+            self.ui.channel_9_button.setToolTip('Click to Show on Graph')
         else:
             self.chan_tog[8] = True
             self.ch_9_ref.setData(self.plot_temp[16, 0:self.iter_count-1], self.plot_temp[8, 0:self.iter_count-1])  
-            
+            self.ui.channel_9_button.setStyleSheet("background-color : %s;" "border-style: solid;"
+                            "border-width: 1px;" "border-color: gray;" "border-radius: 3px" %(self.Chan9Col))
+            self.ui.channel_9_button.setToolTip('Click to Hide from Graph')
+
 
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
     def channel_10_clicked(self, button):
         if self.chan_tog[9]:
             self.chan_tog[9] = False
             self.ch_10_ref.setData([],[])
+            self.ui.channel_10_button.setStyleSheet("background-color : #673a70;" "border-style: solid;"
+                            "border-width: 1px;" "border-color: gray;" "border-radius: 3px")
+            self.ui.channel_10_button.setToolTip('Click to Show on Graph')
         else:
             self.chan_tog[9] = True
             self.ch_10_ref.setData(self.plot_temp[16, 0:self.iter_count-1], self.plot_temp[9, 0:self.iter_count-1])  
-            
+            self.ui.channel_10_button.setStyleSheet("background-color : %s;" "border-style: solid;"
+                            "border-width: 1px;" "border-color: gray;" "border-radius: 3px" %(self.Chan10Col))
+            self.ui.channel_10_button.setToolTip('Click to Hide from Graph')
+
 
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
     def channel_11_clicked(self, button):
         if self.chan_tog[10]:
             self.chan_tog[10] = False
             self.ch_11_ref.setData([],[])
+            self.ui.channel_11_button.setStyleSheet("background-color : #a35700;" "border-style: solid;"
+                            "border-width: 1px;" "border-color: gray;" "border-radius: 3px")
+            self.ui.channel_11_button.setToolTip('Click to Show on Graph')
         else:
             self.chan_tog[10] = True
             self.ch_11_ref.setData(self.plot_temp[16, 0:self.iter_count-1], self.plot_temp[10, 0:self.iter_count-1])  
+            self.ui.channel_11_button.setStyleSheet("background-color : %s;" "border-style: solid;"
+                            "border-width: 1px;" "border-color: gray;" "border-radius: 3px" %(self.Chan11Col))
+            self.ui.channel_11_button.setToolTip('Click to Hide from Graph')
+
             
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
     def channel_12_clicked(self, button):
         if self.chan_tog[11]:
             self.chan_tog[11] = False
             self.ch_12_ref.setData([],[])
+            self.ui.channel_12_button.setStyleSheet("background-color : #6ba66f;" "border-style: solid;"
+                            "border-width: 1px;" "border-color: gray;" "border-radius: 3px")
+            self.ui.channel_12_button.setToolTip('Click to Show on Graph')
         else:
             self.chan_tog[11] = True
             self.ch_12_ref.setData(self.plot_temp[16, 0:self.iter_count-1], self.plot_temp[11, 0:self.iter_count-1])  
+            self.ui.channel_12_button.setStyleSheet("background-color : %s;" "border-style: solid;"
+                            "border-width: 1px;" "border-color: gray;" "border-radius: 3px" %(self.Chan12Col))
+            self.ui.channel_12_button.setToolTip('Click to Hide from Graph')
             
             
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
@@ -625,9 +801,15 @@ class Arduino_Interlock_Tab(DeviceTab):
         if self.chan_tog[12]:
             self.chan_tog[12] = False
             self.ch_13_ref.setData([],[])
+            self.ui.channel_13_button.setStyleSheet("background-color : #746e6c;" "border-style: solid;"
+                            "border-width: 1px;" "border-color: gray;" "border-radius: 3px")
+            self.ui.channel_13_button.setToolTip('Click to Show on Graph')
         else:
             self.chan_tog[12] = True
             self.ch_13_ref.setData(self.plot_temp[16, 0:self.iter_count-1], self.plot_temp[12, 0:self.iter_count-1])  
+            self.ui.channel_13_button.setStyleSheet("background-color : %s;" "border-style: solid;"
+                            "border-width: 1px;" "border-color: gray;" "border-radius: 3px" %(self.Chan13Col))
+            self.ui.channel_13_button.setToolTip('Click to Hide from Graph')
 
 
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
@@ -635,10 +817,16 @@ class Arduino_Interlock_Tab(DeviceTab):
         if self.chan_tog[15]:
             self.chan_tog[15] = False
             self.ch_16_ref.setData([],[])
+            self.ui.channel_16_button.setStyleSheet("background-color : #adadad;" "border-style: solid;"
+                            "border-width: 1px;" "border-color: gray;" "border-radius: 3px")
+            self.ui.channel_16_button.setToolTip('Click to Show on Graph')
         else:
             self.chan_tog[15] = True
             self.ch_16_ref.setData(self.plot_temp[16, 0:self.iter_count-1], self.plot_temp[15, 0:self.iter_count-1])  
-            
+            self.ui.channel_16_button.setStyleSheet("background-color : %s;" "border-style: solid;"
+                            "border-width: 1px;" "border-color: gray;" "border-radius: 3px" %(self.Chan16Col))
+            self.ui.channel_16_button.setToolTip('Click to Hide from Graph')            
+
     
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
     def grab_temp_update(self):
@@ -754,6 +942,7 @@ class Arduino_Interlock_Tab(DeviceTab):
         for ch in range(self.numSensors):
             chName = ch+1
             self.temp[ch].setText('%s C' %(temp_up[str(chName)]))
+            self.chanBut[ch].setText("%s \n %s C" %(self.chanText[ch], temp_up[str(chName)]))
             self.setpoint[ch].setText('%s C' %(sets_up[str(chName)]))
         intlock_trigger = str(stat_up)[0:4]
         if intlock_trigger == "Fals":
@@ -769,21 +958,6 @@ class Arduino_Interlock_Tab(DeviceTab):
             pixmap = icon.pixmap(QtCore.QSize(16, 16))
             self.ui.status_icon.setPixmap(pixmap)
             self.ui.status_update.setText('%s' %(intlock_trigger))
-        #create plot of ch1-ch5 temp    
-        # self.plot_temp_ch1.append(temp_up['1'])
-        # self.plot_temp_ch2.append(temp_up['2'])
-        # self.plot_temp_ch3.append(temp_up['3'])
-        # self.plot_temp_ch4.append(temp_up['4'])
-        # self.plot_temp_ch5.append(temp_up['5'])
-        # self.plot_time.append(int(time.time()-self.plot_start))
-        # if self.iter_count > self.graph_points:
-        #     self.iter_count = 1440
-        #     self.plot_temp_ch1 = np.roll(self.plot_temp_ch1, -1)
-        #     self.plot_temp_ch2 = np.roll(self.plot_temp_ch2, -1)
-        #     self.plot_temp_ch3 = np.roll(self.plot_temp_ch3, -1)
-        #     self.plot_temp_ch4 = np.roll(self.plot_temp_ch4, -1)
-        #     self.plot_temp_ch5 = np.roll(self.plot_temp_ch5, -1)
-        #     self.plot_time = np.insert(self.plot_time, -1)
         if self.iter_count > (self.max_graph_points):
             self.iter_count = self.max_graph_points
             self.plot_temp = np.delete(self.plot_temp, [0], axis = 1)
