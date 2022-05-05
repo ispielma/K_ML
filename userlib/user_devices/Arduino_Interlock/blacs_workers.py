@@ -41,7 +41,7 @@ class Arduino_Interlock_Worker(Worker):
         # self.lastStat = ""
         self.newTemps = {}
         self.newSets = {}
-        self.newStat = ""
+        self.newStat = []
         
         self.timeTag = 0
         
@@ -75,7 +75,7 @@ class Arduino_Interlock_Worker(Worker):
         #temp_vals, intlock_stat = self.interlock.grab_full_packet()
         self.newTemps, self.newSets, self.newStat = self.interlock.grab_new_packet()
         temp_vals = self.newTemps
-        intlock_stat = self.newStat
+        intlock_stat = self.newStat[0]
         setpoint_vals = self.newSets
         self.interlock.call_plumber()     #to flush the serial
         downTime = time.time() - self.timeTag

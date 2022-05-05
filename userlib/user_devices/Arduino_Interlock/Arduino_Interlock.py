@@ -24,14 +24,15 @@ class Arduino_Interlock:
         
         self.temp_packet = ""
         self.setpoint_packet = ""
-        self.status = ""
-        self.lastStatus = ""
+        self.status_packet = ""
         
         #empty lists/dictionaries to be used for storing values
         self.temperatures = []
         self.lastTemps = []
         self.setpoints = []
         self.lastSetpoints = []
+        self.status = []
+        self.lastStatus = []
         self.packet = []
         
         self.chan_temps = {}
@@ -213,7 +214,7 @@ class Arduino_Interlock:
 
             # This will be stored on the python side as a list and then dictionary 
             #      of all the packet info (should be 16 channel temps, 16 setpoints, and the status)
-            self.temp_packet, self.setpoint_packet, self.status = output.split('#')
+            self.temp_packet, self.setpoint_packet, self.status_packet, junk = output.split('#')
             
             self.temperatures = self.temp_packet[:-1].split(",")
             #print(self.temperatures)
@@ -225,6 +226,7 @@ class Arduino_Interlock:
             self.chan_setpoints = self.convert_to_dict(self.setpoints)
             self.chan_lastSetpoints = self.chan_setpoints
             
+            self.status = self.status_packet[:-1].split(",")
             self.lastStatus = self.status
             #print(self.lastStatus)
             
@@ -244,7 +246,7 @@ class Arduino_Interlock:
 
             # This will be stored on the python side as a list and then dictionary 
             #      of all the packet info (should be 16 channel temps, 16 setpoints, and the status)
-            self.temp_packet, self.setpoint_packet, self.status = output.split('#')
+            self.temp_packet, self.setpoint_packet, self.status_packet, junk = output.split('#')
             #print(self.temp_packet)
             if self.temp_packet:
                 self.temperatures = self.temp_packet[:-1].split(",")
@@ -259,8 +261,11 @@ class Arduino_Interlock:
                 for ch in self.chan_setpoints:
                     self.chan_lastSetpoints[ch] = self.chan_setpoints[ch]
             
-            #print(self.status)
-            if self.status[0:4] == 'True' or self.status[0:4] == 'Fals':
+            #print(self.status_packet)
+            if self.status_packet:
+                self.status = self.status_packet[:-1].split(",")
+                if self.status[0] == 'True':
+                    self.status_trig = self.status[1]
                 self.lastStatus = self.status
             
             return self.chan_lastTemperatures, self.chan_lastSetpoints, self.lastStatus

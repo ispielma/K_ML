@@ -61,7 +61,7 @@ class Arduino_Interlock_Tab(DeviceTab):
          
           # Load monitor UI
          ui_filepath = os.path.join(
-             os.path.dirname(os.path.realpath(__file__)), 'interlock.ui'
+             os.path.dirname(os.path.realpath(__file__)), 'interlock_chan_buts.ui'
          )
          self.ui = UiLoader().load(ui_filepath)
          
@@ -105,16 +105,17 @@ class Arduino_Interlock_Tab(DeviceTab):
          self.set_setpoint_vals = []
          self.adjust = []
          self.setpoint = []
-         self.temp = []
          self.chanBut = []
          self.chanText = []
+         self.chanCol = []
+         self.chanDisCol = []
          self.chan_tog = [True, True, True, True, True, True, True, True, 
                           True, True, True, True, True, True, True, True]
          
          self.iter_count = 0
-         self.max_graph_points = 1440
-         self.plot_temp = np.zeros([17, 1])
-         self.plot_start = 0
+         self.max_graph_points = 1440           #maximum points to be saved for temp graphing
+         self.plot_temp = np.zeros([17, 1])             #creates an arry of 17 rows with 0s as the entries
+         self.plot_start = 0                #begins the plotting time at zero seconds
          
          layout.addWidget(scrollArea)
          self.graph_widget = self.ui.graph_widget
@@ -151,9 +152,11 @@ class Arduino_Interlock_Tab(DeviceTab):
          self.ch_16_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[15], pen =[250, 250, 250],
                                 name ='Ch_16')
          
+         
          chan1Text = ("\u0332".join(" Chan 1 "))
          self.ui.channel_1_button.setText("%s \n 0.00 C" %(chan1Text))
-         self.Chan1Col = "red"
+         #self.Chan1Col = "red"
+         self.Chan1Col = "qlineargradient(spread:pad, x1:0.489, y1:0.00568182, x2:0.489, y2:0.482955, stop:0 rgba(220, 0, 0, 255), stop:1 rgba(255, 0, 0, 255))"
          self.ui.channel_1_button.setStyleSheet("background-color : %s;"
                                                 "border-style: solid;"
                                                 "border-width: 1px;"
@@ -162,7 +165,8 @@ class Arduino_Interlock_Tab(DeviceTab):
                                                 %(self.Chan1Col))
          chan2Text = ("\u0332".join(" Chan 2 "))
          self.ui.channel_2_button.setText("%s \n 0.00 C" %(chan2Text))
-         self.Chan2Col = "yellow"
+         #self.Chan2Col = "yellow"
+         self.Chan2Col = "qlineargradient(spread:pad, x1:0.489, y1:0.00568182, x2:0.489, y2:0.482955, stop:0 rgba(220, 220, 0, 255), stop:1 rgba(255, 255, 0, 255))"
          self.ui.channel_2_button.setStyleSheet("background-color : %s;"
                                                 "bacjground-style: gradient;"
                                                 "border-style: solid;"
@@ -172,7 +176,8 @@ class Arduino_Interlock_Tab(DeviceTab):
                                                 %(self.Chan2Col))
          chan3Text = ("\u0332".join(" Chan 3 "))
          self.ui.channel_3_button.setText("%s \n 0.00 C" %(chan3Text))
-         self.Chan3Col = "lime"
+         #self.Chan3Col = "lime"
+         self.Chan3Col = "qlineargradient(spread:pad, x1:0.489, y1:0.00568182, x2:0.489, y2:0.482955, stop:0 rgba(0, 220, 0, 255), stop:1 rgba(0, 255, 0, 255))"
          self.ui.channel_3_button.setStyleSheet("background-color : %s;"
                                                 "border-style: solid;"
                                                 "border-width: 1px;"
@@ -181,7 +186,8 @@ class Arduino_Interlock_Tab(DeviceTab):
                                                 %(self.Chan3Col))
          chan4Text = ("\u0332".join(" Chan 4 "))
          self.ui.channel_4_button.setText("%s \n 0.00 C" %(chan4Text))
-         self.Chan4Col = "cyan"
+         #self.Chan4Col = "cyan"
+         self.Chan4Col = "qlineargradient(spread:pad, x1:0.489, y1:0.00568182, x2:0.489, y2:0.482955, stop:0 rgba(0, 220, 220, 255), stop:1 rgba(0, 255, 255, 255))"
          self.ui.channel_4_button.setStyleSheet("background-color : %s;" 
                                                 "border-style: solid;"
                                                 "border-width: 1px;"
@@ -190,7 +196,8 @@ class Arduino_Interlock_Tab(DeviceTab):
                                                 %(self.Chan4Col))
          chan5Text = ("\u0332".join(" Chan 5 "))
          self.ui.channel_5_button.setText("%s \n 0.00 C" %(chan5Text))
-         self.Chan5Col = "#148dff" #blue
+         #self.Chan5Col = "#148dff" #blue
+         self.Chan5Col = "qlineargradient(spread:pad, x1:0.489, y1:0.00568182, x2:0.489, y2:0.482955, stop:0 rgba(17, 122, 220, 255), stop:1 rgba(20, 141, 255, 255))"
          self.ui.channel_5_button.setStyleSheet("background-color : %s;"
                                                 "border-style: solid;"
                                                 "border-width: 1px;"
@@ -199,7 +206,8 @@ class Arduino_Interlock_Tab(DeviceTab):
                                                 %(self.Chan5Col))
          chan9Text = ("\u0332".join(" Chan 9 "))
          self.ui.channel_9_button.setText("%s \n 0.00 C" %(chan9Text))
-         self.Chan9Col = "#f8bbd0" #pink
+         #self.Chan9Col = "#f8bbd0" #pink
+         self.Chan9Col = "qlineargradient(spread:pad, x1:0.489, y1:0.00568182, x2:0.489, y2:0.482955, stop:0 rgba(218, 165, 184, 255), stop:1 rgba(248, 187, 208, 255))"
          self.ui.channel_9_button.setStyleSheet("background-color : %s;"
                                                 "border-style: solid;"
                                                 "border-width: 1px;"
@@ -208,7 +216,8 @@ class Arduino_Interlock_Tab(DeviceTab):
                                                 %(self.Chan9Col))
          chan10Text = ("\u0332".join(" Chan 10 "))
          self.ui.channel_10_button.setText("%s \n 0.00 C" %(chan10Text))
-         self.Chan10Col = "#b868c8" #violet
+         #self.Chan10Col = "#b868c8" #violet
+         self.Chan10Col = "qlineargradient(spread:pad, x1:0.489, y1:0.00568182, x2:0.489, y2:0.482955, stop:0 rgba(163, 92, 177, 255), stop:1 rgba(184, 104, 200, 255))"
          self.ui.channel_10_button.setStyleSheet("background-color : %s;"
                                                 "border-style: solid;"
                                                 "border-width: 1px;"
@@ -217,7 +226,8 @@ class Arduino_Interlock_Tab(DeviceTab):
                                                 %(self.Chan10Col))
          chan11Text = ("\u0332".join(" Chan 11 "))
          self.ui.channel_11_button.setText("%s \n 0.00 C" %(chan11Text))
-         self.Chan11Col = "#ff8800" #orange
+         #self.Chan11Col = "#ff8800" #orange
+         self.Chan11Col = "qlineargradient(spread:pad, x1:0.489, y1:0.00568182, x2:0.489, y2:0.482955, stop:0 rgba(220, 117, 0, 255), stop:1 rgba(255, 136, 0, 255))"
          self.ui.channel_11_button.setStyleSheet("background-color : %s;"
                                                 "border-style: solid;"
                                                 "border-width: 1px;"
@@ -226,7 +236,8 @@ class Arduino_Interlock_Tab(DeviceTab):
                                                 %(self.Chan11Col))
          chan12Text = ("\u0332".join(" Chan 12 "))
          self.ui.channel_12_button.setText("%s \n 0.00 C" %(chan12Text))
-         self.Chan12Col = "#b3ffcb" #mint-green
+         #self.Chan12Col = "#b3ffcb" #mint-green
+         self.Chan12Col = "qlineargradient(spread:pad, x1:0.489, y1:0.00568182, x2:0.489, y2:0.482955, stop:0 rgba(155, 220, 174, 255), stop:1 rgba(179, 255, 203, 255))"
          self.ui.channel_12_button.setStyleSheet("background-color : %s;"
                                                 "border-style: solid;"
                                                 "border-width: 1px;"
@@ -235,7 +246,8 @@ class Arduino_Interlock_Tab(DeviceTab):
                                                 %(self.Chan12Col))
          chan13Text = ("\u0332".join(" Chan 13 "))
          self.ui.channel_13_button.setText("%s \n 0.00 C" %(chan13Text))
-         self.Chan13Col = "#d7ccc8" #grey
+         #self.Chan13Col = "#d7ccc8" #tan
+         self.Chan13Col = "qlineargradient(spread:pad, x1:0.489, y1:0.00568182, x2:0.489, y2:0.482955, stop:0 rgba(189, 180, 177, 255), stop:1 rgba(215, 204, 200, 255))"
          self.ui.channel_13_button.setStyleSheet("background-color : %s;"
                                                 "border-style: solid;"
                                                 "border-width: 1px;"
@@ -244,13 +256,15 @@ class Arduino_Interlock_Tab(DeviceTab):
                                                 %(self.Chan13Col))
          chan16Text = ("\u0332".join(" Chan 16 "))
          self.ui.channel_16_button.setText("%s \n 0.00 C" %(chan16Text))
-         self.Chan16Col = "#fafafa" #white
+         #self.Chan16Col = "#fafafa" #white
+         self.Chan16Col = "qlineargradient(spread:pad, x1:0.489, y1:0.00568182, x2:0.489, y2:0.482955, stop:0 rgba(216, 216, 216, 255), stop:1 rgba(250, 250, 250, 255))"
          self.ui.channel_16_button.setStyleSheet("background-color : %s;"
                                                 "border-style: solid;"
                                                 "border-width: 1px;"
                                                 "border-color: gray;"
                                                 "border-radius: 3px"
                                                 %(self.Chan16Col))
+         
          
          # # Connect signals for buttons
          self.ui.interlock_controls.clicked.connect(self.interlock_controls_clicked)
@@ -318,48 +332,68 @@ class Arduino_Interlock_Tab(DeviceTab):
          self.chanBut.append(self.ui.channel_14_marker)
          self.chanBut.append(self.ui.channel_15_marker)
          self.chanBut.append(self.ui.channel_16_button)
-    
+         
+         #Adds the channel colors as items in a list for convenient calling
+         self.chanCol.append(self.Chan1Col)
+         self.chanCol.append(self.Chan2Col)
+         self.chanCol.append(self.Chan3Col)
+         self.chanCol.append(self.Chan4Col)
+         self.chanCol.append(self.Chan5Col)
+         self.chanCol.append("")
+         self.chanCol.append("")
+         self.chanCol.append("")
+         self.chanCol.append(self.Chan9Col)
+         self.chanCol.append(self.Chan10Col)
+         self.chanCol.append(self.Chan11Col)
+         self.chanCol.append(self.Chan12Col)
+         self.chanCol.append(self.Chan13Col)
+         self.chanCol.append("")
+         self.chanCol.append("")
+         self.chanCol.append(self.Chan16Col)
+         
+         #Adds the channel disabled colors as items in a list for convenient calling
+         self.chanDisCol.append("#8c0000")
+         self.chanDisCol.append("#9a9a00")
+         self.chanDisCol.append("#008800")
+         self.chanDisCol.append("#009999")
+         self.chanDisCol.append("#094175")
+         self.chanDisCol.append("")
+         self.chanDisCol.append("")
+         self.chanDisCol.append("")
+         self.chanDisCol.append("#987380")
+         self.chanDisCol.append("#673a70")
+         self.chanDisCol.append("#a35700")
+         self.chanDisCol.append("#6ba66f")
+         self.chanDisCol.append("#746e6c")
+         self.chanDisCol.append("")
+         self.chanDisCol.append("")
+         self.chanDisCol.append("#adadad")
+         
          #Adds the channel names as items in a list for convenient calling
          self.chanText.append(chan1Text)
          self.chanText.append(chan2Text)
          self.chanText.append(chan3Text)
          self.chanText.append(chan4Text)
          self.chanText.append(chan5Text)
-         self.chanText.append("Chan_6")
-         self.chanText.append("Chan_7")
-         self.chanText.append("Chan_8")
+         self.chanText.append("\u0332".join(" Chan 6 "))
+         self.chanText.append("\u0332".join(" Chan 7 "))
+         self.chanText.append("\u0332".join(" Chan 8 "))
          self.chanText.append(chan9Text)
          self.chanText.append(chan10Text)
          self.chanText.append(chan11Text)
          self.chanText.append(chan12Text)
          self.chanText.append(chan13Text)
-         self.chanText.append("Chan_14")
-         self.chanText.append("Chan_15")
+         self.chanText.append("\u0332".join(" Chan 14 "))
+         self.chanText.append("\u0332".join(" Chan 15 "))
          self.chanText.append(chan16Text)    
-    
-         #Adds the temperature channel labels as items in a list for convenient calling
-         self.temp.append(self.ui.chan_1_temp)
-         self.temp.append(self.ui.chan_2_temp)
-         self.temp.append(self.ui.chan_3_temp)
-         self.temp.append(self.ui.chan_4_temp)
-         self.temp.append(self.ui.chan_5_temp)
-         self.temp.append(self.ui.chan_6_temp)
-         self.temp.append(self.ui.chan_7_temp)
-         self.temp.append(self.ui.chan_8_temp)
-         self.temp.append(self.ui.chan_9_temp)
-         self.temp.append(self.ui.chan_10_temp)
-         self.temp.append(self.ui.chan_11_temp)
-         self.temp.append(self.ui.chan_12_temp)
-         self.temp.append(self.ui.chan_13_temp)
-         self.temp.append(self.ui.chan_14_temp)
-         self.temp.append(self.ui.chan_15_temp)
-         self.temp.append(self.ui.chan_16_temp)
-          
-         #Sets initial temperature values in the ui to 0.00
-         for ch in range(self.numSensors):
-             self.temp[ch].setText('0.00 C ')
          
-         #Adds the temperature channel labels as items in a list for convenient calling
+         self.chanBut[5].setText("%s \n 0.00 C" %(self.chanText[5]))
+         self.chanBut[6].setText("%s \n 0.00 C" %(self.chanText[6]))
+         self.chanBut[7].setText("%s \n 0.00 C" %(self.chanText[7]))
+         self.chanBut[13].setText("%s \n 0.00 C" %(self.chanText[13]))
+         self.chanBut[14].setText("%s \n 0.00 C" %(self.chanText[14]))
+         
+         #Adds the temperature setpoint labels as items in a list for convenient calling
          self.setpoint.append(self.ui.chan_1_setpoint)
          self.setpoint.append(self.ui.chan_2_setpoint)
          self.setpoint.append(self.ui.chan_3_setpoint)
@@ -421,6 +455,8 @@ class Arduino_Interlock_Tab(DeviceTab):
          for ch in range(self.numSensors):
              self.adjust[ch].hide()
          
+         self.ui.status_symbol.hide()
+         self.ui.status_message.hide()
          self.ui.stop_continuous.hide()
          self.ui.push_widg.hide()
          
@@ -475,7 +511,7 @@ class Arduino_Interlock_Tab(DeviceTab):
         temp_init, set_init, stat_init = yield(self.queue_work(self._primary_worker,'initial_packet'))
         for ch in range(self.numSensors):
              chName = ch+1
-             self.temp[ch].setText('%s C' %(temp_init[str(chName)]))
+             self.chanBut[ch].setText("%s \n %s C" %(self.chanText[ch], temp_init[str(chName)]))
              self.setpoint[ch].setText('%s C' %(set_init[str(chName)]))
             
 
@@ -489,6 +525,7 @@ class Arduino_Interlock_Tab(DeviceTab):
         )
         self.primary_worker = 'main_worker'
 
+        self.on_const_temps()
 
     def plot(self, time, temp):    
         self.graph_widget.plot(time, temp)
@@ -540,14 +577,36 @@ class Arduino_Interlock_Tab(DeviceTab):
         print(lock_stat)
         if lock_stat == "Digital Interlock Trigger... Stopping system!" or lock_stat == "System is already triggered... Digital Lock activated!":
             self.ui.digital_lock.setText('Unlock')
+            # # self.ui.digital_lock.setStyleSheet("border-style: solid;"
+            # #                                    "border-width: 2px;"
+            # #                                    "border-color: red;"
+            # #                                    "border-radius: 3px"
+            # #                                    )
+            # self.ui.digital_lock.setStyleSheet("* {background: qlineargradient(spread:pad, x1:0.489, y1:0.00568182, x2:0.489, y2:0.482955, stop:0 rgba(220, 0, 0, 255), stop:1 rgba(255, 0, 0, 255));"
+            #                                     "border-style: solid;"
+            #                                     "border-width: 1px;"
+            #                                     "border-color: gray;"
+            #                                     "border-radius: 5px;}"
+            #                                     )
+            # #self.ui.digital_lock.setStyleSheet("* {color: qlineargradient(spread:pad, x1:0 y1:0, x2:1 y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));"
+            # #           "background: qlineargradient( x1:0 y1:0, x2:1 y2:0, stop:0 cyan, stop:1 blue);}")
         else:
             self.ui.digital_lock.setText('Lock')
+            self.ui.digital_lock.setStyleSheet("")
+            # self.ui.digital_reset.setStyleSheet("* {background: qlineargradient(spread:pad, x1:0.489, y1:0.00568182, x2:0.489, y2:0.482955, stop:0 rgba(230, 0, 0, 255), stop:1 rgba(255, 0, 0, 255));"
+            #                                     "border-style: solid;"
+            #                                     "border-width: 1px;"
+            #                                     "border-color: gray;"
+            #                                     "border-radius: 5px;}"
+            #                                     )
         
             
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
     def reset_clicked(self, button):
         print('Attempting to Reset...')
         yield(self.queue_work(self._primary_worker,'push_reset'))
+        
+        self.ui.digital_reset.setStyleSheet("")                                     
     
         
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
@@ -834,7 +893,7 @@ class Arduino_Interlock_Tab(DeviceTab):
         temp_up = yield(self.queue_work(self._primary_worker,'new_temps'))
         for ch in range(self.numSensors):
             chName = ch+1
-            self.temp[ch].setText('%s C' %(temp_up[str(chName)]))
+            self.chanBut[ch].setText("%s \n %s C" %(self.chanText[ch], temp_up[str(chName)]))
         
     
     @define_state(MODE_TRANSITION_TO_MANUAL,True)      
@@ -843,7 +902,7 @@ class Arduino_Interlock_Tab(DeviceTab):
         temp_up = yield(self.queue_work(self._primary_worker,'temp_return'))
         for ch in range(self.numSensors):
             chName = ch+1
-            self.temp[ch].setText('%s C' %(temp_up[str(chName)]))
+            self.chanBut[ch].setText("%s \n %s C" %(self.chanText[ch], temp_up[str(chName)]))
     
     # @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
     # def status_update_clicked(self, button):
@@ -855,40 +914,82 @@ class Arduino_Interlock_Tab(DeviceTab):
     def grab_status_update(self):
         print('Updating Interlock Status...')
         stat_up = yield(self.queue_work(self._primary_worker,'new_stat'))
-        intlock_trigger = str(stat_up)[0:4]
+        intlock_trigger = str(stat_up[0])[0:4]
         if intlock_trigger == "Fals":
             icon = QtGui.QIcon(':/qtutils/fugue/tick-circle')
             pixmap = icon.pixmap(QtCore.QSize(16, 16))
             self.ui.status_icon.setPixmap(pixmap)
+            self.ui.status_symbol.hide()
+            self.ui.status_message.hide()
         elif intlock_trigger == "True":
             icon = QtGui.QIcon(':/qtutils/fugue/cross-circle')
             pixmap = icon.pixmap(QtCore.QSize(16, 16))
             self.ui.status_icon.setPixmap(pixmap)
+            stat_mess = str(stat_up[1])
+            if stat_mess == "flow1":
+                self.ui.status_message.setText("Check Flowmeter 1")
+            elif stat_mess == "flow2":
+                self.ui.status_message.setText("Check Flowmeter 2")
+            elif stat_mess == "DigiL":
+                self.ui.status_message.setText("Check Digital Lock")
+                self.ui.digital_lock.setStyleSheet("background-color : red;" "border-style: solid;"
+                                                       "border-width: 1px;" "border-color: gray;" "border-radius: 3px")
+            elif stat_mess == "HighT":
+                self.ui.status_message.setText("Check Temperatures")
+            elif stat_mess == "React":
+                self.ui.status_message.setText("Push Reset")
+                self.ui.digital_reset.setText("RESET!")
+            mess_icon = QtGui.QIcon(':/qtutils/fugue/exclamation')
+            mess_pixmap = mess_icon.pixmap(QtCore.QSize(16, 16))
+            self.ui.status_symbol.setPixmap(mess_pixmap)
+            self.ui.status_symbol.show()
+            self.ui.status_message.show()
         else:
             icon = QtGui.QIcon(':/qtutils/fugue/question')
             pixmap = icon.pixmap(QtCore.QSize(16, 16))
             self.ui.status_icon.setPixmap(pixmap)
             self.ui.status_update.setText('%s' %(intlock_trigger))
-
+            self.ui.status_symbol.hide()
+            self.ui.status_message.hide()
     
     @define_state(MODE_TRANSITION_TO_MANUAL,True)      
     def stat_shot_update(self):
         print('Updating Interlock Status...')
         stat_up = yield(self.queue_work(self._primary_worker,'stat_return'))
-        intlock_trigger = str(stat_up)[0:4]
+        intlock_trigger = str(stat_up[0])[0:4]
         if intlock_trigger == "Fals":
             icon = QtGui.QIcon(':/qtutils/fugue/tick-circle')
             pixmap = icon.pixmap(QtCore.QSize(16, 16))
             self.ui.status_icon.setPixmap(pixmap)
+            self.ui.status_symbol.hide()
+            self.ui.status_message.hide()
         elif intlock_trigger == "True":
             icon = QtGui.QIcon(':/qtutils/fugue/cross-circle')
             pixmap = icon.pixmap(QtCore.QSize(16, 16))
             self.ui.status_icon.setPixmap(pixmap)
+            stat_mess = str(stat_up[1])
+            if stat_mess == "flow1":
+                self.ui.status_message.setText("Check Flowmeter 1")
+            elif stat_mess == "flow2":
+                self.ui.status_message.setText("Check Flowmeter 2")
+            elif stat_mess == "DigiL":
+                self.ui.status_message.setText("Check Digital Lock")
+            elif stat_mess == "HighT":
+                self.ui.status_message.setText("Check Temperatures")
+            elif stat_mess == "React":
+                self.ui.status_message.setText("Press Reset")
+            mess_icon = QtGui.QIcon(':/qtutils/fugue/exclamation')
+            mess_pixmap = mess_icon.pixmap(QtCore.QSize(16, 16))
+            self.ui.status_symbol.setPixmap(mess_pixmap)
+            self.ui.status_symbol.show()
+            self.ui.status_message.show()
         else:
             icon = QtGui.QIcon(':/qtutils/fugue/question')
             pixmap = icon.pixmap(QtCore.QSize(16, 16))
             self.ui.status_icon.setPixmap(pixmap)
             self.ui.status_update.setText('%s' %(intlock_trigger))
+            self.ui.status_symbol.hide()
+            self.ui.status_message.hide()
  
     
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
@@ -941,23 +1042,80 @@ class Arduino_Interlock_Tab(DeviceTab):
         temp_up, sets_up, stat_up = yield(self.queue_work(self._primary_worker,'new_packet', verbose = False))
         for ch in range(self.numSensors):
             chName = ch+1
-            self.temp[ch].setText('%s C' %(temp_up[str(chName)]))
             self.chanBut[ch].setText("%s \n %s C" %(self.chanText[ch], temp_up[str(chName)]))
             self.setpoint[ch].setText('%s C' %(sets_up[str(chName)]))
-        intlock_trigger = str(stat_up)[0:4]
+        intlock_trigger = str(stat_up[0])[0:4]
         if intlock_trigger == "Fals":
             icon = QtGui.QIcon(':/qtutils/fugue/tick-circle')
             pixmap = icon.pixmap(QtCore.QSize(16, 16))
             self.ui.status_icon.setPixmap(pixmap)
+            # for ch in range(self.numSensors):
+            #     chName = ch+1
+                
+            self.ui.digital_reset.setStyleSheet("")
+            self.ui.status_symbol.hide()
+            self.ui.status_message.hide()
         elif intlock_trigger == "True":
+            self.chanBut[7].setText(stat_up[1])
             icon = QtGui.QIcon(':/qtutils/fugue/cross-circle')
             pixmap = icon.pixmap(QtCore.QSize(16, 16))
             self.ui.status_icon.setPixmap(pixmap)
+            stat_mess = str(stat_up[1])
+            if stat_mess == "flow1":
+                self.ui.status_message.setText("Check Flowmeter 1")
+            elif stat_mess == "flow2":
+                self.ui.status_message.setText("Check Flowmeter 2")
+            elif stat_mess == "DigiL":
+                self.ui.status_message.setText("Check Digital Lock")
+                self.ui.digital_lock.setStyleSheet("color: red;"
+                                                   "border-style: solid;"
+                                                   "border-width: 2px;"
+                                                   "border-color: red;"
+                                                   "border-radius: 3px"
+                                                   )
+            elif stat_mess == "HighT":
+                self.ui.status_message.setText("Check Temperatures")
+                for ch in range(self.numSensors):
+                    chName = ch+1
+                    if temp_up[str(chName)] > sets_up[str(chName)]:
+                        if self.chan_tog[ch]:
+                            self.chanBut[ch].setStyleSheet("color: red;"
+                                                           "background-color: %s;"
+                                                            "border-style: solid;"
+                                                            "border-width: 2px;"
+                                                            "border-color: red;"
+                                                            "border-radius: 3px"
+                                                            %(self.chanCol[ch]))
+                        else:
+                            self.chanBut[ch].setStyleSheet("color: red;"
+                                                           "background-color: %s;"
+                                                            "border-style: solid;"
+                                                            "border-width: 2px;"
+                                                            "border-color: red;"
+                                                            "border-radius: 3px"
+                                                            %(self.chanDisCol[ch]))
+                    #self.chanBut[ch].setText("%s \n %s C" %(self.chanText[ch], temp_up[str(chName)]))
+            elif stat_mess == "React":
+                self.ui.status_message.setText("Press Reset")
+                self.ui.digital_reset.setStyleSheet("color: red;"
+                                                    "border-style: solid;"
+                                                    "border-width: 2px;"
+                                                    "border-color: red;"
+                                                    "border-radius: 3px"
+                                                    )
+            mess_icon = QtGui.QIcon(':/qtutils/fugue/exclamation')
+            mess_pixmap = mess_icon.pixmap(QtCore.QSize(16, 16))
+            self.ui.status_symbol.setPixmap(mess_pixmap)
+            self.ui.status_symbol.show()
+            self.ui.status_message.show()
         else:
             icon = QtGui.QIcon(':/qtutils/fugue/question')
             pixmap = icon.pixmap(QtCore.QSize(16, 16))
             self.ui.status_icon.setPixmap(pixmap)
             self.ui.status_update.setText('%s' %(intlock_trigger))
+            self.ui.status_symbol.hide()
+            self.ui.status_message.hide()
+            
         if self.iter_count > (self.max_graph_points):
             self.iter_count = self.max_graph_points
             self.plot_temp = np.delete(self.plot_temp, [0], axis = 1)
@@ -1015,7 +1173,7 @@ class Arduino_Interlock_Tab(DeviceTab):
     def temp_zero(self, button):
         print('Returning Temperatures to Zero...')
         for ch in range(self.numSensors):
-            self.temp[ch].setText('0.00 C ')
+            self.chanBut[ch].setText("%s \n 0.00 C" %(self.chanText[ch]))
     
     
     @define_state(MODE_MANUAL|MODE_BUFFERED|MODE_TRANSITION_TO_BUFFERED|MODE_TRANSITION_TO_MANUAL,True)    
@@ -1025,7 +1183,7 @@ class Arduino_Interlock_Tab(DeviceTab):
    
         
     @define_state(MODE_MANUAL,True)
-    def on_const_temps(self, button):
+    def on_const_temps(self, button=0):
         print('Constant Temperature Acquisition Strarting...')  
         self.ui.start_continuous.hide()
         self.ui.stop_continuous.show()
@@ -1077,20 +1235,4 @@ class Arduino_Interlock_Tab(DeviceTab):
             time.sleep(interval)
 
             
-    # # This function gets the status of the Pulseblaster from the spinapi,
-    # # and updates the front panel widgets!
-    # @define_state(MODE_MANUAL|MODE_BUFFERED|MODE_TRANSITION_TO_BUFFERED|MODE_TRANSITION_TO_MANUAL,True)  
-    # def status_monitor(self):
-    #     self.status = yield(self.queue_work(self._primary_worker,'check_status')) 
-            
-
-    #     # Update widgets with new status
-    #     for state in self.status_states:
-    #         if self.status[state]:
-    #             icon = QtGui.QIcon(':/qtutils/fugue/tick')
-    #         else:
-    #             icon = QtGui.QIcon(':/qtutils/fugue/cross')
-            
-    #         pixmap = icon.pixmap(QtCore.QSize(16, 16))
-    #         self.status_widgets[state].setPixmap(pixmap)
 
