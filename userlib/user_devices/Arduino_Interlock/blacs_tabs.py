@@ -285,7 +285,7 @@ class Arduino_Interlock_Tab(DeviceTab):
          self.ui.hide_setpoints.clicked.connect(self.hide_setpoints_clicked)
         
          self.ui.set_setpoints.clicked.connect(self.set_setpoints_clicked)
-         self.ui.send_setpoints.clicked.connect(self.send_setpoints_clicked)
+         #self.ui.send_setpoints.clicked.connect(self.send_setpoints_clicked)
          self.ui.default_setpoints.clicked.connect(self.default_setpoints_clicked)
          self.ui.release_setpoints.clicked.connect(self.release_setpoints_clicked)
          
@@ -466,7 +466,7 @@ class Arduino_Interlock_Tab(DeviceTab):
              self.setpoint[ch].hide()
          
          #hides the setpoint adjust spinboxes and buttons initially
-         self.ui.send_setpoints.hide()
+         #self.ui.send_setpoints.hide()
          self.ui.default_setpoints.hide()
          self.ui.release_setpoints.hide()
          for ch in range(self.numSensors):
@@ -662,7 +662,7 @@ class Arduino_Interlock_Tab(DeviceTab):
         self.ui.show_setpoints.hide()
         self.ui.hide_setpoints.hide()
         self.ui.set_setpoints.hide()
-        self.ui.send_setpoints.show()
+        #self.ui.send_setpoints.show()
         self.ui.default_setpoints.show()
         self.ui.release_setpoints.show()
         self.grab_setpoints()
@@ -675,24 +675,24 @@ class Arduino_Interlock_Tab(DeviceTab):
             self.adjust[ch].show()
 
 
-    @define_state(MODE_MANUAL, True)      
-    def send_setpoints_clicked(self, button):
-        self.ui.show_setpoints.hide()
-        self.ui.hide_setpoints.show()
-        self.ui.set_setpoints.show()
-        self.ui.send_setpoints.hide()
-        self.ui.default_setpoints.hide()
-        self.ui.release_setpoints.hide()
-        self.ui.setpoints_label_1.show()
-        self.ui.setpoints_label_2.show()
+    # @define_state(MODE_MANUAL, True)      
+    # def send_setpoints_clicked(self, button):
+    #     self.ui.show_setpoints.hide()
+    #     self.ui.hide_setpoints.show()
+    #     self.ui.set_setpoints.show()
+    #     self.ui.send_setpoints.hide()
+    #     self.ui.default_setpoints.hide()
+    #     self.ui.release_setpoints.hide()
+    #     self.ui.setpoints_label_1.show()
+    #     self.ui.setpoints_label_2.show()
         
-        self.grab_new_setpoints()
-        self.send_new_setpoints()
-        self.grab_setpoints()
+    #     self.grab_new_setpoints()
+    #     self.send_new_setpoints()
+    #     self.grab_setpoints()
 
-        for ch in range(self.numSensors):
-            self.adjust[ch].hide() 
-            self.setpoint[ch].show()
+    #     for ch in range(self.numSensors):
+    #         self.adjust[ch].hide() 
+    #         self.setpoint[ch].show()
 
 
     @define_state(MODE_MANUAL, True)      
@@ -707,7 +707,7 @@ class Arduino_Interlock_Tab(DeviceTab):
         self.ui.show_setpoints.hide()
         self.ui.hide_setpoints.show()
         self.ui.set_setpoints.show()
-        self.ui.send_setpoints.hide()
+        #self.ui.send_setpoints.hide()
         self.ui.default_setpoints.hide()
         self.ui.release_setpoints.hide()
         self.ui.setpoints_label_1.show()
@@ -726,7 +726,7 @@ class Arduino_Interlock_Tab(DeviceTab):
         self.ui.show_setpoints.hide()
         self.ui.hide_setpoints.show()
         self.ui.set_setpoints.show()
-        self.ui.send_setpoints.hide()
+        #self.ui.send_setpoints.hide()
         self.ui.default_setpoints.hide()
         self.ui.release_setpoints.hide()
         self.ui.setpoints_label_1.show()
@@ -1102,8 +1102,15 @@ class Arduino_Interlock_Tab(DeviceTab):
                 for ch in range(self.numSensors):
                     chName = ch+1
                     if temp_up[str(chName)] > sets_up[str(chName)]:
+                        self.adjust[ch].show()
+                        self.adjust[ch].setStyleSheet("color: red;"
+                                                       #"background-color: red;"
+                                                        "border-style: solid;"
+                                                        "border-width: 1px;"
+                                                        "border-color: red;"
+                                                        "border-radius: 3px")
                         if self.chan_tog[ch]:
-                            self.chanBut[ch].setStyleSheet("color: red;"
+                            self.chanBut[ch].setStyleSheet("color: #950000;"
                                                            "background-color: %s;"
                                                             "border-style: solid;"
                                                             "border-width: 2px;"
@@ -1111,11 +1118,27 @@ class Arduino_Interlock_Tab(DeviceTab):
                                                             "border-radius: 3px"
                                                             %(self.chanCol[ch]))
                         else:
-                            self.chanBut[ch].setStyleSheet("color: red;"
+                            self.chanBut[ch].setStyleSheet("color: #950000;"
                                                            "background-color: %s;"
                                                             "border-style: solid;"
                                                             "border-width: 2px;"
                                                             "border-color: red;"
+                                                            "border-radius: 3px"
+                                                            %(self.chanDisCol[ch]))
+                    else:
+                        self.adjust[ch].setStyleSheet("")
+                        if self.chan_tog[ch]:
+                            self.chanBut[ch].setStyleSheet("background-color: %s;"
+                                                            "border-style: solid;"
+                                                            "border-width: 1px;"
+                                                            "border-color: gray;"
+                                                            "border-radius: 3px"
+                                                            %(self.chanCol[ch]))
+                        else:
+                            self.chanBut[ch].setStyleSheet("background-color: %s;"
+                                                            "border-style: solid;"
+                                                            "border-width: 1px;"
+                                                            "border-color: gray;"
                                                             "border-radius: 3px"
                                                             %(self.chanDisCol[ch]))
                     #self.chanBut[ch].setText("%s \n %s C" %(self.chanText[ch], temp_up[str(chName)]))
@@ -1127,6 +1150,22 @@ class Arduino_Interlock_Tab(DeviceTab):
                                                     "border-color: red;"
                                                     "border-radius: 3px"
                                                     )
+                for ch in range(self.numSensors):
+                    self.adjust[ch].setStyleSheet("")
+                    if self.chan_tog[ch]:
+                        self.chanBut[ch].setStyleSheet("background-color: %s;"
+                                                        "border-style: solid;"
+                                                        "border-width: 1px;"
+                                                        "border-color: gray;"
+                                                        "border-radius: 3px"
+                                                        %(self.chanCol[ch]))
+                    else:
+                        self.chanBut[ch].setStyleSheet("background-color: %s;"
+                                                        "border-style: solid;"
+                                                        "border-width: 1px;"
+                                                        "border-color: gray;"
+                                                        "border-radius: 3px"
+                                                        %(self.chanDisCol[ch]))
             mess_icon = QtGui.QIcon(':/qtutils/fugue/exclamation')
             mess_pixmap = mess_icon.pixmap(QtCore.QSize(16, 16))
             self.ui.status_symbol.setPixmap(mess_pixmap)

@@ -206,7 +206,7 @@
             <item>
              <widget class="QSpinBox" name="chan_16_adjust">
               <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <set>Qt::AlignJustify|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -234,7 +234,7 @@
             <item>
              <widget class="QSpinBox" name="chan_3_adjust">
               <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <set>Qt::AlignJustify|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -269,7 +269,7 @@
                </font>
               </property>
               <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <set>Qt::AlignJustify|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -301,7 +301,7 @@
                </font>
               </property>
               <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <set>Qt::AlignJustify|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -345,7 +345,7 @@
             <item>
              <widget class="QSpinBox" name="chan_11_adjust">
               <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <set>Qt::AlignJustify|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -419,7 +419,7 @@
             <item>
              <widget class="QSpinBox" name="chan_8_adjust">
               <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <set>Qt::AlignJustify|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -447,7 +447,7 @@
             <item>
              <widget class="QSpinBox" name="chan_13_adjust">
               <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <set>Qt::AlignJustify|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -514,7 +514,7 @@
             <item>
              <widget class="QSpinBox" name="chan_9_adjust">
               <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <set>Qt::AlignJustify|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -542,7 +542,7 @@
             <item>
              <widget class="QSpinBox" name="chan_14_adjust">
               <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <set>Qt::AlignJustify|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -570,7 +570,7 @@
             <item>
              <widget class="QSpinBox" name="chan_4_adjust">
               <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <set>Qt::AlignJustify|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -598,7 +598,7 @@
             <item>
              <widget class="QSpinBox" name="chan_15_adjust">
               <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <set>Qt::AlignJustify|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -718,7 +718,7 @@
             <item>
              <widget class="QSpinBox" name="chan_6_adjust">
               <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <set>Qt::AlignJustify|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -746,7 +746,7 @@
             <item>
              <widget class="QSpinBox" name="chan_10_adjust">
               <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <set>Qt::AlignJustify|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -774,7 +774,7 @@
             <item>
              <widget class="QSpinBox" name="chan_7_adjust">
               <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <set>Qt::AlignJustify|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -814,7 +814,7 @@
             <item>
              <widget class="QSpinBox" name="chan_5_adjust">
               <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <set>Qt::AlignJustify|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -854,7 +854,7 @@
             <item>
              <widget class="QSpinBox" name="chan_12_adjust">
               <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <set>Qt::AlignJustify|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -1203,18 +1203,6 @@
                         </property>
                         <property name="text">
                          <string>Hide</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QPushButton" name="send_setpoints">
-                        <property name="font">
-                         <font>
-                          <underline>false</underline>
-                         </font>
-                        </property>
-                        <property name="text">
-                         <string>Send</string>
                         </property>
                        </widget>
                       </item>
