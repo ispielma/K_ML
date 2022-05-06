@@ -303,22 +303,22 @@ class Arduino_Interlock_Tab(DeviceTab):
          self.ui.channel_13_button.clicked.connect(self.channel_13_clicked)
          self.ui.channel_16_button.clicked.connect(self.channel_16_clicked)
          
-         self.ui.chan_1_adjust.valueChanged.connect(self.send_setpoint_set)
-         self.ui.chan_2_adjust.valueChanged.connect(self.send_setpoint_set)
-         self.ui.chan_3_adjust.valueChanged.connect(self.send_setpoint_set)
-         self.ui.chan_4_adjust.valueChanged.connect(self.send_setpoint_set)
-         self.ui.chan_5_adjust.valueChanged.connect(self.send_setpoint_set)
-         self.ui.chan_6_adjust.valueChanged.connect(self.send_setpoint_set)
-         self.ui.chan_7_adjust.valueChanged.connect(self.send_setpoint_set)
-         self.ui.chan_8_adjust.valueChanged.connect(self.send_setpoint_set)
-         self.ui.chan_9_adjust.valueChanged.connect(self.send_setpoint_set)
-         self.ui.chan_10_adjust.valueChanged.connect(self.send_setpoint_set)
-         self.ui.chan_11_adjust.valueChanged.connect(self.send_setpoint_set)
-         self.ui.chan_12_adjust.valueChanged.connect(self.send_setpoint_set)
-         self.ui.chan_13_adjust.valueChanged.connect(self.send_setpoint_set)
-         self.ui.chan_14_adjust.valueChanged.connect(self.send_setpoint_set)
-         self.ui.chan_15_adjust.valueChanged.connect(self.send_setpoint_set)
-         self.ui.chan_16_adjust.valueChanged.connect(self.send_setpoint_set)
+         self.ui.chan_1_adjust.editingFinished.connect(self.send_setpoint_set)
+         self.ui.chan_2_adjust.editingFinished.connect(self.send_setpoint_set)
+         self.ui.chan_3_adjust.editingFinished.connect(self.send_setpoint_set)
+         self.ui.chan_4_adjust.editingFinished.connect(self.send_setpoint_set)
+         self.ui.chan_5_adjust.editingFinished.connect(self.send_setpoint_set)
+         self.ui.chan_6_adjust.editingFinished.connect(self.send_setpoint_set)
+         self.ui.chan_7_adjust.editingFinished.connect(self.send_setpoint_set)
+         self.ui.chan_8_adjust.editingFinished.connect(self.send_setpoint_set)
+         self.ui.chan_9_adjust.editingFinished.connect(self.send_setpoint_set)
+         self.ui.chan_10_adjust.editingFinished.connect(self.send_setpoint_set)
+         self.ui.chan_11_adjust.editingFinished.connect(self.send_setpoint_set)
+         self.ui.chan_12_adjust.editingFinished.connect(self.send_setpoint_set)
+         self.ui.chan_13_adjust.editingFinished.connect(self.send_setpoint_set)
+         self.ui.chan_14_adjust.editingFinished.connect(self.send_setpoint_set)
+         self.ui.chan_15_adjust.editingFinished.connect(self.send_setpoint_set)
+         self.ui.chan_16_adjust.editingFinished.connect(self.send_setpoint_set)
          
          #Sets icons for start and stop continuous
          self.ui.start_continuous.setIcon(QtGui.QIcon(':/qtutils/fugue/control'))
@@ -411,26 +411,26 @@ class Arduino_Interlock_Tab(DeviceTab):
          self.chanBut[14].setText("%s \n 0.00 C" %(self.chanText[14]))
          
          #Adds the temperature setpoint labels as items in a list for convenient calling
-         self.setpoint.append(self.ui.chan_1_setpoint)
-         self.setpoint.append(self.ui.chan_2_setpoint)
-         self.setpoint.append(self.ui.chan_3_setpoint)
-         self.setpoint.append(self.ui.chan_4_setpoint)
-         self.setpoint.append(self.ui.chan_5_setpoint)
-         self.setpoint.append(self.ui.chan_6_setpoint)
-         self.setpoint.append(self.ui.chan_7_setpoint)
-         self.setpoint.append(self.ui.chan_8_setpoint)
-         self.setpoint.append(self.ui.chan_9_setpoint)
-         self.setpoint.append(self.ui.chan_10_setpoint)
-         self.setpoint.append(self.ui.chan_11_setpoint)
-         self.setpoint.append(self.ui.chan_12_setpoint)
-         self.setpoint.append(self.ui.chan_13_setpoint)
-         self.setpoint.append(self.ui.chan_14_setpoint)
-         self.setpoint.append(self.ui.chan_15_setpoint)
-         self.setpoint.append(self.ui.chan_16_setpoint)
+         # self.setpoint.append(self.ui.chan_1_setpoint)
+         # self.setpoint.append(self.ui.chan_2_setpoint)
+         # self.setpoint.append(self.ui.chan_3_setpoint)
+         # self.setpoint.append(self.ui.chan_4_setpoint)
+         # self.setpoint.append(self.ui.chan_5_setpoint)
+         # self.setpoint.append(self.ui.chan_6_setpoint)
+         # self.setpoint.append(self.ui.chan_7_setpoint)
+         # self.setpoint.append(self.ui.chan_8_setpoint)
+         # self.setpoint.append(self.ui.chan_9_setpoint)
+         # self.setpoint.append(self.ui.chan_10_setpoint)
+         # self.setpoint.append(self.ui.chan_11_setpoint)
+         # self.setpoint.append(self.ui.chan_12_setpoint)
+         # self.setpoint.append(self.ui.chan_13_setpoint)
+         # self.setpoint.append(self.ui.chan_14_setpoint)
+         # self.setpoint.append(self.ui.chan_15_setpoint)
+         # self.setpoint.append(self.ui.chan_16_setpoint)
          
-         #Sets initial setpoint values in the ui to -
-         for ch in range(self.numSensors):
-             self.setpoint[ch].setText(' - ') 
+         # #Sets initial setpoint values in the ui to -
+         # for ch in range(self.numSensors):
+         #     self.setpoint[ch].setText(' - ') 
          
          #Adds the setpoint spinboxes as items to the list self.adjust
          self.adjust.append(self.ui.chan_1_adjust)
@@ -463,7 +463,7 @@ class Arduino_Interlock_Tab(DeviceTab):
          self.ui.setpoints_label_1.hide()
          self.ui.setpoints_label_2.hide()
          for ch in range(self.numSensors):
-             self.setpoint[ch].hide()
+             self.adjust[ch].hide()
          
          #hides the setpoint adjust spinboxes and buttons initially
          #self.ui.send_setpoints.hide()
@@ -529,7 +529,7 @@ class Arduino_Interlock_Tab(DeviceTab):
         for ch in range(self.numSensors):
              chName = ch+1
              self.chanBut[ch].setText("%s \n %s C" %(self.chanText[ch], temp_init[str(chName)]))
-             self.setpoint[ch].setText('%s C' %(set_init[str(chName)]))
+             self.adjust[ch].setValue(set_init[str(chName)])
             
 
     def initialise_workers(self):
@@ -644,7 +644,7 @@ class Arduino_Interlock_Tab(DeviceTab):
         self.ui.setpoints_label_2.show()
         self.grab_setpoints()
         for ch in range(self.numSensors):
-            self.setpoint[ch].show()
+            self.adjust[ch].show()
         
         
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
@@ -654,7 +654,7 @@ class Arduino_Interlock_Tab(DeviceTab):
         self.ui.setpoints_label_1.hide()
         self.ui.setpoints_label_2.hide()
         for ch in range(self.numSensors):
-            self.setpoint[ch].hide()
+            self.adjust[ch].hide()
 
 
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
@@ -671,7 +671,7 @@ class Arduino_Interlock_Tab(DeviceTab):
         self.ui.setpoints_label_2.show()
         
         for ch in range(self.numSensors):
-            self.setpoint[ch].hide()
+            # self.setpoint[ch].hide()
             self.adjust[ch].show()
 
 
@@ -696,7 +696,7 @@ class Arduino_Interlock_Tab(DeviceTab):
 
 
     @define_state(MODE_MANUAL, True)      
-    def send_setpoint_set(self, button):
+    def send_setpoint_set(self, button=0):
         self.grab_new_setpoints()
         self.send_new_setpoints()
 
@@ -717,8 +717,8 @@ class Arduino_Interlock_Tab(DeviceTab):
         self.grab_setpoints()
 
         for ch in range(self.numSensors):
-            self.adjust[ch].hide() 
-            self.setpoint[ch].show()        
+            self.adjust[ch].show() 
+            #self.setpoint[ch].show()        
         
         
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
@@ -729,13 +729,13 @@ class Arduino_Interlock_Tab(DeviceTab):
         #self.ui.send_setpoints.hide()
         self.ui.default_setpoints.hide()
         self.ui.release_setpoints.hide()
-        self.ui.setpoints_label_1.show()
-        self.ui.setpoints_label_2.show()
+        self.ui.setpoints_label_1.hide()
+        self.ui.setpoints_label_2.hide()
         self.grab_setpoints()
 
         for ch in range(self.numSensors):
             self.adjust[ch].hide() 
-            self.setpoint[ch].show()
+            #self.setpoint[ch].show()
 
 
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
@@ -1022,7 +1022,7 @@ class Arduino_Interlock_Tab(DeviceTab):
         set_update = yield(self.queue_work(self._primary_worker,'new_setpoints'))
         for ch in range(self.numSensors):
             chName = ch+1
-            self.setpoint[ch].setText('%s C' %(set_update[str(chName)]))
+            #self.setpoint[ch].setText('%s C' %(set_update[str(chName)]))
         
         for ch in range(self.numSensors):
             chName = ch+1
@@ -1055,9 +1055,9 @@ class Arduino_Interlock_Tab(DeviceTab):
         yield(self.queue_work(self._primary_worker,'set_default_setpoints'))
 
 
-    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)
-    def initial_grab(self):
-        yield(self.queue_work(self._primary_worker,'initial_packet'))
+    # @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)
+    # def initial_grab(self):
+    #     yield(self.queue_work(self._primary_worker,'initial_packet'))
 
     
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
@@ -1067,7 +1067,7 @@ class Arduino_Interlock_Tab(DeviceTab):
         for ch in range(self.numSensors):
             chName = ch+1
             self.chanBut[ch].setText("%s \n %s C" %(self.chanText[ch], temp_up[str(chName)]))
-            self.setpoint[ch].setText('%s C' %(sets_up[str(chName)]))
+            #self.setpoint[ch].setText('%s C' %(sets_up[str(chName)]))
         intlock_trigger = str(stat_up[0])[0:4]
         if intlock_trigger == "Fals":
             icon = QtGui.QIcon(':/qtutils/fugue/tick-circle')

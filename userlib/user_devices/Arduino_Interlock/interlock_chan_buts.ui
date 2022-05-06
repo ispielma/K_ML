@@ -187,23 +187,6 @@
           <item row="7" column="8">
            <layout class="QVBoxLayout" name="verticalLayout_20">
             <item>
-             <widget class="QLabel" name="chan_16_setpoint">
-              <property name="font">
-               <font>
-                <family>Yu Gothic UI Semibold</family>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
              <widget class="QSpinBox" name="chan_16_adjust">
               <property name="alignment">
                <set>Qt::AlignJustify|Qt::AlignVCenter</set>
@@ -215,23 +198,6 @@
           <item row="2" column="3">
            <layout class="QVBoxLayout" name="verticalLayout_7">
             <item>
-             <widget class="QLabel" name="chan_3_setpoint">
-              <property name="font">
-               <font>
-                <family>Yu Gothic UI Semibold</family>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
              <widget class="QSpinBox" name="chan_3_adjust">
               <property name="alignment">
                <set>Qt::AlignJustify|Qt::AlignVCenter</set>
@@ -242,25 +208,6 @@
           </item>
           <item row="2" column="2">
            <layout class="QVBoxLayout" name="verticalLayout_6">
-            <item>
-             <widget class="QLabel" name="chan_2_setpoint">
-              <property name="font">
-               <font>
-                <family>Yu Gothic UI Semibold</family>
-                <weight>75</weight>
-                <italic>false</italic>
-                <bold>true</bold>
-                <underline>false</underline>
-               </font>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
             <item>
              <widget class="QSpinBox" name="chan_2_adjust">
               <property name="font">
@@ -277,22 +224,6 @@
           </item>
           <item row="2" column="1">
            <layout class="QVBoxLayout" name="verticalLayout_5">
-            <item>
-             <widget class="QLabel" name="chan_1_setpoint">
-              <property name="font">
-               <font>
-                <family>Yu Gothic UI Semibold</family>
-                <underline>false</underline>
-               </font>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
             <item>
              <widget class="QSpinBox" name="chan_1_adjust">
               <property name="font">
@@ -325,23 +256,6 @@
           </item>
           <item row="7" column="3">
            <layout class="QVBoxLayout" name="verticalLayout_15">
-            <item>
-             <widget class="QLabel" name="chan_11_setpoint">
-              <property name="font">
-               <font>
-                <family>Yu Gothic UI Semibold</family>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
             <item>
              <widget class="QSpinBox" name="chan_11_adjust">
               <property name="alignment">
@@ -400,23 +314,6 @@
           <item row="2" column="8">
            <layout class="QVBoxLayout" name="verticalLayout_12">
             <item>
-             <widget class="QLabel" name="chan_8_setpoint">
-              <property name="font">
-               <font>
-                <family>Yu Gothic UI Semibold</family>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
              <widget class="QSpinBox" name="chan_8_adjust">
               <property name="alignment">
                <set>Qt::AlignJustify|Qt::AlignVCenter</set>
@@ -427,23 +324,6 @@
           </item>
           <item row="7" column="5">
            <layout class="QVBoxLayout" name="verticalLayout_17">
-            <item>
-             <widget class="QLabel" name="chan_13_setpoint">
-              <property name="font">
-               <font>
-                <family>Yu Gothic UI Semibold</family>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
             <item>
              <widget class="QSpinBox" name="chan_13_adjust">
               <property name="alignment">
@@ -495,23 +375,6 @@
           <item row="7" column="1">
            <layout class="QVBoxLayout" name="verticalLayout_13">
             <item>
-             <widget class="QLabel" name="chan_9_setpoint">
-              <property name="font">
-               <font>
-                <family>Yu Gothic UI Semibold</family>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
              <widget class="QSpinBox" name="chan_9_adjust">
               <property name="alignment">
                <set>Qt::AlignJustify|Qt::AlignVCenter</set>
@@ -522,23 +385,6 @@
           </item>
           <item row="7" column="6">
            <layout class="QVBoxLayout" name="verticalLayout_18">
-            <item>
-             <widget class="QLabel" name="chan_14_setpoint">
-              <property name="font">
-               <font>
-                <family>Yu Gothic UI Semibold</family>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
             <item>
              <widget class="QSpinBox" name="chan_14_adjust">
               <property name="alignment">
@@ -551,23 +397,6 @@
           <item row="2" column="4">
            <layout class="QVBoxLayout" name="verticalLayout_8">
             <item>
-             <widget class="QLabel" name="chan_4_setpoint">
-              <property name="font">
-               <font>
-                <family>Yu Gothic UI Semibold</family>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
              <widget class="QSpinBox" name="chan_4_adjust">
               <property name="alignment">
                <set>Qt::AlignJustify|Qt::AlignVCenter</set>
@@ -578,23 +407,6 @@
           </item>
           <item row="7" column="7">
            <layout class="QVBoxLayout" name="verticalLayout_19">
-            <item>
-             <widget class="QLabel" name="chan_15_setpoint">
-              <property name="font">
-               <font>
-                <family>Yu Gothic UI Semibold</family>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
             <item>
              <widget class="QSpinBox" name="chan_15_adjust">
               <property name="alignment">
@@ -699,23 +511,6 @@
           <item row="2" column="6">
            <layout class="QVBoxLayout" name="verticalLayout_10">
             <item>
-             <widget class="QLabel" name="chan_6_setpoint">
-              <property name="font">
-               <font>
-                <family>Yu Gothic UI Semibold</family>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
              <widget class="QSpinBox" name="chan_6_adjust">
               <property name="alignment">
                <set>Qt::AlignJustify|Qt::AlignVCenter</set>
@@ -727,23 +522,6 @@
           <item row="7" column="2">
            <layout class="QVBoxLayout" name="verticalLayout_14">
             <item>
-             <widget class="QLabel" name="chan_10_setpoint">
-              <property name="font">
-               <font>
-                <family>Yu Gothic UI Semibold</family>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
              <widget class="QSpinBox" name="chan_10_adjust">
               <property name="alignment">
                <set>Qt::AlignJustify|Qt::AlignVCenter</set>
@@ -754,23 +532,6 @@
           </item>
           <item row="2" column="7">
            <layout class="QVBoxLayout" name="verticalLayout_11">
-            <item>
-             <widget class="QLabel" name="chan_7_setpoint">
-              <property name="font">
-               <font>
-                <family>Yu Gothic UI Semibold</family>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
             <item>
              <widget class="QSpinBox" name="chan_7_adjust">
               <property name="alignment">
@@ -795,23 +556,6 @@
           <item row="2" column="5">
            <layout class="QVBoxLayout" name="verticalLayout_9">
             <item>
-             <widget class="QLabel" name="chan_5_setpoint">
-              <property name="font">
-               <font>
-                <family>Yu Gothic UI Semibold</family>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
              <widget class="QSpinBox" name="chan_5_adjust">
               <property name="alignment">
                <set>Qt::AlignJustify|Qt::AlignVCenter</set>
@@ -834,23 +578,6 @@
           </item>
           <item row="7" column="4">
            <layout class="QVBoxLayout" name="verticalLayout_16">
-            <item>
-             <widget class="QLabel" name="chan_12_setpoint">
-              <property name="font">
-               <font>
-                <family>Yu Gothic UI Semibold</family>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
             <item>
              <widget class="QSpinBox" name="chan_12_adjust">
               <property name="alignment">
