@@ -303,6 +303,23 @@ class Arduino_Interlock_Tab(DeviceTab):
          self.ui.channel_13_button.clicked.connect(self.channel_13_clicked)
          self.ui.channel_16_button.clicked.connect(self.channel_16_clicked)
          
+         self.ui.chan_1_adjust.valueChanged.connect(self.send_setpoint_set)
+         self.ui.chan_2_adjust.valueChanged.connect(self.send_setpoint_set)
+         self.ui.chan_3_adjust.valueChanged.connect(self.send_setpoint_set)
+         self.ui.chan_4_adjust.valueChanged.connect(self.send_setpoint_set)
+         self.ui.chan_5_adjust.valueChanged.connect(self.send_setpoint_set)
+         self.ui.chan_6_adjust.valueChanged.connect(self.send_setpoint_set)
+         self.ui.chan_7_adjust.valueChanged.connect(self.send_setpoint_set)
+         self.ui.chan_8_adjust.valueChanged.connect(self.send_setpoint_set)
+         self.ui.chan_9_adjust.valueChanged.connect(self.send_setpoint_set)
+         self.ui.chan_10_adjust.valueChanged.connect(self.send_setpoint_set)
+         self.ui.chan_11_adjust.valueChanged.connect(self.send_setpoint_set)
+         self.ui.chan_12_adjust.valueChanged.connect(self.send_setpoint_set)
+         self.ui.chan_13_adjust.valueChanged.connect(self.send_setpoint_set)
+         self.ui.chan_14_adjust.valueChanged.connect(self.send_setpoint_set)
+         self.ui.chan_15_adjust.valueChanged.connect(self.send_setpoint_set)
+         self.ui.chan_16_adjust.valueChanged.connect(self.send_setpoint_set)
+         
          #Sets icons for start and stop continuous
          self.ui.start_continuous.setIcon(QtGui.QIcon(':/qtutils/fugue/control'))
          self.ui.start_continuous.setToolTip('Starts Automatic Updating of Temperatures, Graph, and Status')
@@ -676,6 +693,13 @@ class Arduino_Interlock_Tab(DeviceTab):
         for ch in range(self.numSensors):
             self.adjust[ch].hide() 
             self.setpoint[ch].show()
+
+
+    @define_state(MODE_MANUAL, True)      
+    def send_setpoint_set(self, button):
+        self.grab_new_setpoints()
+        self.send_new_setpoints()
+
 
 
     @define_state(MODE_MANUAL, True)      
