@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Mar 24 12:04:05 2022
+Last Updated on Mon May 09 15:31:37 2022
 
 @author: rubidium
 
@@ -27,7 +28,8 @@ class Arduino_Interlock_Worker(Worker):
 
         self.interlock = Arduino_Interlock(self.addr, termination=self.termination)
         print('Connected to Arduino_Interlock')
-        
+
+        #variables for later use        
         self.stop_acquisition_timeout = None
         self.continuous_stop = threading.Event()
         self.continuous_thread = None
@@ -36,15 +38,12 @@ class Arduino_Interlock_Worker(Worker):
         self.restart_thread = False
         self.thread_standby = False
         
-        # self.lastTemps = {}
-        # self.lastSets = {}
-        # self.lastStat = ""
+        #dictionaries and lsit to store temperature values, setpoints, and status 
         self.newTemps = {}
         self.newSets = {}
         self.newStat = []
         
-        self.timeTag = 0
-        
+        self.timeTag = 0 #used later for tracking time to complete a shot
         
     
     def shutdown(self):
@@ -61,59 +60,55 @@ class Arduino_Interlock_Worker(Worker):
             self.interlock_params = labscript_utils.properties.get(
                 hdf5_file, device_name, 'device_properties'
             )
-            #self.interlock.timeout = 1000 * self.interlock_params.get('timeout', 5)
         return {}
 
 
     def transition_to_manual(self):
         self.continuous_interval = True
-        self.shot_read = False
+        self.shot_read = False   #!! May not use this anymore!
         
         #Grab temperatures, interlock status, and interlock setpoints from the arduino
-        self.timeTag = time.time()
+        self.timeTag = time.time()      #set to current time
         print('Downloading Temps and Status...')
-        #temp_vals, intlock_stat = self.interlock.grab_full_packet()
+        
+        #grab a new packet of the latest temperatures, setpoints, and status update 
         self.newTemps, self.newSets, self.newStat = self.interlock.grab_new_packet()
         temp_vals = self.newTemps
         intlock_stat = self.newStat[0]
-        setpoint_vals = self.newSets
         self.interlock.call_plumber()     #to flush the serial
-        downTime = time.time() - self.timeTag
+        downTime = time.time() - self.timeTag   #calculate how much time was spent getting and setting the packet
         print('Took %s seconds' %(downTime)) 
 
         # Collect temp data in an array
-        self.timeTag = time.time()
-        data = np.empty([self.interlock.numSensors], dtype=float)
+        self.timeTag = time.time()       #reuse timeTag (for time it takes to write to h5)
+        
+        #Create a numpy array to serve as the dataset for latest temperature values and fill
+        data = np.empty([self.interlock.numSensors, 2], dtype=float)
         for ch in temp_vals:
             chNum = int(ch)-1
-            data[chNum] = temp_vals[ch]
+            data[chNum, 0] = chNum+1 
+            data[chNum, 1] = temp_vals[ch]
 
-        # Open the file after download, create an Arduino_Interlock folder, and save attributes there
+        # Open the h5 file after download, create an Arduino_Interlock folder, and save attributes there
         with h5py.File(self.h5file, 'r+') as hdf_file:
-            grp = hdf_file['/devices/Arduino_Interlock']
+            grp = hdf_file['/devices/Arduino_Interlock']  #directs use of "grp" to an Arduino_Interlock device folder
             print('Saving attributes...')
-            grp2 = hdf_file.create_group('/data/temps')
-            dset = grp2.create_dataset(self.device_name, track_order= True, data=data)
+            grp2 = hdf_file.create_group('/data/temps') #directs use of "grp2" to a temps folder in data
+            dset = grp2.create_dataset(self.device_name, track_order= True, data=data)  #creates a dataset for grp2 (from the array "data")
             for ch in temp_vals:
                 if len(ch) == 1: 
                     chNum = "channel_0"+str(ch)+"_temp"
                 else:
                     chNum = "channel_"+str(ch)+"_temp"
-                grp.attrs.create(chNum, temp_vals[ch])
-                dset.attrs.create(chNum, temp_vals[ch])
+                dset.attrs.create(chNum, temp_vals[ch])  #creates an attribute to go with the dataset array
+            #This sets interlock trigger status as an attribute in the Arduino_interlock folder with appropriate indication
             if intlock_stat == 'False':
                 grp.attrs.create("interlock_trigger_status", 'False')
             elif intlock_stat[0:4] == 'True':
                 grp.attrs.create("interlock_trigger_status", 'True')
             else:
                 grp.attrs.create("interlock_trigger_status", intlock_stat)
-            # for ch in setpoint_vals:
-            #     if len(ch) == 1: 
-            #         chName = "setpoint_channel_0"+str(ch)
-            #     else:
-            #         chName = "setpoint_channel_"+str(ch)
-            #     grp.attrs.create(chName, setpoint_vals[ch])
-        downTime2 = time.time() - self.timeTag
+        downTime2 = time.time() - self.timeTag  #calculate time it takes to open and set the values in the h5
         print('Done!')
         print('Took %s seconds' %(downTime2)) 
         return True
@@ -137,25 +132,31 @@ class Arduino_Interlock_Worker(Worker):
         print('abort_transition_to_buffered: ...')
         return self.abort()
 
-    
+
+    #Activates the self.interlock.digital_lock function for digitally locking and unlocking the interlock
     def toggle_lock(self):
         print("Attempting to toggle digital lock...")
         locked_status = self.interlock.digital_lock(verbose=True)
         self.interlock.call_plumber()     #to flush the serial
         return locked_status
     
-        
+    
+    #Activates the self.digital_reset function for digitally pushing the reset button    
     def push_reset(self):
         print("Attempting to reset...")
         self.interlock.digital_reset(verbose=True)
         self.interlock.call_plumber()     #to flush the serial
     
+    
+    #Grabs an entirely new packet from the arduino, including all channel temperatures, channel setpoints, and the interlock status
     def initial_packet(self):
         self.newTemps, self.newSets, self.newStat = self.interlock.grab_init()
         print('Grabbed initial value packet')
         self.interlock.call_plumber()     #to flush the serial
         return self.newTemps, self.newSets, self.newStat
     
+    
+    #Grabs a full call of only the channel temperatures  (!!may be ignored now)
     def new_temps(self):
         print("Requesting new temperature values...")
         temps = self.interlock.get_temps(verbose=True)
@@ -163,6 +164,7 @@ class Arduino_Interlock_Worker(Worker):
         return temps
     
     
+    #Performs a check for temperature values and then grabs, unless there are no temperatures which forces a full new temp grab
     def temp_return(self):
         print("Calling latest received temperature values...")
         if self.interlock.chan_temperatures:
@@ -176,6 +178,7 @@ class Arduino_Interlock_Worker(Worker):
             return tempers
         
     
+    #Grabs the new status of the interlock
     def new_stat(self):
         print("Requesting new interlock status...")
         status = self.interlock.get_status()
@@ -183,12 +186,13 @@ class Arduino_Interlock_Worker(Worker):
         return status
     
     
+    #Performs a check of the latest called interlock status and returns that status
     def stat_return(self):
         print("Calling latest interlock status...")
         status = self.interlock.check_status()
         return status
     
-    
+    #Grabs a full call of only the channel setpoints (!! may be ignored now)
     def new_setpoints(self):
         print("Requesting the interlock setpoints...")
         setpoints = self.interlock.get_setpoints(verbose=True)
@@ -196,11 +200,13 @@ class Arduino_Interlock_Worker(Worker):
         return setpoints
     
     
+    #Accepts setpoint ch# and value dict, and then sends a setpoint write command for any changed setpoint values
     def set_setpoints(self, write_setpoints):
         print("Writing new interlock setpoints...")
-        cur_setpoints = self.interlock.get_setpoints(verbose=False)
+        cur_setpoints = self.interlock.get_setpoints(verbose=False)  #calls current setpoints for reference
         self.interlock.call_plumber()     #to flush the serial
         
+        #writes a new setpoint for a particular channel after verifying that that channel's setpoint has changed value
         for ch in range(self.interlock.numSensors):
             chNum = ch+1
             chVal = write_setpoints[ch]
@@ -215,6 +221,7 @@ class Arduino_Interlock_Worker(Worker):
         return
     
     
+    #Sends the command to return the setpoint values to the default programmed values in the arduino
     def set_default_setpoints(self):
         print("Resetting interlock setpoints...")
         self.interlock.set_default_setpoints(verbose=False)
@@ -222,6 +229,8 @@ class Arduino_Interlock_Worker(Worker):
         self.interlock.arduino_save_setpoints(verbose=True)
         return
     
+    
+    #Requests a packet for any changed values (as compared to the last request)
     def new_packet(self, verbose = True):
         if verbose:
             print("Requesting new temperature values and status...")
@@ -230,13 +239,15 @@ class Arduino_Interlock_Worker(Worker):
         return self.newTemps, self.newSets, self.newStat
     
     
+    #Checks to see if a shot is being read (I cannot recall if this actually has proper use)
     def shot_check(self):
         #print("Checking for active shots...")
         shot = self.shot_read
         return shot
     
 
-#These final three functions are likely defunct - will have to test    
+##These final three functions are likely defunct - will have to test    
+    #signifies the start of a continuous loop (formerly created a continuous call loop, but the implementation was changed)
     def continuous_loop(self):
         print("Acquiring...")
         # interval=5
@@ -250,7 +261,8 @@ class Arduino_Interlock_Worker(Worker):
         #     # else:
         #         pass
 
-
+    #Begins an automatic loop thread if none exists, or otherwise indicates that the auto loop should continue acquiring values
+    # (!! I believe this thread no longer does anything)
     def start_continuous(self, interval=5):
         print("Starting automated temperature acquisition")
         #assert self.continuous_thread is None
@@ -265,7 +277,7 @@ class Arduino_Interlock_Worker(Worker):
             #self.restart_thread = True
             self.continuous_interval = True
 
-
+    #Stops auto-acquisition from the loop thread by setting the continuous_interval to false
     def stop_continuous(self, pause=False):
         assert self.continuous_thread is not None
         self.continuous_interval = False

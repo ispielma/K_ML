@@ -1,6 +1,6 @@
 #Module for the Arduino_Interlock device
 #Modeling from Tekscope device in labscript
-#The Arduino_Interlock is in a beta development state at the moment
+#The Arduino_Interlock is in a gamma development state - mostly done
 import pyvisa
 import numpy as np
 import time
@@ -15,18 +15,24 @@ class Arduino_Interlock:
         self.device = rm.open_resource(devices[0])
         self.device.timeout = 1000 * timeout
         self.device.read_termination = termination
-        #self.idn = self.device.query('*IDN?')             #Need to add a command to support this in the arduino first
+        
+        #The arduino has no IDN command and functions perfectly fine without it, but it could be added
+        #               as a standardizing initial component in the future, if necessary
+        #self.idn = self.device.query('*IDN?')  
+        
+        #These are standard requests to make over VISA
         self.read = self.device.read
         self.write = self.device.write
         self.query = self.device.query
         self.flush = self.device.flush
-        self.numSensors = 16
         
+        #These are defined for particular data about the interlock device (the packet strings are left empty)
+        self.numSensors = 16    #number of total channels  - NOT JUST ACTIVE CHANNELS 
         self.temp_packet = ""
         self.setpoint_packet = ""
         self.status_packet = ""
         
-        #empty lists/dictionaries to be used for storing values
+        #empty lists/dictionaries to be used for storing various values/strings of information
         self.temperatures = []
         self.lastTemps = []
         self.setpoints = []
@@ -43,7 +49,11 @@ class Arduino_Interlock:
         self.chan_lastSetpoints = {}
         self.this_dict = {}
 
+
+
+#The following functions are internally referred to by other functions in the Arduino_Interlock class
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    #Activates a flush of the serial buffer to prevent inaccurate line-reading
     def call_plumber(self, verbose=False):
          if verbose:
              print('Plumber is here - Time to flush')
@@ -52,6 +62,7 @@ class Arduino_Interlock:
              print("Flush attempted")
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    #Converts lists that contain temperature or setpoint information into dictionaries for convienient reference    
     def convert_to_dict(self, this_list):
         self.this_dict = {}
         for item in range(len(this_list)):
@@ -68,18 +79,22 @@ class Arduino_Interlock:
         return self.this_dict
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    #Sends a call number to the arduino to verify that the serial is clear and the arduino is ready for a call    
     def send_call_num(self, verbose=False):
          if verbose:
              print('Generating call number...')
+         
+         #Generates a random 4 digit number using time.time() 
          call_num_gen = time.time()
          call_str = str(call_num_gen)[-4:]
-         try:    
-             call_int = int(call_str)
+         try:                                     
+             call_int = int(call_str)    #try to convert to an interger
          except ValueError:
-             print("Error: Call number not int()")
+             print("Error: Call number not int()")   #if string has a decimal, just send call number 1000
              call_str = '1000'
              call_int = int(call_str)
-    
+        
+         #send a call number and read response from the arduino
          if verbose:
             print('The call number being sent is %s' %(call_str))
          call_read = self.device.query('@callNum, '+call_str)
@@ -89,8 +104,8 @@ class Arduino_Interlock:
                  print(call_read)
          else:
              self.call_plumber()
+             print('**!Call Error!**')
              if verbose:
-                 print('**!Call Error!**')
                  print(call_read)
                  print("Expected ",expected_read)
                  #self.call_plumber()
@@ -98,53 +113,17 @@ class Arduino_Interlock:
                  #raise an error here someday
          return
 
+ 
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # def channel_names(self, all=True):
-    #     """Return a dictionary of the channel names to correspond with each channel number, if such exist. """
-    #     #***!!ARDUINO INTERLOCK DOES NOT CURRENTLY SUPPORT THIS FUNCTION!!***
-    #     #will need arduino to list active channels (i.e. ones that are supposed to be connected to the thermocouples)
-    #     #will most likely choose to include a way to discern between open circuit channels - have to think about practical safety / failures
-        
-    #     # #planning to use this to store the names of each channel with the assigned channel number as a dictionary
-    #     # #all other info for a channel (current temp, last temp, interlock setpoint) will be stored as a list
-        
-    #     numSensors = self.numSensors
-    #     responses = []
-    #     chans = {}
-        
-    #     self.send_call_num()
-        
-    #     # # determine the device's channel name assignment for the channel number
-    #     self.device.write('@names,')
-        
-    #     for n in range(numSensors):
-    #         rawOutput = self.device.read_bytes(50, chunk_size = None, break_on_termchar = True)
-    #         try:
-    #             output = rawOutput.decode('utf-8')
-    #             responses.append(output)
-    #         except UnicodeDecodeError:
-    #             print("******!! PYTHON ERROR for channel_names: Could not decode!******")
-    #             print(rawOutput)
-
-    #     # # create a dict from the responses to store actual channel names, like MOT_QUAD_I, etc.            
-    #     for n in range(numSensors):    
-    #         respon = responses[n]
-    #         name, val = respon.rsplit(';',1)
-    #         chans[val] = {name}
-
-    #     return chans    
-
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    #Grabs the arduino interlock setpoints from serial and returns as a list of channel and value pairs for parsing 
     def interlock_setpoints(self, all=True):
-        """Return a list of the channel interlock setpoints, in order of channel number. """
-        #will need arduino to list setpoints of channels (Probably based on active channels) - include in degrees Celcius     
+        """Return a list of the channel interlock setpoints, in order of channel number. """  
         
         self.send_call_num()
         
         numSensors = self.numSensors
         self.setpoints = []
-        # # determine the device's channel name assignment for the channel number
         self.device.write('@chanSetpoints,')
         
         for n in range(numSensors):
@@ -159,17 +138,15 @@ class Arduino_Interlock:
         return self.setpoints
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    #Grabs the channel temperatures from serial and returns as a list of channel and value pairs for parsing
     def channel_temperatures(self, all=True):
             """Return a list of the channel interlock setpoints, in order of channel number. """
-            #will need arduino to list setpoints of channels (Probably based on active channels) - include in degrees Celcius
             
             self.send_call_num()
             
             numSensors = self.numSensors
             self.temperatures = []
-            # # determine the device's channel name assignment for the channel number
             self.device.write('@temps,')
-            #time.sleep(0.05)
             
             for n in range(numSensors):
                 rawOutput = self.device.read_bytes(75, chunk_size = None, break_on_termchar = True)
@@ -183,9 +160,10 @@ class Arduino_Interlock:
             return self.temperatures
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    #Creates a list to be used for storing the last temperature of each channel
+    #This function may go unused!!!
     def channel_last_temps(self, all=True):
             """Return a list of the channel last temperatures, in order of channel number. """
-            #creates a list to be used for storing the last temperatures of the channels
             
             self.send_call_num()
             
@@ -200,9 +178,9 @@ class Arduino_Interlock:
             return self.lastTemps
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    #Grabs the full interlock packet which contains all channel temperatures, all channel setpoints, and interlock status
     def grab_init(self, all=True):
             """Return full dictionaries of the channel temperatures, channel setpoints, and status. """
-            #creates a list to be used for storing the last temperatures of the channels
             
             self.send_call_num()
             
@@ -210,32 +188,33 @@ class Arduino_Interlock:
             time.sleep(1)
             rawOutput = self.device.read_bytes(500, chunk_size = None, break_on_termchar = True)
             output = rawOutput.decode('utf-8')
-            #print(output)
 
             # This will be stored on the python side as a list and then dictionary 
             #      of all the packet info (should be 16 channel temps, 16 setpoints, and the status)
             self.temp_packet, self.setpoint_packet, self.status_packet, junk = output.split('#')
             
+            #store the first parse of the packet as temperatures, taking the list and converting to a dictionary
             self.temperatures = self.temp_packet[:-1].split(",")
-            #print(self.temperatures)
             self.chan_temperatures = self.convert_to_dict(self.temperatures)
             self.chan_lastTemperatures = self.chan_temperatures
             
+            #store the next parse of the packet as setpoints, taking the list and converting to a dictionary
             self.setpoints = self.setpoint_packet[:-1].split(",")
-            #print(self.setpoints)
             self.chan_setpoints = self.convert_to_dict(self.setpoints)
             self.chan_lastSetpoints = self.chan_setpoints
             
+            #store the final parse of the packet as status in a list
             self.status = self.status_packet[:-1].split(",")
             self.lastStatus = self.status
-            #print(self.lastStatus)
+            
+            #ignore junk!
             
             return self.chan_temperatures, self.chan_setpoints, self.status     
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    #Grabs a new packet which contains only changed channel temperatures, all channel setpoints, and/or interlock status
     def grab_new_packet(self, all=True):
             """Return updates to channel temperatures, channel setpoints, and status. """
-            #creates a list to be used for storing the last temperatures of the channels
             
             self.send_call_num()
             
@@ -247,21 +226,22 @@ class Arduino_Interlock:
             # This will be stored on the python side as a list and then dictionary 
             #      of all the packet info (should be 16 channel temps, 16 setpoints, and the status)
             self.temp_packet, self.setpoint_packet, self.status_packet, junk = output.split('#')
-            #print(self.temp_packet)
+            
+            #update channels that have a new temperature value, and leave consistent channels alone
             if self.temp_packet:
                 self.temperatures = self.temp_packet[:-1].split(",")
                 self.chan_temperatures = self.convert_to_dict(self.temperatures)
                 for ch in self.chan_temperatures:
                     self.chan_lastTemperatures[ch] = self.chan_temperatures[ch]
             
-            #print(self.setpoint_packet)
+            #update channels that have a new setpoint value, and leave consistent channels alone
             if self.setpoint_packet:    
                 self.setpoints = self.setpoint_packet[:-1].split(",")
                 self.chan_setpoints = self.convert_to_dict(self.setpoints)
                 for ch in self.chan_setpoints:
                     self.chan_lastSetpoints[ch] = self.chan_setpoints[ch]
             
-            #print(self.status_packet)
+            #update the status list of new information was sent
             if self.status_packet:
                 self.status = self.status_packet[:-1].split(",")
                 if self.status[0] == 'True':
@@ -272,8 +252,10 @@ class Arduino_Interlock:
   
     
   
+
+#These functions a called directly by the blacs_worker and may refer to those above   
 #-----------------------------------------------------------------
-    #have to check to ensure temperatures are received and stored properly    
+    #Get new temperature values (completes a full call for only temperatures)    
     def get_temps(self, verbose=False):
         if verbose:
             print('Grabbing thermocouple temperatures...')
@@ -282,13 +264,15 @@ class Arduino_Interlock:
         return self.chan_temperatures
 
 #-----------------------------------------------------------------   
+    #Check the latest temperatures saved as self.chan_temperatures
     def check_temps(self, verbose=False):
         if verbose:
             print('Sending latest temperatures...')
         latest_temps = self.chan_temperatures
         return latest_temps
     
-#-----------------------------------------------------------------    
+#-----------------------------------------------------------------
+    #Store the last temperature packet of values for compaarison later    
     def store_last_temps(self, verbose=False):
         numSensors = self.numSensors
         if verbose:
@@ -301,8 +285,9 @@ class Arduino_Interlock:
         return self.chan_lastTemps
     
 #-----------------------------------------------------------------   
-    #note that setpoints should only change if set_setpoint is used
+    #Get new setpoint values (completes a full call for only setpoints)
     def get_setpoints(self, verbose=False):
+        #note that setpoints should only change if set_setpoint is used
         if verbose:
             print('Grabbing interlock setpoints...')
         int_set = self.interlock_setpoints()
@@ -310,12 +295,12 @@ class Arduino_Interlock:
         return self.chan_setpoints
 
 #-----------------------------------------------------------------
+    #Send command to set a new setpoint value for a particular channel, given as n for ch# and v for value
     def set_setpoint(self, n, v, verbose=False):
         self.send_call_num()
         chanPos = n
         setVal = v
         if verbose:
-            #chanName = chans{chanPos}
             print('Sending new setpoint for channel...')
         self.device.write('@setpoint, %s, %s,'%(chanPos, setVal))
         rawOutput = self.device.read_bytes(75, chunk_size = None, break_on_termchar = True)
@@ -323,6 +308,7 @@ class Arduino_Interlock:
         print(output)
 
 #-----------------------------------------------------------------
+    #Send command for the arduino to return all setpoints to the default values stored in the arduino sketch
     def set_default_setpoints(self, verbose=False):
         self.send_call_num()
         if verbose:
@@ -336,6 +322,7 @@ class Arduino_Interlock:
             print(rawOutput)
     
 #-----------------------------------------------------------------    
+    #Send the command to save all current setpoint values
     def arduino_save_setpoints(self, verbose=False):
         self.send_call_num() 
         if verbose:
@@ -343,7 +330,8 @@ class Arduino_Interlock:
         self.device.write('@SV,')
         return
 
-#-----------------------------------------------------------------    
+#-----------------------------------------------------------------
+    #Send the command to toggle the digital lock, which if locked will act as a trigger (like High temp, no flow, etc.)    
     def digital_lock(self, verbose=False):
         self.send_call_num() 
         if verbose:
@@ -352,7 +340,9 @@ class Arduino_Interlock:
         print(resp)
         return resp
     
-#-----------------------------------------------------------------    
+#-----------------------------------------------------------------
+    #Send the command to digitally push the reset button 
+    #         (remove the interlock trigger when all conditions have returned to acceptable states)    
     def digital_reset(self, verbose=False):
         self.send_call_num() 
         if verbose:
@@ -362,6 +352,7 @@ class Arduino_Interlock:
         return
     
 #-----------------------------------------------------------------    
+    #Get the status of the interlock trigger
     def get_status(self, verbose=False):
         self.send_call_num() 
         if verbose:
@@ -371,7 +362,8 @@ class Arduino_Interlock:
             print(self.status)
         return self.status
         
-#-----------------------------------------------------------------   
+#----------------------------------------------------------------- 
+    #Checks that interlock trigger's latest saved status  
     def check_status(self, verbose=False):
         if verbose:
             print('Sending latest interlock status...')
@@ -379,12 +371,13 @@ class Arduino_Interlock:
         return latest_stat
     
 #----------------------------------------------------------------- 
-    #meant to be used by BLACS / labscript during shutdown procedures
+    #Meant to be used by BLACS / labscript during shutdown procedures (ensures device is disconnected from serial properly)
     def close(self):
         self.device.close()
 
 
 
+#This is a test script to verify that a given individual function of the Arduino_Interlock class is working properly
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # # This has gone beyond the length of a reasonable test script - oops
 if __name__ == '__main__':

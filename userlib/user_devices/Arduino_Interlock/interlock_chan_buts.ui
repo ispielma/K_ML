@@ -910,18 +910,6 @@
                     <item>
                      <layout class="QVBoxLayout" name="verticalLayout_2">
                       <item>
-                       <widget class="QPushButton" name="show_setpoints">
-                        <property name="font">
-                         <font>
-                          <underline>false</underline>
-                         </font>
-                        </property>
-                        <property name="text">
-                         <string>Show</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
                        <widget class="QPushButton" name="hide_setpoints">
                         <property name="font">
                          <font>
@@ -962,18 +950,6 @@
                        </widget>
                       </item>
                      </layout>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="release_setpoints">
-                      <property name="font">
-                       <font>
-                        <underline>false</underline>
-                       </font>
-                      </property>
-                      <property name="text">
-                       <string>Release</string>
-                      </property>
-                     </widget>
                     </item>
                    </layout>
                   </widget>
