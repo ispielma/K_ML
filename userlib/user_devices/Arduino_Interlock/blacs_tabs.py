@@ -9,7 +9,7 @@ Defines the blacs tab class and GUI for the Arduino_Interlock device
 
 from labscript_devices import BLACS_tab#, runviewer_parser
 from blacs.device_base_class import DeviceTab
-from blacs.tab_base_classes import define_state
+from blacs.tab_base_classes import define_state, Tab
 from blacs.tab_base_classes import MODE_MANUAL, MODE_TRANSITION_TO_BUFFERED, MODE_TRANSITION_TO_MANUAL, MODE_BUFFERED  
 
 import os
@@ -27,7 +27,6 @@ class Arduino_Interlock_Tab(DeviceTab):
 
     def initialise_GUI(self):
          layout = self.get_tab_layout()
-         
          # # dds_prop = {}
          # # for i in range(2): # 2 is the number of DDS outputs on this device
          # #     dds_prop['dds %d'%i] = {}
@@ -101,6 +100,8 @@ class Arduino_Interlock_Tab(DeviceTab):
          self.con_toggle = True
          self.mon_toggle = True
          self.gra_toggle = True
+         
+         #self.auto_go = True
          self.loop_time = 0
          self.set_setpoint_vals = []
          self.adjust = []
@@ -111,6 +112,7 @@ class Arduino_Interlock_Tab(DeviceTab):
          self.chanDisCol = []
          self.chan_tog = [True, True, True, True, True, True, True, True, 
                           True, True, True, True, True, True, True, True]
+         
          
          self.iter_count = 0
          self.max_graph_points = 1440           #maximum points to be saved for temp graphing
@@ -125,7 +127,7 @@ class Arduino_Interlock_Tab(DeviceTab):
          # create plot window object
          plt = self.graph_widget 
          plt.showGrid(x = True, y = True)
-         plt.addLegend()
+         #plt.addLegend()    #with button colors, this is no longer necessary
          plt.setLabel('left', 'Temperature', units ='degC')
          plt.setLabel('bottom', 'Time', units ='sec')
          plt.setTitle(title)
@@ -499,12 +501,14 @@ class Arduino_Interlock_Tab(DeviceTab):
     #grabs the initial packet from the arduino (grabs all channel temperatures, setpoints, and the interlock status)
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)
     def initial_grab(self):
+        time.sleep(1.5)    #necessary to prevent timeout error!
         temp_init, set_init, stat_init = yield(self.queue_work(self._primary_worker,'initial_packet'))
         for ch in range(self.numSensors):
              chName = ch+1
              self.chanBut[ch].setText("%s \n %s C" %(self.chanText[ch], temp_init[str(chName)]))
              self.adjust[ch].setValue(set_init[str(chName)])
-            
+        self.on_const_temps()    
+
 
     def initialise_workers(self):
         worker_initialisation_kwargs = self.connection_table.find_by_name(self.device_name).properties
@@ -516,7 +520,7 @@ class Arduino_Interlock_Tab(DeviceTab):
         )
         self.primary_worker = 'main_worker'
 
-        self.on_const_temps()
+        self.begin_autoloop()
 
     def plot(self, time, temp):    
         self.graph_widget.plot(time, temp)
@@ -1091,8 +1095,9 @@ class Arduino_Interlock_Tab(DeviceTab):
         self.ui.stop_continuous.show()
         self.start_continuous()
         self.contin_on = True
+        #self.auto_go = True
         if self.temp_check_flag == False:
-            self.initial_grab()
+            #self.initial_grab()
             self.check_thread = threading.Thread(
                 target=self.continuous_loop, args=(), daemon=True
                 )
@@ -1110,7 +1115,13 @@ class Arduino_Interlock_Tab(DeviceTab):
         self.ui.start_continuous.show()
         self.stop_continuous()
         self.contin_on = False
+        #self.auto_go = False
 
+    @define_state(MODE_MANUAL|MODE_BUFFERED|MODE_TRANSITION_TO_BUFFERED|MODE_TRANSITION_TO_MANUAL, True)
+    def begin_autoloop(self):
+        self.first_grab_thread = threading.Thread(target=self.initial_grab, args=(), daemon=True)
+        self.first_grab_thread.start()
+        
         
     @define_state(MODE_MANUAL, True)
     def start_continuous(self):
@@ -1133,6 +1144,6 @@ class Arduino_Interlock_Tab(DeviceTab):
             elif self.contin_on:
                 self.grab_packet_update()
             time.sleep(interval)
-        
+        #yield(self.queue_work(self._primary_worker,'restart'))
             
 

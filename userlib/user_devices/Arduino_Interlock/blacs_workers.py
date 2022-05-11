@@ -14,8 +14,7 @@ import numpy as np
 import labscript_utils.h5_lock
 import h5py
 
-from blacs.tab_base_classes import Worker, define_state
-from blacs.tab_base_classes import MODE_MANUAL, MODE_TRANSITION_TO_BUFFERED, MODE_TRANSITION_TO_MANUAL, MODE_BUFFERED  
+from blacs.tab_base_classes import Worker
 import labscript_utils.properties
 
 
@@ -28,8 +27,8 @@ class Arduino_Interlock_Worker(Worker):
 
         self.interlock = Arduino_Interlock(self.addr, termination=self.termination)
         print('Connected to Arduino_Interlock')
-
-        #variables for later use        
+        
+        #variables for later use  
         self.stop_acquisition_timeout = None
         self.continuous_stop = threading.Event()
         self.continuous_thread = None
@@ -38,7 +37,7 @@ class Arduino_Interlock_Worker(Worker):
         self.restart_thread = False
         self.thread_standby = False
         
-        #dictionaries and lsit to store temperature values, setpoints, and status 
+        #dictionaries and list to store temperature values, setpoints, and status 
         self.newTemps = {}
         self.newSets = {}
         self.newStat = []
@@ -49,6 +48,8 @@ class Arduino_Interlock_Worker(Worker):
     def shutdown(self):
         self.interlock.close()
 
+    def restart(self, args, kargs):
+        self.interlock.close()
 
     def transition_to_buffered(self, device_name, h5file, front_panel_values, refresh):
         self.continuous_interval = False
@@ -246,7 +247,7 @@ class Arduino_Interlock_Worker(Worker):
         return shot
     
 
-##These final three functions are likely defunct - will have to test    
+##These final three functions are defunct (the thread is not necessary)  - may keep for printouts 
     #signifies the start of a continuous loop (formerly created a continuous call loop, but the implementation was changed)
     def continuous_loop(self):
         print("Acquiring...")
@@ -267,20 +268,20 @@ class Arduino_Interlock_Worker(Worker):
         print("Starting automated temperature acquisition")
         #assert self.continuous_thread is None
         #interval = self.continuous_interval
-        if self.thread_standby == False:
-            self.continuous_thread = threading.Thread(
-                target=self.continuous_loop, args=(), daemon=True
-                )
-            self.continuous_thread.start()
-            self.thread_standby = True
-        else:
-            #self.restart_thread = True
-            self.continuous_interval = True
+        # if self.thread_standby == False:
+        #     self.continuous_thread = threading.Thread(
+        #         target=self.continuous_loop, args=(), daemon=True
+        #         )
+        #     self.continuous_thread.start()
+        #     self.thread_standby = True
+        # else:
+        #     #self.restart_thread = True
+        #     self.continuous_interval = True
 
     #Stops auto-acquisition from the loop thread by setting the continuous_interval to false
     def stop_continuous(self, pause=False):
-        assert self.continuous_thread is not None
-        self.continuous_interval = False
+        # assert self.continuous_thread is not None
+        # self.continuous_interval = False
         #self.restart_thread = False
         print("Continuous acquisition has been stopped")
        
