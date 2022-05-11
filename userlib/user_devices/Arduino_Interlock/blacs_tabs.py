@@ -16,7 +16,7 @@ import os
 import sys
 import numpy as np
 import threading, time
-from qtutils import UiLoader#, inmain_decorator
+from qtutils import UiLoader, inmain_decorator
 import qtutils.icons
 from qtutils.qt import QtWidgets, QtGui, QtCore
 from labscript_utils.qtwidgets.toolpalette import ToolPaletteGroup
@@ -267,6 +267,10 @@ class Arduino_Interlock_Tab(DeviceTab):
                                                 %(self.Chan16Col))
          
          
+         # self.ui.interlock_controls.setCheckable(True)
+         # self.ui.channel_monitor.setCheckable(True)
+         # self.ui.temp_graph.setCheckable(True)
+         
          # # Connect signals for buttons
          self.ui.interlock_controls.clicked.connect(self.interlock_controls_clicked)
          self.ui.channel_monitor.clicked.connect(self.channel_monitor_clicked)
@@ -288,6 +292,7 @@ class Arduino_Interlock_Tab(DeviceTab):
          self.ui.default_setpoints.clicked.connect(self.default_setpoints_clicked)
          
          self.ui.status_update.clicked.connect(self.status_update_clicked)
+         
          
          self.ui.channel_1_button.clicked.connect(self.channel_1_clicked)
          self.ui.channel_2_button.clicked.connect(self.channel_2_clicked)
@@ -458,42 +463,46 @@ class Arduino_Interlock_Tab(DeviceTab):
          self.ui.status_icon.setPixmap(pixmap)
 
          #self.supports_smart_programming(self.use_smart_programming) 
-
-    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+      
+        
     def interlock_controls_clicked(self, button):
         if self.con_toggle:
             self.ui.control_box.hide()
             self.con_toggle = False
+            self.ui.interlock_controls.setIcon(QtGui.QIcon(':/qtutils/fugue/toggle-small-expand'))
             self.ui.interlock_controls.setToolTip('Click to show')
         else:
             self.ui.control_box.show()
             self.con_toggle = True
+            self.ui.interlock_controls.setIcon(QtGui.QIcon(':/qtutils/fugue/toggle-small'))
             self.ui.interlock_controls.setToolTip('Click to hide')
 
-
-    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+    
     def channel_monitor_clicked(self, button):
         if self.mon_toggle:
             self.ui.monitor_box.hide()
             self.mon_toggle = False
+            self.ui.channel_monitor.setIcon(QtGui.QIcon(':/qtutils/fugue/toggle-small-expand'))
             self.ui.channel_monitor.setToolTip('Click to show')
         else:
             self.ui.monitor_box.show()
             self.mon_toggle = True
+            self.ui.channel_monitor.setIcon(QtGui.QIcon(':/qtutils/fugue/toggle-small'))
             self.ui.channel_monitor.setToolTip('Click to hide')
        
-
-    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+     
     def temp_graph_clicked(self, button):
         if self.gra_toggle:
             self.ui.graph_widget.hide()
             self.ui.push_widg.show()
             self.gra_toggle = False
+            self.ui.temp_graph.setIcon(QtGui.QIcon(':/qtutils/fugue/toggle-small-expand'))
             self.ui.temp_graph.setToolTip('Click to show')
         else:
             self.ui.graph_widget.show()
             self.ui.push_widg.hide()
             self.gra_toggle = True
+            self.ui.temp_graph.setIcon(QtGui.QIcon(':/qtutils/fugue/toggle-small'))
             self.ui.temp_graph.setToolTip('Click to hide')      
          
 
