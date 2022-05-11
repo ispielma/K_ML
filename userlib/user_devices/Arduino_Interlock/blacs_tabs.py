@@ -100,8 +100,8 @@ class Arduino_Interlock_Tab(DeviceTab):
          self.con_toggle = True
          self.mon_toggle = True
          self.gra_toggle = True
+         self.auto_go = False
          
-         #self.auto_go = True
          self.loop_time = 0
          self.set_setpoint_vals = []
          self.adjust = []
@@ -112,7 +112,6 @@ class Arduino_Interlock_Tab(DeviceTab):
          self.chanDisCol = []
          self.chan_tog = [True, True, True, True, True, True, True, True, 
                           True, True, True, True, True, True, True, True]
-         
          
          self.iter_count = 0
          self.max_graph_points = 1440           #maximum points to be saved for temp graphing
@@ -501,7 +500,7 @@ class Arduino_Interlock_Tab(DeviceTab):
     #grabs the initial packet from the arduino (grabs all channel temperatures, setpoints, and the interlock status)
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)
     def initial_grab(self):
-        time.sleep(1.5)    #necessary to prevent timeout error!
+        time.sleep(2)    #necessary to prevent timeout error!
         temp_init, set_init, stat_init = yield(self.queue_work(self._primary_worker,'initial_packet'))
         for ch in range(self.numSensors):
              chName = ch+1
@@ -831,7 +830,7 @@ class Arduino_Interlock_Tab(DeviceTab):
             icon = QtGui.QIcon(':/qtutils/fugue/question')
             pixmap = icon.pixmap(QtCore.QSize(16, 16))
             self.ui.status_icon.setPixmap(pixmap)
-            self.ui.status_update.setText('%s' %(intlock_trigger))
+            #self.ui.status_update.setText('%s' %(intlock_trigger))
             self.ui.status_symbol.hide()
             self.ui.status_message.hide()
     
@@ -870,7 +869,7 @@ class Arduino_Interlock_Tab(DeviceTab):
             icon = QtGui.QIcon(':/qtutils/fugue/question')
             pixmap = icon.pixmap(QtCore.QSize(16, 16))
             self.ui.status_icon.setPixmap(pixmap)
-            self.ui.status_update.setText('%s' %(intlock_trigger))
+            #self.ui.status_update.setText('%s' %(intlock_trigger))
             self.ui.status_symbol.hide()
             self.ui.status_message.hide()
  
@@ -1019,7 +1018,7 @@ class Arduino_Interlock_Tab(DeviceTab):
             icon = QtGui.QIcon(':/qtutils/fugue/question')
             pixmap = icon.pixmap(QtCore.QSize(16, 16))
             self.ui.status_icon.setPixmap(pixmap)
-            self.ui.status_update.setText('%s' %(intlock_trigger))
+            #self.ui.status_update.setText('%s' %(intlock_trigger))
             self.ui.status_symbol.hide()
             self.ui.status_message.hide()
             
@@ -1097,7 +1096,6 @@ class Arduino_Interlock_Tab(DeviceTab):
         self.contin_on = True
         #self.auto_go = True
         if self.temp_check_flag == False:
-            #self.initial_grab()
             self.check_thread = threading.Thread(
                 target=self.continuous_loop, args=(), daemon=True
                 )
@@ -1133,10 +1131,11 @@ class Arduino_Interlock_Tab(DeviceTab):
         yield(self.queue_work(self._primary_worker,'stop_continuous'))
    
     
-    def continuous_loop(self):
+    def continuous_loop(self, auto_go=True):
+        self.auto_go = auto_go
         interval=5
         self.plot_start = time.time()
-        while True:
+        while self.auto_go:
             self.shot_read_check()
             if self.shot_read:
                 self.temp_shot_update()
@@ -1144,6 +1143,5 @@ class Arduino_Interlock_Tab(DeviceTab):
             elif self.contin_on:
                 self.grab_packet_update()
             time.sleep(interval)
-        #yield(self.queue_work(self._primary_worker,'restart'))
-            
 
+            
