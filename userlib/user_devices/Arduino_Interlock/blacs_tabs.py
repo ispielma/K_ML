@@ -59,6 +59,7 @@ class Arduino_Interlock_Tab(DeviceTab):
          self.chanName = []           #stores button thermocouple names for convenient and iterative calling
          self.chanCol = []          #stores channel active colors for convenient and iterative calling
          self.chanDisCol = []          #stores channel disable colors for convenient and iterative calling
+         self.chanHovCol = []          #stores channel hover colors for convenient and iterative calling
          self.chanPlotRef = []
          self.chan_tog = [True, True, True, True, True, False, False, False, 
                           True, True, True, True, True, False, False, True]
@@ -277,6 +278,24 @@ class Arduino_Interlock_Tab(DeviceTab):
          self.chanDisCol.append("")         
          self.chanDisCol.append("")         
          self.chanDisCol.append("#adadad")
+
+         #Adds the channel disabled colors as items in a list for convenient calling
+         self.chanHovCol.append("#aa0000")  #Note: each color is in hexcode
+         self.chanHovCol.append("#b8b800")
+         self.chanHovCol.append("#00a600")
+         self.chanHovCol.append("#00b7b7")
+         self.chanHovCol.append("#0a5494")
+         self.chanHovCol.append("")         #this channel is inactive, so it has no color
+         self.chanHovCol.append("")         
+         self.chanHovCol.append("")         
+         self.chanHovCol.append("#be91a3")
+         self.chanHovCol.append("#844a91")
+         self.chanHovCol.append("#d87000")
+         self.chanHovCol.append("#83cb88")
+         self.chanHovCol.append("#98918f")
+         self.chanHovCol.append("")         
+         self.chanHovCol.append("")         
+         self.chanHovCol.append("#cccccc")
 
          
          #Adds the channel-number names as items in a list for convenient calling
@@ -505,14 +524,17 @@ class Arduino_Interlock_Tab(DeviceTab):
             self.chan_tog[ch] = False
             self.chanPlotRef[ch].setData([],[])
             color = self.chanDisCol[ch]
+            colorHov = self.chanHovCol[ch]
             self.chanBut[ch].setToolTip('Click to Show on Graph')                                                   
         else:
             self.chan_tog[ch] = True
-            self.chanPlotRef[ch].setData(self.plot_temp[16, 0:self.iter_count-1], self.plot_temp[ch, 0:self.iter_count-1])
+            self.chanPlotRef[ch].setData(self.plot_temp[16, 1:self.iter_count], self.plot_temp[ch, 1:self.iter_count])
             color = self.chanCol[ch]
+            colorHov = ''
             self.chanBut[ch].setToolTip('Click to Hide from Graph')
-        self.chanBut[ch].setStyleSheet("background-color : %s;" "border-style: solid;"
-                        "border-width: 1px;" "border-color: gray;" "border-radius: 3px" %(color))
+        self.chanBut[ch].setStyleSheet("""QPushButton{background-color : %s; border-style: solid;
+                        border-width: 1px;border-color: gray;border-radius: 3px;}
+                        QPushButton::hover {background-color: %s;}""" %(color, colorHov))
 
     #function for reuqesting only new temperatures from the worker (linked to a button rather than auto-loop)    
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
@@ -663,8 +685,8 @@ class Arduino_Interlock_Tab(DeviceTab):
         #set the channel buttons with the appropriate updated strings that include the latest temperatures
         for ch in range(self.numSensors):
             chName = ch+1
-            #self.chanBut[ch].setText("%s \n %s C" %(self.chanText[ch], temp_up[str(chName)]))
-            self.chanBut[ch].setText("%s \n %s C" %(self.chanName[ch], temp_up[str(chName)]))
+            #self.chanBut[ch].setText("%s \n %s C" %(self.chanText[ch], temp_up[str(chName)]))  #if chan number display desired
+            self.chanBut[ch].setText("%s \n %s C" %(self.chanName[ch], temp_up[str(chName)]))   #if chan name display desired
         #grab the interlock trigger status and update appropriately
         intlock_trigger = str(stat_up[0])[0:4]
         if intlock_trigger == "Fals":
@@ -700,18 +722,28 @@ class Arduino_Interlock_Tab(DeviceTab):
                                                         "border-radius: 3px")
                         if self.chan_tog[ch]:
                             colorCol = self.chanCol[ch]
+                            colorHov = ''
                         else:
                             colorCol = self.chanDisCol[ch]
-                        self.chanBut[ch].setStyleSheet("color: #950000;background-color: %s;border-style: solid;border-width: 2px;"
-                                                            "border-color: red;border-radius: 3px" %(colorCol))
+                            colorHov = self.chanHovCol[ch]
+                        # self.chanBut[ch].setStyleSheet("color: #950000;background-color: %s;border-style: solid;border-width: 2px;"
+                        #                                     "border-color: red;border-radius: 3px" %(colorCol))
+                        self.chanBut[ch].setStyleSheet("""QPushButton{color: #950000;background-color : %s; border-style: solid;
+                                        border-width: 2px;border-color: red;border-radius: 3px;}
+                                        QPushButton::hover {background-color: %s;}""" %(colorCol, colorHov))
                     else:
                         self.adjust[ch].setStyleSheet("")
                         if self.chan_tog[ch]:
                             colorCol = self.chanCol[ch]
+                            colorHov = ''
                         else:
                             colorCol = self.chanDisCol[ch]
-                        self.chanBut[ch].setStyleSheet("background-color: %s;border-style: solid;border-width: 1px;"
-                                                            "border-color: gray;border-radius: 3px" %(colorCol))
+                            colorHov = self.chanHovCol[ch]
+                        # self.chanBut[ch].setStyleSheet("background-color: %s;border-style: solid;border-width: 1px;"
+                        #                                     "border-color: gray;border-radius: 3px" %(colorCol))
+                        self.chanBut[ch].setStyleSheet("""QPushButton{background-color : %s; border-style: solid;
+                                        border-width: 1px;border-color: gray;border-radius: 3px;}
+                                        QPushButton::hover {background-color: %s;}""" %(colorCol, colorHov))
             elif stat_mess == "React":
                 self.ui.status_message.setText("Press Reset")
                 #This is added to remove old attention warnings for the channels (as "React" can only be displayed once
@@ -724,8 +756,11 @@ class Arduino_Interlock_Tab(DeviceTab):
                         self.chanBut[ch].setStyleSheet("background-color: %s;border-style: solid;border-width: 1px;border-color: gray;"
                                                         "border-radius: 3px" %(self.chanCol[ch]))
                     else:
-                        self.chanBut[ch].setStyleSheet("background-color: %s;border-style: solid;border-width: 1px;border-color: gray;"
-                                                        "border-radius: 3px" %(self.chanDisCol[ch]))
+                        # self.chanBut[ch].setStyleSheet("background-color: %s;border-style: solid;border-width: 1px;border-color: gray;"
+                        #                                 "border-radius: 3px" %(self.chanDisCol[ch]))
+                        self.chanBut[ch].setStyleSheet("""QPushButton{background-color : %s; border-style: solid;
+                                        border-width: 1px;border-color: gray;border-radius: 3px;}
+                                        QPushButton::hover {background-color: %s;}""" %(self.chanDisCol[ch], self.chanHovCol[ch]))
             mess_icon = QtGui.QIcon(':/qtutils/fugue/exclamation')
             mess_pixmap = mess_icon.pixmap(QtCore.QSize(16, 16))
             self.ui.status_symbol.setPixmap(mess_pixmap)
@@ -768,7 +803,7 @@ class Arduino_Interlock_Tab(DeviceTab):
         #for each channel: if the button is active, plot the channel's temperature line
         for ch in range(self.numSensors):
             if self.chan_tog[ch]:
-                self.chanPlotRef[ch].setData(self.plot_temp[16, 0:self.iter_count], self.plot_temp[ch, 0:self.iter_count])
+                self.chanPlotRef[ch].setData(self.plot_temp[16, 1:self.iter_count+1], self.plot_temp[ch, 1:self.iter_count+1])
        #increase point count by 1
         self.iter_count += 1
 
@@ -841,7 +876,7 @@ class Arduino_Interlock_Tab(DeviceTab):
    #defines the loop for auto-aquisition of packets
     def continuous_loop(self, auto_go=True, interval = 5):
         self.auto_go = auto_go
-        self.plot_start = time.time()
+        time_go = True
         while self.auto_go:
             self.shot_read_check()
             if self.shot_read:
@@ -850,6 +885,8 @@ class Arduino_Interlock_Tab(DeviceTab):
             elif self.contin_on:
                 self.grab_packet_update()
             time.sleep(interval)
-
+            if time_go:
+                self.plot_start = time.time()
+                time_go = False
 
             
