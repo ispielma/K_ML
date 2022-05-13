@@ -13,11 +13,9 @@ from blacs.tab_base_classes import define_state, Tab
 from blacs.tab_base_classes import MODE_MANUAL, MODE_TRANSITION_TO_BUFFERED, MODE_TRANSITION_TO_MANUAL, MODE_BUFFERED  
 
 import os
-import sys
 import numpy as np
 import threading, time
 from qtutils import UiLoader, inmain_decorator
-import qtutils.icons
 from qtutils.qt import QtWidgets, QtGui, QtCore
 from labscript_utils.qtwidgets.toolpalette import ToolPaletteGroup
 import pyqtgraph as pg
@@ -84,89 +82,49 @@ class Arduino_Interlock_Tab(DeviceTab):
          plt.setTitle(title)
          
          #create a reference line to plot for each active channel and define attributes
-         self.ch_1_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[0], pen ='r', #red
-                                name ='Ch_1')
-         self.ch_2_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[1], pen ='y', #yellow
-                                name ='Ch_2')
-         self.ch_3_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[2], pen ='g', #green
-                                name ='Ch_3')
-         self.ch_4_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[3], pen ='c', #cyan
-                                name ='Ch_4')
-         self.ch_5_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[4], pen =[20, 141, 255], #blue
-                                name ='Ch_5')
-         self.ch_9_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[8], pen =[248, 187, 208], #pink
-                                name ='Ch_9')
-         self.ch_10_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[9], pen =[184, 104, 200], #purple
-                                name ='Ch_10')
-         self.ch_11_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[10], pen =[255, 136, 0], #orange
-                                name ='Ch_11')
-         self.ch_12_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[11], pen =[204, 255, 144], #mint-green
-                                name ='Ch_12')
-         self.ch_13_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[12], pen =[215, 204, 200], #tan
-                                name ='Ch_13')
-         self.ch_16_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[15], pen =[250, 250, 250], #white
-                                name ='Ch_16')
+         self.ch_1_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[0], pen ='r', name ='Ch_1') #red
+         self.ch_2_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[1], pen ='y', name ='Ch_2') #yellow
+         self.ch_3_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[2], pen ='g', name ='Ch_3') #green
+         self.ch_4_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[3], pen ='c', name ='Ch_4') #cyan
+         self.ch_5_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[4], pen =[20, 141, 255], name ='Ch_5') #blue
+         self.ch_9_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[8], pen =[248, 187, 208], name ='Ch_9') #pink
+         self.ch_10_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[9], pen =[184, 104, 200], name ='Ch_10') #purple
+         self.ch_11_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[10], pen =[255, 136, 0], name ='Ch_11') #orange
+         self.ch_12_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[11], pen =[204, 255, 144], name ='Ch_12') #mint-green
+         self.ch_13_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[12], pen =[215, 204, 200], name ='Ch_13') #tan
+         self.ch_16_ref = self.graph_widget.plot(self.plot_temp[16], self.plot_temp[15], pen =[250, 250, 250], name ='Ch_16') #white
+
                
          #Adds the channel plots as items in a list for convenient calling
-         self.chanPlotRef.append(self.ch_1_ref)
-         self.chanPlotRef.append(self.ch_2_ref)
-         self.chanPlotRef.append(self.ch_3_ref)
-         self.chanPlotRef.append(self.ch_4_ref)
-         self.chanPlotRef.append(self.ch_5_ref)
-         self.chanPlotRef.append(False)
-         self.chanPlotRef.append(False)
-         self.chanPlotRef.append(False)
-         self.chanPlotRef.append(self.ch_9_ref)
-         self.chanPlotRef.append(self.ch_10_ref)
-         self.chanPlotRef.append(self.ch_11_ref)
-         self.chanPlotRef.append(self.ch_12_ref)
-         self.chanPlotRef.append(self.ch_13_ref)
-         self.chanPlotRef.append(False)
-         self.chanPlotRef.append(False)
-         self.chanPlotRef.append(self.ch_16_ref)
-         
+         self.chanPlotRef = [self.ch_1_ref, self.ch_2_ref, self.ch_3_ref, self.ch_4_ref, self.ch_5_ref, False, False, False,
+                             self.ch_9_ref, self.ch_10_ref, self.ch_11_ref, self.ch_12_ref, self.ch_13_ref, False, False, self.ch_16_ref]
+
          #Adds the channel buttons as items in a list for convenient calling
-         self.chanBut.append(self.ui.channel_1_button)
-         self.chanBut.append(self.ui.channel_2_button)
-         self.chanBut.append(self.ui.channel_3_button)
-         self.chanBut.append(self.ui.channel_4_button)
-         self.chanBut.append(self.ui.channel_5_button)
-         self.chanBut.append(self.ui.channel_6_marker)
-         self.chanBut.append(self.ui.channel_7_marker)
-         self.chanBut.append(self.ui.channel_8_marker)
-         self.chanBut.append(self.ui.channel_9_button)
-         self.chanBut.append(self.ui.channel_10_button)
-         self.chanBut.append(self.ui.channel_11_button)
-         self.chanBut.append(self.ui.channel_12_button)
-         self.chanBut.append(self.ui.channel_13_button)
-         self.chanBut.append(self.ui.channel_14_marker)
-         self.chanBut.append(self.ui.channel_15_marker)
-         self.chanBut.append(self.ui.channel_16_button)
+         self.chanBut = [self.ui.channel_1_button, self.ui.channel_2_button, self.ui.channel_3_button, self.ui.channel_4_button,
+                         self.ui.channel_5_button, self.ui.channel_6_marker, self.ui.channel_7_marker, self.ui.channel_8_marker,
+                         self.ui.channel_9_button, self.ui.channel_10_button, self.ui.channel_11_button, self.ui.channel_12_button,
+                         self.ui.channel_13_button, self.ui.channel_14_marker, self.ui.channel_15_marker, self.ui.channel_16_button]
          
          #Adds the setpoint spinboxes as items to the list self.adjust for convenient calling
-         self.adjust.append(self.ui.chan_1_adjust)
-         self.adjust.append(self.ui.chan_2_adjust)
-         self.adjust.append(self.ui.chan_3_adjust)
-         self.adjust.append(self.ui.chan_4_adjust)
-         self.adjust.append(self.ui.chan_5_adjust)
-         self.adjust.append(self.ui.chan_6_adjust)
-         self.adjust.append(self.ui.chan_7_adjust)
-         self.adjust.append(self.ui.chan_8_adjust)
-         self.adjust.append(self.ui.chan_9_adjust)
-         self.adjust.append(self.ui.chan_10_adjust)
-         self.adjust.append(self.ui.chan_11_adjust)
-         self.adjust.append(self.ui.chan_12_adjust)
-         self.adjust.append(self.ui.chan_13_adjust)
-         self.adjust.append(self.ui.chan_14_adjust)
-         self.adjust.append(self.ui.chan_15_adjust)
-         self.adjust.append(self.ui.chan_16_adjust)
+         self.adjust = [self.ui.chan_1_adjust, self.ui.chan_2_adjust, self.ui.chan_3_adjust, self.ui.chan_4_adjust,
+                        self.ui.chan_5_adjust, self.ui.chan_6_adjust, self.ui.chan_7_adjust, self.ui.chan_8_adjust,
+                        self.ui.chan_9_adjust, self.ui.chan_10_adjust, self.ui.chan_11_adjust, self.ui.chan_12_adjust,
+                        self.ui.chan_13_adjust, self.ui.chan_14_adjust, self.ui.chan_15_adjust, self.ui.chan_16_adjust]    
          
-         
+         self.sub_tab_button = [self.ui.interlock_controls, self.ui.channel_monitor, self.ui.temp_graph]        
+         self.tab_toggle = [self.con_toggle, self.mon_toggle, self.gra_toggle]
+         self.sub_tab = [self.ui.control_box, self.ui.monitor_box, self.ui.graph_widget]
+
+
          # # Connect the appropriate signals for buttons
          #Connect clicked signal to the appropriate function for each respective sub-tab
-         self.ui.interlock_controls.clicked.connect(self.interlock_controls_clicked)
-         self.ui.channel_monitor.clicked.connect(self.channel_monitor_clicked)
-         self.ui.temp_graph.clicked.connect(self.temp_graph_clicked)
+         self.ui.interlock_controls.clicked.connect(lambda: self.sub_tab_clicked(0))
+         self.ui.channel_monitor.clicked.connect(lambda: self.sub_tab_clicked(1))
+         self.ui.temp_graph.clicked.connect(lambda: self.sub_tab_clicked(2))
+         
+         # self.ui.interlock_controls.clicked.connect(self.interlock_controls_clicked)
+         # self.ui.channel_monitor.clicked.connect(self.channel_monitor_clicked)
+         # self.ui.temp_graph.clicked.connect(self.temp_graph_clicked)
          
          #Connect clicked signal to the appropriate function for the digital interlock controls
          self.ui.digital_lock.clicked.connect(self.lock_clicked)    
@@ -244,67 +202,24 @@ class Arduino_Interlock_Tab(DeviceTab):
          self.Chan16Col = "qlineargradient(spread:pad, x1:0.489, y1:0.00568182, x2:0.489, y2:0.482955, stop:0 rgba(216, 216, 216, 255), stop:1 rgba(250, 250, 250, 255))"
          
          #Adds the channel colors as items in a list for convenient calling (they are such long strings, so this happens in 2 steps)
-         self.chanCol.append(self.Chan1Col)  #Note: each color is in hexcode (currently defined above - will optimize/ rearrange)
-         self.chanCol.append(self.Chan2Col)
-         self.chanCol.append(self.Chan3Col)
-         self.chanCol.append(self.Chan4Col)
-         self.chanCol.append(self.Chan5Col)
-         self.chanCol.append(self.Chan6Col)
-         self.chanCol.append(self.Chan7Col)        
-         self.chanCol.append(self.Chan8Col)        
-         self.chanCol.append(self.Chan9Col)
-         self.chanCol.append(self.Chan10Col)
-         self.chanCol.append(self.Chan11Col)
-         self.chanCol.append(self.Chan12Col)
-         self.chanCol.append(self.Chan13Col)
-         self.chanCol.append(self.Chan14Col)        
-         self.chanCol.append(self.Chan15Col)        
-         self.chanCol.append(self.Chan16Col)
+         self.chanCol =[self.Chan1Col, self.Chan2Col, self.Chan3Col, self.Chan4Col, self.Chan5Col, self.Chan6Col,
+                        self.Chan7Col, self.Chan8Col, self.Chan9Col, self.Chan10Col, self.Chan11Col,
+                        self.Chan12Col, self.Chan13Col, self.Chan14Col, self.Chan15Col, self.Chan16Col]
          
          #Adds the channel disabled colors as items in a list for convenient calling
-         self.chanDisCol.append("#8c0000")  #Note: each color is in hexcode
-         self.chanDisCol.append("#9a9a00")
-         self.chanDisCol.append("#008800")
-         self.chanDisCol.append("#009999")
-         self.chanDisCol.append("#094175")
-         self.chanDisCol.append("")         #this channel is inactive, so it has no color
-         self.chanDisCol.append("")         
-         self.chanDisCol.append("")         
-         self.chanDisCol.append("#987380")
-         self.chanDisCol.append("#673a70")
-         self.chanDisCol.append("#a35700")
-         self.chanDisCol.append("#6ba66f")
-         self.chanDisCol.append("#746e6c")
-         self.chanDisCol.append("")         
-         self.chanDisCol.append("")         
-         self.chanDisCol.append("#adadad")
+         self.chanDisCol = ["#8c0000", "#9a9a00", "#008800", "#009999", "#094175", "", "", "",
+                            "#987380", "#673a70", "#a35700", "#6ba66f", "#6ba66f", "", "", "#adadad"]
 
          #Adds the channel disabled colors as items in a list for convenient calling
-         self.chanHovCol.append("#aa0000")  #Note: each color is in hexcode
-         self.chanHovCol.append("#b8b800")
-         self.chanHovCol.append("#00a600")
-         self.chanHovCol.append("#00b7b7")
-         self.chanHovCol.append("#0a5494")
-         self.chanHovCol.append("")         #this channel is inactive, so it has no color
-         self.chanHovCol.append("")         
-         self.chanHovCol.append("")         
-         self.chanHovCol.append("#be91a3")
-         self.chanHovCol.append("#844a91")
-         self.chanHovCol.append("#d87000")
-         self.chanHovCol.append("#83cb88")
-         self.chanHovCol.append("#98918f")
-         self.chanHovCol.append("")         
-         self.chanHovCol.append("")         
-         self.chanHovCol.append("#cccccc")
+         self.chanHovCol = ["#aa0000", "#b8b800", "#00a600", "#00b7b7", "#0a5494", "", "", "",
+                            "#be91a3", "#844a91", "#d87000", "#83cb88", "#98918f", "", "", "#cccccc"]
 
-         
          #Adds the channel-number names as items in a list for convenient calling
          for ch in range(self.numSensors):
              chanNum = ch+1
              textMess = " Chan "+str(chanNum)+" "
              self.chanText.append("\u0332".join(textMess))      #the "\u0332".join() string adds an underline
- 
-         
+          
          #Adds the channel thermocouple names as items in a list for convenient calling
          self.chanName.append("\u0332".join(" TC-MOT-I "))      #MOT Coils (interior)        
          self.chanName.append("\u0332".join(" TC-MOTB-I "))         #MOT Bias Coils (exterior)
@@ -389,49 +304,24 @@ class Arduino_Interlock_Tab(DeviceTab):
              self.chanBut[ch].setText("%s \n %s C" %(self.chanName[ch], temp_init[str(chName)]))
              self.adjust[ch].setValue(set_init[str(chName)])
         self.on_const_temps()    
-     
-    #takes a signal from the interlock_controls sub-tab button and toggles the sub-tab between shown and hidden
-    def interlock_controls_clicked(self, button):
-        if self.con_toggle:
-            self.ui.control_box.hide()
-            self.con_toggle = False
-            self.ui.interlock_controls.setIcon(QtGui.QIcon(':/qtutils/fugue/toggle-small-expand'))
-            self.ui.interlock_controls.setToolTip('Click to show')
-        else:
-            self.ui.control_box.show()
-            self.con_toggle = True
-            self.ui.interlock_controls.setIcon(QtGui.QIcon(':/qtutils/fugue/toggle-small'))
-            self.ui.interlock_controls.setToolTip('Click to hide')
+ 
 
-    
-    #takes a signal from the channel_monitor sub-tab button and toggles the sub-tab between shown and hidden
-    def channel_monitor_clicked(self, button):
-        if self.mon_toggle:
-            self.ui.monitor_box.hide()
-            self.mon_toggle = False
-            self.ui.channel_monitor.setIcon(QtGui.QIcon(':/qtutils/fugue/toggle-small-expand'))
-            self.ui.channel_monitor.setToolTip('Click to show')
+    #takes a signal from the interlock_controls sub-tab button and toggles the sub-tab between shown and hidden
+    def sub_tab_clicked(self, ID):
+        if self.tab_toggle[ID]:
+            self.sub_tab[ID].hide()
+            if ID == 2:
+                self.ui.push_widg.show()
+            self.tab_toggle[ID] = False
+            self.sub_tab_button[ID].setIcon(QtGui.QIcon(':/qtutils/fugue/toggle-small-expand'))
+            self.sub_tab_button[ID].setToolTip('Click to show')
         else:
-            self.ui.monitor_box.show()
-            self.mon_toggle = True
-            self.ui.channel_monitor.setIcon(QtGui.QIcon(':/qtutils/fugue/toggle-small'))
-            self.ui.channel_monitor.setToolTip('Click to hide')
-       
-    
-    #takes a signal from the temperature graph sub-tab button and toggles the sub-tab between shown and hidden    
-    def temp_graph_clicked(self, button):
-        if self.gra_toggle:
-            self.ui.graph_widget.hide()
-            self.ui.push_widg.show()
-            self.gra_toggle = False
-            self.ui.temp_graph.setIcon(QtGui.QIcon(':/qtutils/fugue/toggle-small-expand'))
-            self.ui.temp_graph.setToolTip('Click to show')
-        else:
-            self.ui.graph_widget.show()
-            self.ui.push_widg.hide()
-            self.gra_toggle = True
-            self.ui.temp_graph.setIcon(QtGui.QIcon(':/qtutils/fugue/toggle-small'))
-            self.ui.temp_graph.setToolTip('Click to hide')              
+            self.sub_tab[ID].show()
+            if ID == 2:
+                self.ui.push_widg.show()
+            self.tab_toggle[ID] = True
+            self.sub_tab_button[ID].setIcon(QtGui.QIcon(':/qtutils/fugue/toggle-small'))
+            self.sub_tab_button[ID].setToolTip('Click to hide')
      
         
     #Takes a signal from the digital_lock button and appropriately toggles the lock (by queueing a worker function) 
@@ -477,6 +367,7 @@ class Arduino_Interlock_Tab(DeviceTab):
         self.ui.setpoints_label_2.hide()
         for ch in range(self.numSensors):
             self.adjust[ch].hide()
+
 
     #Takes a signal from the set_setpoints button and displays the setpoint spinboxes in the interlock GUI
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
@@ -536,6 +427,7 @@ class Arduino_Interlock_Tab(DeviceTab):
                         border-width: 1px;border-color: gray;border-radius: 3px;}
                         QPushButton::hover {background-color: %s;}""" %(color, colorHov))
 
+
     #function for reuqesting only new temperatures from the worker (linked to a button rather than auto-loop)    
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
     def grab_temp_update(self):
@@ -543,7 +435,7 @@ class Arduino_Interlock_Tab(DeviceTab):
         temp_up = yield(self.queue_work(self._primary_worker,'new_temps'))
         for ch in range(self.numSensors):
             chName = ch+1
-            #self.chanBut[ch].setText("%s \n %s C" %(self.chanText[ch], temp_up[str(chName)]))
+            #self.chanBut[ch].setText("%s \n %s C" %(self.chanText[ch], temp_up[str(chName)]))  #for chan numbers
             self.chanBut[ch].setText("%s \n %s C" %(self.chanName[ch], temp_up[str(chName)]))
         
     
@@ -554,92 +446,24 @@ class Arduino_Interlock_Tab(DeviceTab):
         temp_up = yield(self.queue_work(self._primary_worker,'temp_return'))
         for ch in range(self.numSensors):
             chName = ch+1
-            #self.chanBut[ch].setText("%s \n %s C" %(self.chanText[ch], temp_up[str(chName)]))
+            #self.chanBut[ch].setText("%s \n %s C" %(self.chanText[ch], temp_up[str(chName)]))  #for chan numbers
             self.chanBut[ch].setText("%s \n %s C" %(self.chanName[ch], temp_up[str(chName)]))
         
     
-    #function for reuqesting only new interlock status from the worker (linked to a button rather than auto-loop)    
+    #function for reuqesting new interlock status from the worker   
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
     def grab_status_update(self):
         print('Updating Interlock Status...')
-        stat_up = yield(self.queue_work(self._primary_worker,'new_stat'))
-        intlock_trigger = str(stat_up[0])[0:4]
-        if intlock_trigger == "Fals":
-            icon = QtGui.QIcon(':/qtutils/fugue/tick-circle')
-            pixmap = icon.pixmap(QtCore.QSize(16, 16))
-            self.ui.status_icon.setPixmap(pixmap)
-            self.ui.status_symbol.hide()
-            self.ui.status_message.hide()
-        elif intlock_trigger == "True":
-            icon = QtGui.QIcon(':/qtutils/fugue/cross-circle')
-            pixmap = icon.pixmap(QtCore.QSize(16, 16))
-            self.ui.status_icon.setPixmap(pixmap)
-            stat_mess = str(stat_up[1])
-            if stat_mess == "flow1":
-                self.ui.status_message.setText("Check Flowmeter 1")
-            elif stat_mess == "flow2":
-                self.ui.status_message.setText("Check Flowmeter 2")
-            elif stat_mess == "DigiL":
-                self.ui.status_message.setText("Check Digital Lock")
-                self.ui.digital_lock.setStyleSheet("background-color : red;" "border-style: solid;"
-                                                       "border-width: 1px;" "border-color: gray;" "border-radius: 3px")
-            elif stat_mess == "HighT":
-                self.ui.status_message.setText("Check Temperatures")
-            elif stat_mess == "React":
-                self.ui.status_message.setText("Push Reset")
-                self.ui.digital_reset.setText("RESET!")
-            mess_icon = QtGui.QIcon(':/qtutils/fugue/exclamation')
-            mess_pixmap = mess_icon.pixmap(QtCore.QSize(16, 16))
-            self.ui.status_symbol.setPixmap(mess_pixmap)
-            self.ui.status_symbol.show()
-            self.ui.status_message.show()
-        else:
-            icon = QtGui.QIcon(':/qtutils/fugue/question')
-            pixmap = icon.pixmap(QtCore.QSize(16, 16))
-            self.ui.status_icon.setPixmap(pixmap)
-            #self.ui.status_update.setText('%s' %(intlock_trigger))
-            self.ui.status_symbol.hide()
-            self.ui.status_message.hide()
-    
+        temp_up, sets_up, stat_up = yield(self.queue_work(self._primary_worker,'new_packet'))
+        self.status_display(temp_up, sets_up, stat_up)
+
     
     #function for reuqesting the interlock status from the worker during a shot    
     @define_state(MODE_TRANSITION_TO_MANUAL,True)      
     def stat_shot_update(self):
         print('Updating Interlock Status...')
-        stat_up = yield(self.queue_work(self._primary_worker,'stat_return'))
-        intlock_trigger = str(stat_up[0])[0:4]
-        if intlock_trigger == "Fals":
-            icon = QtGui.QIcon(':/qtutils/fugue/tick-circle')
-            pixmap = icon.pixmap(QtCore.QSize(16, 16))
-            self.ui.status_icon.setPixmap(pixmap)
-            self.ui.status_symbol.hide()
-            self.ui.status_message.hide()
-        elif intlock_trigger == "True":
-            icon = QtGui.QIcon(':/qtutils/fugue/cross-circle')
-            pixmap = icon.pixmap(QtCore.QSize(16, 16))
-            self.ui.status_icon.setPixmap(pixmap)
-            stat_mess = str(stat_up[1])
-            if stat_mess == "flow1":
-                self.ui.status_message.setText("Check Flowmeter 1")
-            elif stat_mess == "flow2":
-                self.ui.status_message.setText("Check Flowmeter 2")
-            elif stat_mess == "DigiL":
-                self.ui.status_message.setText("Check Digital Lock")
-            elif stat_mess == "HighT":
-                self.ui.status_message.setText("Check Temperatures")
-            elif stat_mess == "React":
-                self.ui.status_message.setText("Press Reset")
-            mess_icon = QtGui.QIcon(':/qtutils/fugue/exclamation')
-            mess_pixmap = mess_icon.pixmap(QtCore.QSize(16, 16))
-            self.ui.status_symbol.setPixmap(mess_pixmap)
-            self.ui.status_symbol.show()
-            self.ui.status_message.show()
-        else:
-            icon = QtGui.QIcon(':/qtutils/fugue/question')
-            pixmap = icon.pixmap(QtCore.QSize(16, 16))
-            self.ui.status_icon.setPixmap(pixmap)
-            self.ui.status_symbol.hide()
-            self.ui.status_message.hide()
+        temp_up, sets_up, stat_up = yield(self.queue_work(self._primary_worker,'packet_return'))
+        self.status_display(temp_up, sets_up, stat_up)
  
     
     #function for reuqesting the current setpoints from the worker (linked to a button rather than auto-loop) 
@@ -665,7 +489,7 @@ class Arduino_Interlock_Tab(DeviceTab):
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
     def send_new_setpoints(self):
         print('Sending New Setpoints...')
-        set_send = yield(self.queue_work(self._primary_worker,'set_setpoints', self.set_setpoint_vals))
+        yield(self.queue_work(self._primary_worker,'set_setpoints', self.set_setpoint_vals))
            
 
     #function that activates the default setpoints worker function to reset setpoints to the arduino's default values
@@ -680,103 +504,19 @@ class Arduino_Interlock_Tab(DeviceTab):
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
     def grab_packet_update(self):
         print('Attempting to Grab Temperatures and Status...')
-        #grab the new packets from the worker
-        temp_up, sets_up, stat_up = yield(self.queue_work(self._primary_worker,'new_packet', verbose = False))
+        temp_up, sets_up, stat_up = yield(self.queue_work(self._primary_worker,'new_packet', verbose = False)) #grab the new packets from the worker
+        
         #set the channel buttons with the appropriate updated strings that include the latest temperatures
         for ch in range(self.numSensors):
             chName = ch+1
             #self.chanBut[ch].setText("%s \n %s C" %(self.chanText[ch], temp_up[str(chName)]))  #if chan number display desired
             self.chanBut[ch].setText("%s \n %s C" %(self.chanName[ch], temp_up[str(chName)]))   #if chan name display desired
-        #grab the interlock trigger status and update appropriately
-        intlock_trigger = str(stat_up[0])[0:4]
-        if intlock_trigger == "Fals":
-            icon = QtGui.QIcon(':/qtutils/fugue/tick-circle')
-            pixmap = icon.pixmap(QtCore.QSize(16, 16))
-            self.ui.status_icon.setPixmap(pixmap)
-                
-            self.ui.digital_reset.setStyleSheet("")
-            self.ui.status_symbol.hide()
-            self.ui.status_message.hide()
-        #if true, update and check for the warning message  - then display warning and highlight the button of attention
-        elif intlock_trigger == "True":
-            self.chanBut[7].setText(stat_up[1])
-            icon = QtGui.QIcon(':/qtutils/fugue/cross-circle')
-            pixmap = icon.pixmap(QtCore.QSize(16, 16))
-            self.ui.status_icon.setPixmap(pixmap)
-            stat_mess = str(stat_up[1])
-            if stat_mess == "flow1":
-                self.ui.status_message.setText("Check Flowmeter 1")
-            elif stat_mess == "flow2":
-                self.ui.status_message.setText("Check Flowmeter 2")
-            elif stat_mess == "DigiL":
-                self.ui.status_message.setText("Check Digital Lock")
-                self.ui.digital_lock.setStyleSheet("color: red;border-style: solid;border-width: 2px;"
-                                                   "border-color: red;border-radius: 3px")
-            elif stat_mess == "HighT":
-                self.ui.status_message.setText("Check Temperatures")
-                for ch in range(self.numSensors):
-                    chName = ch+1
-                    if temp_up[str(chName)] > sets_up[str(chName)]:
-                        self.adjust[ch].show()
-                        self.adjust[ch].setStyleSheet("color: red;border-style: solid;border-width: 1px;border-color: red;"
-                                                        "border-radius: 3px")
-                        if self.chan_tog[ch]:
-                            colorCol = self.chanCol[ch]
-                            colorHov = ''
-                        else:
-                            colorCol = self.chanDisCol[ch]
-                            colorHov = self.chanHovCol[ch]
-                        # self.chanBut[ch].setStyleSheet("color: #950000;background-color: %s;border-style: solid;border-width: 2px;"
-                        #                                     "border-color: red;border-radius: 3px" %(colorCol))
-                        self.chanBut[ch].setStyleSheet("""QPushButton{color: #950000;background-color : %s; border-style: solid;
-                                        border-width: 2px;border-color: red;border-radius: 3px;}
-                                        QPushButton::hover {background-color: %s;}""" %(colorCol, colorHov))
-                    else:
-                        self.adjust[ch].setStyleSheet("")
-                        if self.chan_tog[ch]:
-                            colorCol = self.chanCol[ch]
-                            colorHov = ''
-                        else:
-                            colorCol = self.chanDisCol[ch]
-                            colorHov = self.chanHovCol[ch]
-                        # self.chanBut[ch].setStyleSheet("background-color: %s;border-style: solid;border-width: 1px;"
-                        #                                     "border-color: gray;border-radius: 3px" %(colorCol))
-                        self.chanBut[ch].setStyleSheet("""QPushButton{background-color : %s; border-style: solid;
-                                        border-width: 1px;border-color: gray;border-radius: 3px;}
-                                        QPushButton::hover {background-color: %s;}""" %(colorCol, colorHov))
-            elif stat_mess == "React":
-                self.ui.status_message.setText("Press Reset")
-                #This is added to remove old attention warnings for the channels (as "React" can only be displayed once
-                #       all channels have returned to acceptable temperature levels and all other checks are normal)
-                self.ui.digital_reset.setStyleSheet("color: red;border-style: solid;border-width: 2px;"
-                                                    "border-color: red;border-radius: 3px")
-                for ch in range(self.numSensors):
-                    self.adjust[ch].setStyleSheet("")
-                    if self.chan_tog[ch]:
-                        self.chanBut[ch].setStyleSheet("background-color: %s;border-style: solid;border-width: 1px;border-color: gray;"
-                                                        "border-radius: 3px" %(self.chanCol[ch]))
-                    else:
-                        # self.chanBut[ch].setStyleSheet("background-color: %s;border-style: solid;border-width: 1px;border-color: gray;"
-                        #                                 "border-radius: 3px" %(self.chanDisCol[ch]))
-                        self.chanBut[ch].setStyleSheet("""QPushButton{background-color : %s; border-style: solid;
-                                        border-width: 1px;border-color: gray;border-radius: 3px;}
-                                        QPushButton::hover {background-color: %s;}""" %(self.chanDisCol[ch], self.chanHovCol[ch]))
-            mess_icon = QtGui.QIcon(':/qtutils/fugue/exclamation')
-            mess_pixmap = mess_icon.pixmap(QtCore.QSize(16, 16))
-            self.ui.status_symbol.setPixmap(mess_pixmap)
-            self.ui.status_symbol.show()
-            self.ui.status_message.show()
-        #if neither true nor false are returned, the status is unknown, so display a "question" icon
-        else:
-            icon = QtGui.QIcon(':/qtutils/fugue/question')
-            pixmap = icon.pixmap(QtCore.QSize(16, 16))
-            self.ui.status_icon.setPixmap(pixmap)
-            self.ui.status_symbol.hide()
-            self.ui.status_message.hide()
+            
+        #grab the interlock trigger status message and update the display appropriately
+        self.status_display(temp_up, sets_up, stat_up)
         
-    #Update the temperature graph with the new temperature data for each channel's line    
-        
-        #check for the maximum points on the graph, and if reached, remove the oldest column of data
+        #Update the temperature graph with the new temperature data for each channel's line      
+        #       check for the maximum points on the graph, and if reached, remove the oldest column of data
         if self.iter_count > (self.max_graph_points):
             self.iter_count = self.max_graph_points
             self.plot_temp = np.delete(self.plot_temp, [0], axis = 1)
@@ -806,8 +546,7 @@ class Arduino_Interlock_Tab(DeviceTab):
                 self.chanPlotRef[ch].setData(self.plot_temp[16, 1:self.iter_count+1], self.plot_temp[ch, 1:self.iter_count+1])
        #increase point count by 1
         self.iter_count += 1
-
-    
+   
     
     #if a signal is recieved from the temperature_zero button, remove all the temperatures displayed on the button
     #       This DOES NOT affect the temperature graph, just the button displays
@@ -881,7 +620,7 @@ class Arduino_Interlock_Tab(DeviceTab):
             self.shot_read_check()
             if self.shot_read:
                 self.temp_shot_update()
-                self.stat_shot_update()
+                self.grab_status_update()
             elif self.contin_on:
                 self.grab_packet_update()
             time.sleep(interval)
@@ -889,4 +628,88 @@ class Arduino_Interlock_Tab(DeviceTab):
                 self.plot_start = time.time()
                 time_go = False
 
+
+   #function to handle updating the interlock status and warnings in the blacs tab
+    def status_display(self, temp_up, sets_up, stat_up):
+        #grab the interlock trigger status and update appropriately
+        intlock_trigger = str(stat_up[0])[0:4]
+        if intlock_trigger == "Fals":
+            icon = QtGui.QIcon(':/qtutils/fugue/tick-circle')
+            pixmap = icon.pixmap(QtCore.QSize(16, 16))
+            self.ui.status_icon.setPixmap(pixmap)
+            self.ui.digital_reset.setStyleSheet("")
+            self.ui.status_symbol.hide()
+            self.ui.status_message.hide()
             
+        #if true, update and check for the warning message  - then display warning and highlight the button of attention
+        elif intlock_trigger == "True":
+            icon = QtGui.QIcon(':/qtutils/fugue/cross-circle')
+            pixmap = icon.pixmap(QtCore.QSize(16, 16))
+            self.ui.status_icon.setPixmap(pixmap)
+            stat_mess = str(stat_up[1])
+            if stat_mess == "flow1":
+                self.ui.status_message.setText("Check Flowmeter 1")
+            elif stat_mess == "flow2":
+                self.ui.status_message.setText("Check Flowmeter 2")
+            elif stat_mess == "DigiL":
+                self.ui.status_message.setText("Check Digital Lock")
+                self.ui.digital_lock.setStyleSheet("color: red;border-style: solid;border-width: 2px;"
+                                                   "border-color: red;border-radius: 3px")
+            elif stat_mess == "HighT":
+                self.ui.status_message.setText("Check Temperatures")
+                for ch in range(self.numSensors):
+                    chName = ch+1
+                    if temp_up[str(chName)] > sets_up[str(chName)]:
+                        self.adjust[ch].show()
+                        self.adjust[ch].setStyleSheet("color: red;border-style: solid;border-width: 1px;border-color: red;"
+                                                        "border-radius: 3px")
+                        if self.chan_tog[ch]:
+                            colorCol = self.chanCol[ch]
+                            colorHov = ''
+                        else:
+                            colorCol = self.chanDisCol[ch]
+                            colorHov = self.chanHovCol[ch]
+                        self.chanBut[ch].setStyleSheet("""QPushButton{color: #950000;background-color : %s; border-style: solid;
+                                        border-width: 2px;border-color: red;border-radius: 3px;}
+                                        QPushButton::hover {background-color: %s;}""" %(colorCol, colorHov))
+                    else:
+                        self.adjust[ch].setStyleSheet("")
+                        if self.chan_tog[ch]:
+                            colorCol = self.chanCol[ch]
+                            colorHov = ''
+                        else:
+                            colorCol = self.chanDisCol[ch]
+                            colorHov = self.chanHovCol[ch]
+                        self.chanBut[ch].setStyleSheet("""QPushButton{background-color : %s; border-style: solid;
+                                        border-width: 1px;border-color: gray;border-radius: 3px;}
+                                        QPushButton::hover {background-color: %s;}""" %(colorCol, colorHov))
+            elif stat_mess == "React":
+                self.ui.status_message.setText("Push Reset")
+                
+             #This is added to remove old attention warnings for the channels (as "React" can only be displayed once
+             #       all channels have returned to acceptable temperature levels and all other checks are normal)
+                self.ui.digital_reset.setStyleSheet("color: red;border-style: solid;border-width: 2px;"
+                                                    "border-color: red;border-radius: 3px")
+                for ch in range(self.numSensors):
+                    self.adjust[ch].setStyleSheet("")
+                    if self.chan_tog[ch]:
+                        self.chanBut[ch].setStyleSheet("background-color: %s;border-style: solid;border-width: 1px;border-color: gray;"
+                                                        "border-radius: 3px" %(self.chanCol[ch]))
+                    else:
+                        self.chanBut[ch].setStyleSheet("""QPushButton{background-color : %s; border-style: solid;
+                                        border-width: 1px;border-color: gray;border-radius: 3px;}
+                                        QPushButton::hover {background-color: %s;}""" %(self.chanDisCol[ch], self.chanHovCol[ch]))
+            mess_icon = QtGui.QIcon(':/qtutils/fugue/exclamation')
+            mess_pixmap = mess_icon.pixmap(QtCore.QSize(16, 16))
+            self.ui.status_symbol.setPixmap(mess_pixmap)
+            self.ui.status_symbol.show()
+            self.ui.status_message.show()
+            
+        #if neither true nor false are returned, the status is unknown, so display a "question" icon
+        else:
+            icon = QtGui.QIcon(':/qtutils/fugue/question')
+            pixmap = icon.pixmap(QtCore.QSize(16, 16))
+            self.ui.status_icon.setPixmap(pixmap)
+            self.ui.status_symbol.hide()
+            self.ui.status_message.hide()            
+        

@@ -45,9 +45,6 @@ class Arduino_Interlock_Worker(Worker):
     def shutdown(self):
         self.interlock.close()
 
-    #May not be necessary - will check
-    def restart(self, args, kargs):
-        self.interlock.close()
 
     #Defined for blacs functionality - when blacs stat is transition to buffered mode (before a shot), minimal required preparation
     #           for the h5 file (and if necessry, halt any extraneous processes)
@@ -168,7 +165,14 @@ class Arduino_Interlock_Worker(Worker):
         self.interlock.call_plumber()     #to flush the serial
         return self.newTemps, self.newSets, self.newStat
 
+
+    #Performs a check of the latest called interlock status and returns that status
+    def packet_return(self):
+        print("Calling latest packet...")
+        return self.newTemps, self.newSets, self.newStat
     
+    
+    #!! Might be better off sticking with the new_packet function
     #Grabs a full call of only the channel temperatures  (!!may be ignored now)
     def new_temps(self):
         print("Requesting new temperature values...")
@@ -243,8 +247,7 @@ class Arduino_Interlock_Worker(Worker):
         self.interlock.set_default_setpoints(verbose=False)
         self.interlock.call_plumber()     #to flush the serial
         self.interlock.arduino_save_setpoints(verbose=True)
-        return
-    
+        return    
     
 
 #This function had intended functionality for checking for active shots (and is still referenced by the blacs_tab),
