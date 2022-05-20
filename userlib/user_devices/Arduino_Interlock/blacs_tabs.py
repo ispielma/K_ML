@@ -30,9 +30,16 @@ class Arduino_Interlock_Tab(DeviceTab):
          
          # Loads GUI for interlock from ui document made in QT Designer
          ui_filepath = os.path.join(
-             os.path.dirname(os.path.realpath(__file__)), 'interlock_GUI.ui'
+             os.path.dirname(os.path.realpath(__file__)), 'interlock_GUI_log.ui'
          )
          self.ui = UiLoader().load(ui_filepath)       #loads filepath and sets as variable for convenient calling
+         
+         log_filepath = os.path.join(
+             os.path.dirname(os.path.realpath(__file__)), 'status_log.ui'
+         )
+         self.log_box = UiLoader().load(log_filepath)       #loads filepath and sets as variable for convenient calling
+         self.log_box.setWindowTitle("Interlock Status log")
+         self.log_box.hide()
          
          #Creates a scrollArea widget and adds the interlock ui inside 
          #      (allows ui window to be viewed  in smaller frame while maintaining size policies)
@@ -42,7 +49,7 @@ class Arduino_Interlock_Tab(DeviceTab):
          #variables to be used later
          self.numSensors = 16          #Number of channels
          self.contin_on = False           #flag for pausing auto-loop
-         self.shot_read = False           #to be used for updating ui during shots - may be broken currently
+         self.shot_standby = False           #to be used for updating ui during shots - may be broken currently
          self.temp_check_flag = False           #flag to indicate the need to start a new auto-loop thread
          self.con_toggle = True           #toggle flag for interlock controls sub-tab
          self.mon_toggle = True           #toggle flag for channel monitor sub-tab
@@ -62,10 +69,14 @@ class Arduino_Interlock_Tab(DeviceTab):
          self.chan_tog = [True, True, True, True, True, False, False, False, 
                           True, True, True, True, True, False, False, True]
          
+         self.log_start = time.ctime()
+         self.status_log = self.log_start +' [START] :   STATUS LOG began on '+ self.log_start +'.\n'
+         self.log_box.log_text.insertPlainText(self.status_log)
+         
          #integer variables for graphing
          self.loop_time = 0         #starts a time count for the graph
          self.iter_count = 0          #counts the number of iterations (to keep track of points on the graph)
-         self.max_graph_points = 1440           #maximum points to be saved for temp graphing
+         self.max_graph_points = 11520 #1440 #17280    #maximum points to be saved for temp graphing
          self.plot_temp = np.zeros([17, 1])             #creates an arry of 17 rows with 0s as the entries
          self.plot_start = 0                #begins the plotting time at zero seconds
          
@@ -125,6 +136,9 @@ class Arduino_Interlock_Tab(DeviceTab):
          # self.ui.interlock_controls.clicked.connect(self.interlock_controls_clicked)
          # self.ui.channel_monitor.clicked.connect(self.channel_monitor_clicked)
          # self.ui.temp_graph.clicked.connect(self.temp_graph_clicked)
+         
+         self.ui.status_log_button.clicked.connect(self.log_clicked)
+         self.log_box.copy_text_button.clicked.connect(self.copy_clicked)
          
          #Connect clicked signal to the appropriate function for the digital interlock controls
          self.ui.digital_lock.clicked.connect(self.lock_clicked)    
@@ -345,6 +359,16 @@ class Arduino_Interlock_Tab(DeviceTab):
         
         self.ui.digital_reset.setStyleSheet("")                                     
     
+    #Takes a signal from the status_log button and displays the status_log window           
+    def log_clicked(self, button):
+        self.log_box.show()
+
+    #Takes a signal from the copy_text_button in the status log and copies the entire log to the clipboard           
+    def copy_clicked(self, button):
+        cb = QtGui.QApplication.clipboard()
+        cb.clear(mode=cb.Clipboard )
+        self.full_log = self.log_box.log_text.toPlainText()
+        cb.setText(self.full_log, mode=cb.Clipboard)
     
     #Takes a signal from the  button and appropriately toggles the lock (by queueing a worker function)     
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
@@ -546,7 +570,17 @@ class Arduino_Interlock_Tab(DeviceTab):
                 self.chanPlotRef[ch].setData(self.plot_temp[16, 1:self.iter_count+1], self.plot_temp[ch, 1:self.iter_count+1])
        #increase point count by 1
         self.iter_count += 1
-   
+
+    #function for reuqesting the packet from the worker during a shot    
+    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+    def packet_shot_update(self):
+        print('Updating Temperatures and Status...')
+        temp_up, sets_up, stat_up = yield(self.queue_work(self._primary_worker,'packet_return'))
+        self.status_display(temp_up, sets_up, stat_up)
+        for ch in range(self.numSensors):
+            chName = ch+1
+            #self.chanBut[ch].setText("%s \n %s C" %(self.chanText[ch], temp_up[str(chName)]))  #for chan numbers
+            self.chanBut[ch].setText("%s \n %s C" %(self.chanName[ch], temp_up[str(chName)]))
     
     #if a signal is recieved from the temperature_zero button, remove all the temperatures displayed on the button
     #       This DOES NOT affect the temperature graph, just the button displays
@@ -559,8 +593,8 @@ class Arduino_Interlock_Tab(DeviceTab):
     
     #
     @define_state(MODE_MANUAL|MODE_BUFFERED|MODE_TRANSITION_TO_BUFFERED|MODE_TRANSITION_TO_MANUAL,True)    
-    def shot_read_check(self):
-        self.shot_read = yield(self.queue_work(self._primary_worker,'shot_check'))
+    def shot_standby_check(self):
+        self.shot_standby = yield(self.queue_work(self._primary_worker,'shot_check'))
    
      
     #activates the auto-loop (continuos_loop) by either creating a new thread or, if one exists, changing the
@@ -613,17 +647,19 @@ class Arduino_Interlock_Tab(DeviceTab):
    
     
    #defines the loop for auto-aquisition of packets
-    def continuous_loop(self, auto_go=True, interval = 5):
+    def continuous_loop(self, auto_go=True, interval = 5, stand_interval = 0.5):
         self.auto_go = auto_go
         time_go = True
         while self.auto_go:
-            self.shot_read_check()
-            if self.shot_read:
-                self.temp_shot_update()
-                self.grab_status_update()
+            #self.shot_standby_check()
+            if self.shot_standby:
+                # self.temp_shot_update()
+                # self.grab_status_update()
+                self.packet_shot_update()
+                time.sleep(stand_interval)
             elif self.contin_on:
                 self.grab_packet_update()
-            time.sleep(interval)
+                time.sleep(interval)
             if time_go:
                 self.plot_start = time.time()
                 time_go = False
@@ -649,17 +685,27 @@ class Arduino_Interlock_Tab(DeviceTab):
             stat_mess = str(stat_up[1])
             if stat_mess == "flow1":
                 self.ui.status_message.setText("Check Flowmeter 1")
+                self.log_warning = time.ctime() +' [INTLCK WARNING] :  Flowmeter 1 has triggered the interlock!\n'
+                self.log_box.log_text.insertPlainText(self.log_warning)
             elif stat_mess == "flow2":
                 self.ui.status_message.setText("Check Flowmeter 2")
+                self.log_warning = time.ctime() +' [INTLCK WARNING] :  Flowmeter 2 has triggered the interlock!\n'
+                self.log_box.log_text.insertPlainText(self.log_warning)
             elif stat_mess == "DigiL":
                 self.ui.status_message.setText("Check Digital Lock")
                 self.ui.digital_lock.setStyleSheet("color: red;border-style: solid;border-width: 2px;"
                                                    "border-color: red;border-radius: 3px")
+                self.log_warning = time.ctime() +' [INTLCK WARNING] :  The Digital Lock has triggered the interlock!\n'
+                self.log_box.log_text.insertPlainText(self.log_warning)
             elif stat_mess == "HighT":
                 self.ui.status_message.setText("Check Temperatures")
+                self.log_warning = time.ctime() +' [INTLCK WARNING] :  High Temperature has triggered the interlock.\n'
+                self.log_box.log_text.insertPlainText(self.log_warning)
                 for ch in range(self.numSensors):
                     chName = ch+1
                     if temp_up[str(chName)] > sets_up[str(chName)]:
+                        self.log_warning = time.ctime() +' [INTLCK WARNING] :  High temperature for '+self.chanName[ch]+': '+str(temp_up[str(chName)])+' degC ! \n'
+                        self.log_box.log_text.insertPlainText(self.log_warning)
                         self.adjust[ch].show()
                         self.adjust[ch].setStyleSheet("color: red;border-style: solid;border-width: 1px;border-color: red;"
                                                         "border-radius: 3px")
@@ -684,7 +730,8 @@ class Arduino_Interlock_Tab(DeviceTab):
                                         border-width: 1px;border-color: gray;border-radius: 3px;}
                                         QPushButton::hover {background-color: %s;}""" %(colorCol, colorHov))
             elif stat_mess == "React":
-                self.ui.status_message.setText("Push Reset")
+                #Removing for now so that the trigger message can be displayed
+                #self.ui.status_message.setText("Push Reset")
                 
              #This is added to remove old attention warnings for the channels (as "React" can only be displayed once
              #       all channels have returned to acceptable temperature levels and all other checks are normal)

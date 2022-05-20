@@ -35,21 +35,30 @@ class Arduino_Interlock_Worker(Worker):
         self.shot_read = False          #intended to mark when shots are running - currently does not work
         self.timeTag = 0 #used later for tracking time to complete a shot
         
+        self.shot_live = False
+        self.shot_standby = False
+        self.live_work = False
+        
         #dictionaries and list to store temperature values, setpoints, and status 
         self.newTemps = {}
         self.newSets = {}
         self.newStat = []
         
+        self.altName = ['TC_MOT_I','TC_MOTB_I', 'TC_OT_I', 'TC_SCI_I', 'TC_SCIB_I', 'Chan_06', 'Chan_07', 'Chan_08',
+                        'TC_MOT_II','TC_MOTB_II', 'TC_OT_II', 'TC_SCI_II', 'TC_SCIB_II','Chan_14', 'Chan_15', 'TC_TRNBNK']
+    
     
     #Defined for blacs functionality - function necessary to shutdown the tab
     def shutdown(self):
         self.interlock.close()
+        self.live_work = False
 
 
     #Defined for blacs functionality - when blacs stat is transition to buffered mode (before a shot), minimal required preparation
     #           for the h5 file (and if necessry, halt any extraneous processes)
     def transition_to_buffered(self, device_name, h5file, front_panel_values, refresh):
         self.shot_read = True        #Not currently working as intended (so sort of useless)
+        self.shot_live = True
         self.h5file = h5file        #define h5 for reference
         self.device_name = 'Arduino_Interlock'          #device name to be called upon later
         #very quickly add the device to the h5 and then return (don't save anything yet)
@@ -95,9 +104,9 @@ class Arduino_Interlock_Worker(Worker):
             dset = grp2.create_dataset(self.device_name, track_order= True, data=data)  #creates a dataset for grp2 (from the array "data")
             for ch in temp_vals:
                 if len(ch) == 1: 
-                    chNum = "channel_0"+str(ch)+"_temp"
+                    chNum = "channel_0"+str(ch)+"_temp"+" ("+self.altName[int(ch)-1]+")"
                 else:
-                    chNum = "channel_"+str(ch)+"_temp"
+                    chNum = "channel_"+str(ch)+"_temp"+" ("+self.altName[int(ch)-1]+")"
                 dset.attrs.create(chNum, temp_vals[ch])  #creates an attribute to go with the dataset array
             #This sets interlock trigger status as an attribute in the Arduino_interlock folder with appropriate indication
             if intlock_stat == 'False':
@@ -254,8 +263,7 @@ class Arduino_Interlock_Worker(Worker):
 #       but it doesn't really do anything useful at this time    
     #Checks to see if a shot is being read (npt properly working at this time)
     def shot_check(self):
-        shot = self.shot_read
-        return shot
+        return self.shot_standby
     
 
 ##These final three functions are only here for printouts now - not super necessary anymore but they are here for now
@@ -268,7 +276,14 @@ class Arduino_Interlock_Worker(Worker):
     #Prints a continuous acquisition start message in the terminal output
     def start_continuous(self, verbose = True):
         if verbose:
-            print("Starting automated temperature acquisition")
+            print("Starting automated temperature acquisition") 
+
+        # if self.live_work == False:
+        #     self.check_thread = threading.Thread(
+        #         target=self.shot_checker, args=(), daemon=True
+        #         )
+        #     self.check_thread.start()
+        #     self.live_work = True
 
 
     #Prints a continuous acquisition stop message in the terminal output
@@ -277,7 +292,19 @@ class Arduino_Interlock_Worker(Worker):
             print("Continuous acquisition has been stopped")
  
         
- 
-    
+    # def shot_checker(self, interval = 1, idle_interval = 5):
+    #     while self.live_work:
+    #         if self.shot_live:
+    #             print("Live shots!")
+    #             self.shot_last = time.time()
+    #             self.shot_standby = True
+    #             self.shot_live = False
+    #         elif self.shot_standby:
+    #             if self.shot_last - time.time() > idle_interval:
+    #                 self.shot_standby = False
+    #                 print("Shots have ceased!")
+    #             else:
+    #                 print("Standby for more shots...")
+    #         time.sleep(interval)
  
     
