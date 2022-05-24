@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Mar 24 12:10:25 2022
+Created on Wed May 18 15:19:34 2022
 
 @author: rubidium
 
@@ -66,7 +66,7 @@ class Arduino_TEC_Control_Tab(DeviceTab):
          self.loop_time = 0         #starts a time count for the graph
          self.iter_count = 0          #counts the number of iterations (to keep track of points on the graph)
          self.max_graph_points = 21600          #maximum points to be saved for temp graphing
-         self.plot_temp = np.zeros([2, 1])             #creates an arry of 2 rows with 0s as the entries
+         self.plot_temp = np.zeros([3, 1])             #creates an arry of 2 rows with 0s as the entries
          self.plot_start = 0                #begins the plotting time at zero seconds
          
          #adds the scrollArea widget (containing the interlock GUI) into the layout
@@ -74,17 +74,27 @@ class Arduino_TEC_Control_Tab(DeviceTab):
          self.graph_widget = self.ui.graph_widget  #create graph widget and redefine for more convenient calling
 
          # define the data in the graph widget
-         title = "TEC Temp Graph"
-         plt = self.graph_widget        # create plot window object
-         plt.showGrid(x = True, y = True) 
-         plt.setLabel('left', 'Temperature', units ='degC')         #Note: defining units this way allows for autoscaling
-         plt.setLabel('bottom', 'Time', units ='sec')
-         plt.setTitle(title)
+         self.title = "TEC Temperature and Voltage Graph"
+         self.plt = self.graph_widget.plotItem        # create plot window and item object
+         self.plt.showGrid(x = True, y = True) 
+         self.plt.setLabel('left', 'Temperature', units ='degC', color='#ff0000', **{'font-size':'10pt'})     #Note: defining units this way allows for autoscaling
+         self.plt.setLabel('bottom', 'Time', units ='sec')
+         self.plt.setTitle(self.title)
+         
+         #used to create the graph for voltage and overlay it onto the temperature graph while linking the x-axis (time)
+         self.plt2 = pg.ViewBox()
+         self.plt.showAxis('right')
+         self.plt.scene().addItem(self.plt2)
+         self.plt.getAxis('right').linkToView(self.plt2)
+         self.plt2.setXLink(self.plt)
+         self.plt.setLabel('right', 'Voltage', units = 'V', color='#ffff00', **{'font-size':'10pt'})
+         
          
          #create a reference line to plot for each active channel and define attributes
-         self.temp_ref = self.graph_widget.plot(self.plot_temp[1], self.plot_temp[0], pen ='r', name ='Temp') #red
-         #self.volt_ref = self.graph_widget.plot(self.plot_temp[1], self.plot_temp[0], pen ='y', name ='Volt') #yellow
-
+         self.temp_ref = self.graph_widget.plot(self.plot_temp[2], self.plot_temp[0], pen ='r', name ='Temp') #red
+         self.volt_ref = self.plt2
+         self.volt_ref.addItem(pg.PlotCurveItem(self.plot_temp[2], self.plot_temp[1], pen ='y', name ='Volt')) #yellow
+         
          #create lists for a general sub-tab function to use         
          self.sub_tab_button = [self.ui.pid_controls, self.ui.tec_controls, self.ui.tec_graph]        
          self.tab_toggle = [self.pid_toggle, self.tec_toggle, self.gra_toggle]
@@ -247,7 +257,7 @@ class Arduino_TEC_Control_Tab(DeviceTab):
             self.ui.temp_button.setToolTip('Click to Show on Graph')                                                   
         else:
             self.temp_tog = True
-            self.temp_ref.setData(self.plot_temp[1, 1:self.iter_count], self.plot_temp[0, 1:self.iter_count])
+            self.temp_ref.setData(self.plot_temp[2, 1:self.iter_count], self.plot_temp[0, 1:self.iter_count])
             color = self.chanCol[0]
             colorHov = ''
             self.ui.temp_button.setToolTip('Click to Hide from Graph')
@@ -261,13 +271,17 @@ class Arduino_TEC_Control_Tab(DeviceTab):
     def volt_clicked(self, ch=1):
         if self.volt_tog:
             self.volt_tog = False
-            #self.volt_ref.setData([],[])
+            self.volt_ref.clear()
+            self.volt_ref.addItem(pg.PlotCurveItem([], [], pen = 'y', name = 'Volt'))
+            self.volt_ref.setGeometry(self.plt.vb.sceneBoundingRect())
             color = self.chanDisCol[1]
             colorHov = self.chanHovCol[1]
             self.ui.volt_button.setToolTip('Click to Show on Graph')                                                   
         else:
             self.volt_tog = True
-            #self.volt_ref.setData(self.plot_volt[1, 1:self.iter_count], self.plot_volt[0, 1:self.iter_count])
+            self.volt_ref.clear()
+            self.volt_ref.addItem(pg.PlotCurveItem(self.plot_temp[2, 1:self.iter_count], self.plot_temp[1, 1:self.iter_count], pen = 'y', name = 'Volt'))
+            self.volt_ref.setGeometry(self.plt.vb.sceneBoundingRect())
             color = self.chanCol[1]
             colorHov = ''
             self.ui.volt_button.setToolTip('Click to Hide from Graph')
@@ -347,14 +361,17 @@ class Arduino_TEC_Control_Tab(DeviceTab):
         
         #add the new temperature and time to the data array    
         self.plot_temp = np.insert(self.plot_temp, self.iter_count, [self.full_packet[0],
+                                                                     self.tec_volt,
                                                                      int(time.time()-self.plot_start)], axis=1)
-        #self.plot_volt (or maybe will be part of some self.plot_tec)
         
-        #for each channel: if the button is active, plot the channel's temperature line
+        #for each: if the button is active, plot the respective graph
         if self.temp_tog:
-            self.temp_ref.setData(self.plot_temp[1, 1:self.iter_count+1], self.plot_temp[0, 1:self.iter_count+1])
-        # if self.volt_tog:
-        #     self.volt_ref.setData(self.plot_volt[1, 1:self.iter_count+1], self.plot_temp[0, 1:self.iter_count+1])
+            self.temp_ref.setData(self.plot_temp[2, 1:self.iter_count+1], self.plot_temp[0, 1:self.iter_count+1])
+        if self.volt_tog:
+            self.volt_ref.clear()
+            self.volt_ref.addItem(pg.PlotCurveItem(self.plot_temp[2, 1:self.iter_count+1], self.plot_temp[1, 1:self.iter_count+1], pen = 'y', name = 'Volt'))
+            self.volt_ref.setGeometry(self.plt.vb.sceneBoundingRect())
+            
        #increase point count by 1
         self.iter_count += 1
 
