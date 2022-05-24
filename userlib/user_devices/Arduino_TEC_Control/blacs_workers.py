@@ -81,12 +81,8 @@ class Arduino_TEC_Control_Worker(Worker):
         self.controller.call_plumber()     #to flush the serial
         
         self.update_values()   #updates all of the individual variables using the latest full packet
-        # self.temp = self.full_pack[0]
-        # self.setpoint = self.full_pack[2]
-        # self.Kp = self.full_pack[5]
-        # self.Ki = self.full_pack[6]
-        # self.Kd = self.full_pack[7]
         
+        #self.save_pack is used for adding the attributes into the h5 later
         self.save_pack['temp'] = self.temp
         self.save_pack['setpoint'] = self.setpoint
         self.save_pack['Kp'] = self.Kp
@@ -110,7 +106,7 @@ class Arduino_TEC_Control_Worker(Worker):
             for item in self.save_pack:
                 grp.attrs.create(item, self.save_pack[item])  #creates an attribute to go with the dataset array
                 
-            grp2 = hdf_file.create_group('/data/temps') #directs use of "grp2" to a temps folder in data
+            grp2 = hdf_file.create_group('/data/TECtemp') #directs use of "grp2" to a temps folder in data
             dset = grp2.create_dataset(self.device_name, track_order= True, data=data)  #creates a dataset for grp2 (from the array "data")
             dset.attrs.create('temp', self.save_pack['temp'])
             
@@ -235,18 +231,40 @@ class Arduino_TEC_Control_Worker(Worker):
         return
 
     
-    #Accepts Kp share, and then sends a Kp write command for a changed Kp value
+    #Sends a default write command to set the TEC controller values back to default
     def set_defaults(self):
         print("Resetting to default values...")
         self.controller.set_default_settings()
         self.controller.call_plumber()     #to flush the serial
-        self.full_pack = self.controller.grab_new_packet()
-        self.update_values()   #updates all of the individual variables using the latest full packet
+        # self.full_pack = self.controller.grab_new_packet()
+        # self.update_values()   #updates all of the individual variables using the latest full packet
+        # self.controller.call_plumber()     #to flush the serial
+        # return self.full_pack
+
+
+    #Sends a default write command for the PID shares to return to default
+    def set_PID_default(self):
+        print("Resetting to default values...")
+        self.controller.set_default_PID()
         self.controller.call_plumber()     #to flush the serial
-        return self.full_pack
+        # self.full_pack = self.controller.grab_new_packet()
+        # self.update_values()   #updates all of the individual variables using the latest full packet
+        # self.controller.call_plumber()     #to flush the serial
+        # return self.full_pack    
+
+
+    #Sends a default write command for the PID shares to return to default
+    def set_setpoint_default(self):
+        print("Resetting to default values...")
+        self.controller.set_default_temp()
+        self.controller.call_plumber()     #to flush the serial
+        # self.full_pack = self.controller.grab_new_packet()
+        # self.update_values()   #updates all of the individual variables using the latest full packet
+        # self.controller.call_plumber()     #to flush the serial
+        # return self.full_pack    
     
-
-
+    
+    
 ##These final three functions are only here for printouts
     #signifies the acquisition of a new packet
     def continuous_loop(self, verbose = True):

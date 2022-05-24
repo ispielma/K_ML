@@ -72,6 +72,7 @@ class Arduino_TEC_Control:
          if verbose:
              print("Flush attempted")
 
+
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     #Converts lists into dictionaries for convienient reference    
     def convert_to_dict(self, this_list):
@@ -88,6 +89,7 @@ class Arduino_TEC_Control:
             val = float(val_str)
             self.this_dict[name] = val
         return self.this_dict
+
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     #Sends a call number to the arduino to verify that the serial is clear and the arduino is ready for a call    
@@ -186,6 +188,7 @@ class Arduino_TEC_Control:
             #ignore junk!
             
             return self.packet     
+
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     #Grabs a new packet which contains only changed channel temperatures, all channel setpoints, and/or interlock status
@@ -317,6 +320,35 @@ class Arduino_TEC_Control:
         self.set_Ki(1.0)
         self.call_plumber()
         self.set_Kd(0.075)
+
+
+#-----------------------------------------------------------------
+    #Send command for the arduino to return the PID setpoints to the default values
+    def set_default_PID(self, verbose=False):
+        self.send_call_num()
+        if verbose:
+            print('Requesting default PID settings...')
+        
+        #These are temporary default values, but they will be used for now
+        self.set_Kp(20)
+        self.call_plumber()
+        self.set_Ki(0.01)
+        self.call_plumber()
+        self.set_Kd(10)
+        self.call_plumber()
+        
+        
+#-----------------------------------------------------------------
+    #Send command for the arduino to return temperature setpoint to the default value
+    def set_default_temp(self, verbose=False):
+        self.send_call_num()
+        if verbose:
+            print('Requesting default temperature setpoint...')
+        
+        #These are temporary default values, but they will be used for now
+        self.set_setpoint(40)
+        self.call_plumber()
+        
         
 #----------------------------------------------------------------- 
     #Meant to be used by BLACS / labscript during shutdown procedures (ensures device is disconnected from serial properly)

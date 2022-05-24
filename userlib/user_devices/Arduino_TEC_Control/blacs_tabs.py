@@ -30,7 +30,7 @@ class Arduino_TEC_Control_Tab(DeviceTab):
          
          # Loads GUI for interlock from ui document made in QT Designer
          ui_filepath = os.path.join(
-             os.path.dirname(os.path.realpath(__file__)), 'controller_GUI.ui'
+             os.path.dirname(os.path.realpath(__file__)), 'controller_GUI_default.ui'
          )
          self.ui = UiLoader().load(ui_filepath)       #loads filepath and sets as variable for convenient calling
          
@@ -116,19 +116,21 @@ class Arduino_TEC_Control_Tab(DeviceTab):
          #Connect clicked signal to the appropriate function for each respective channel monitor button
          self.ui.temp_button.clicked.connect(self.temp_clicked)
          self.ui.volt_button.clicked.connect(self.volt_clicked)
-         
+
+         self.ui.default_shares.clicked.connect(self.default_PID_clicked)
+         self.ui.default_setpoint.clicked.connect(self.default_temp_clicked)         
         
         #Set parameters for spinboxes
-         self.ui.kp_adjust.setRange(0.00,20.00)   #Sets the range of the kp share spinbox
+         self.ui.kp_adjust.setRange(0.00,65.00)   #Sets the range of the kp share spinbox
          self.set_kp = 0   #creates a placeholder value for each spinbox and stores in self.set_setpoint_vals
          
-         self.ui.ki_adjust.setRange(0.00,20.00)   #Sets the range of the kp share spinbox
+         self.ui.ki_adjust.setRange(0.00,65.00)   #Sets the range of the kp share spinbox
          self.set_ki = 0   #creates a placeholder value for each spinbox and stores in self.set_setpoint_vals
          
-         self.ui.kd_adjust.setRange(0.00,20.00)   #Sets the range of the kp share spinbox
+         self.ui.kd_adjust.setRange(0.00,65.00)   #Sets the range of the kp share spinbox
          self.set_kd = 0   #creates a placeholder value for each spinbox and stores in self.set_setpoint_vals
          
-         self.ui.temp_setpoint_adjust.setRange(0,80)   #Sets the range of the kp share spinbox
+         self.ui.temperature_setpoint_adjust.setRange(0,80)   #Sets the range of the kp share spinbox
          self.set_setpoint = 0   #creates a placeholder value for each spinbox and stores in self.set_setpoint_vals
          
          
@@ -136,7 +138,7 @@ class Arduino_TEC_Control_Tab(DeviceTab):
          self.ui.kp_adjust.editingFinished.connect(self.send_kp)
          self.ui.ki_adjust.editingFinished.connect(self.send_ki)
          self.ui.kd_adjust.editingFinished.connect(self.send_kd)
-         self.ui.temp_setpoint_adjust.editingFinished.connect(self.send_temp_setpoint)
+         self.ui.temperature_setpoint_adjust.editingFinished.connect(self.send_temp_setpoint)
 
          
          # #Sets icons and tool-tip for start / stop continuous buttons
@@ -214,7 +216,7 @@ class Arduino_TEC_Control_Tab(DeviceTab):
         self.tec_volt = (float(self.full_packet[1]) - 1.65)*10 
         self.ui.volt_button.setText("%s \n %.2f V" %('Output_Voltage', round(self.tec_volt,2)))
         if float(self.full_packet[2]) != self.last_setpoint:
-            self.ui.temp_setpoint_adjust.setValue(float(self.full_packet[2]))
+            self.ui.temperature_setpoint_adjust.setValue(float(self.full_packet[2]))
             self.last_setpoint = float(self.full_packet[2])
         if float(self.full_packet[5]) != self.last_kp:
             self.ui.kp_adjust.setValue(float(self.full_packet[5]))
@@ -288,13 +290,25 @@ class Arduino_TEC_Control_Tab(DeviceTab):
         self.ui.volt_button.setStyleSheet("""QPushButton{background-color : %s; border-style: solid;
                         border-width: 1px;border-color: gray;border-radius: 3px;}
                         QPushButton::hover {background-color: %s;}""" %(color, colorHov))
+
                         
+    #takes a signal from default shares and activates default PID worker function
+    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True) 
+    def default_PID_clicked(self, button):
+        self.send_default_PID()
+
+
+    #takes a signal from default setpoint and activates default temp setpooint worker function
+    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True) 
+    def default_temp_clicked(self, button):
+        self.send_default_temp()
+    
     
     #function for sending the compiled setpoints in the set_sendpoint_vals dictionary to the worker function
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
     def send_temp_setpoint(self):
         print('Sending New Setpoint...')
-        self.set_setpoint = self.ui.temp_setpoint_adjust.value()
+        self.set_setpoint = self.ui.temperature_setpoint_adjust.value()
         yield(self.queue_work(self._primary_worker,'set_setpoint', self.set_setpoint))
     
     
@@ -328,6 +342,20 @@ class Arduino_TEC_Control_Tab(DeviceTab):
         print('Sending New Setpoints...')
         yield(self.queue_work(self._primary_worker,'set_defaults'))
 
+
+    #function that activates the default PID setpoints worker function to reset PID setpoints to the arduino's default values
+    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+    def send_default_PID(self, button = 0):
+        print('Sending PID Defaults...')
+        yield(self.queue_work(self._primary_worker,'set_PID_default'))
+        
+
+    #function that activates the default temp setpoint worker function to reset temp setpoint to the arduino's default value
+    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+    def send_default_temp(self):
+        print('Sending Setpoint Default...')
+        yield(self.queue_work(self._primary_worker,'set_setpoint_default'))
+        
     
     #function used by auto-loop to grab a new packet of temperatures, setpoint, and status and then update the blacs tab 
     #       with the appropriate values/ information
@@ -341,7 +369,7 @@ class Arduino_TEC_Control_Tab(DeviceTab):
         self.tec_volt = (float(self.full_packet[1]) - 1.65)*10 
         self.ui.volt_button.setText("%s \n %.2f V" %('Output_Voltage', round(self.tec_volt,2)))
         if float(self.full_packet[2]) != self.last_setpoint:
-            self.ui.temp_setpoint_adjust.setValue(float(self.full_packet[2]))
+            self.ui.temperature_setpoint_adjust.setValue(float(self.full_packet[2]))
             self.last_setpoint = float(self.full_packet[2])
         if float(self.full_packet[5]) != self.last_kp:
             self.ui.kp_adjust.setValue(float(self.full_packet[5]))
@@ -388,7 +416,7 @@ class Arduino_TEC_Control_Tab(DeviceTab):
         self.tec_volt = (float(self.full_packet[1]) - 1.65)*10 
         self.ui.volt_button.setText("%s \n %.2f V" %('Output_Voltage', round(self.tec_volt,2)))
         if float(self.full_packet[2]) != self.last_setpoint:
-            self.ui.temp_setpoint_adjust.setValue(float(self.full_packet[2]))
+            self.ui.temperature_setpoint_adjust.setValue(float(self.full_packet[2]))
             self.last_setpoint = float(self.full_packet[2])
         if float(self.full_packet[5]) != self.last_kp:
             self.ui.kp_adjust.setValue(float(self.full_packet[5]))
