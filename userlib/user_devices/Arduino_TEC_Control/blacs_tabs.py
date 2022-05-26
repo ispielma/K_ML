@@ -30,7 +30,7 @@ class Arduino_TEC_Control_Tab(DeviceTab):
          
          # Loads GUI for interlock from ui document made in QT Designer
          ui_filepath = os.path.join(
-             os.path.dirname(os.path.realpath(__file__)), 'controller_GUI_default.ui'
+             os.path.dirname(os.path.realpath(__file__)), 'controller_GUI_GUIGU.ui'
          )
          self.ui = UiLoader().load(ui_filepath)       #loads filepath and sets as variable for convenient calling
          
@@ -45,7 +45,6 @@ class Arduino_TEC_Control_Tab(DeviceTab):
          
          self.temp_check_flag = False           #flag to indicate the need to start a new auto-loop thread
          self.pid_toggle = True           #toggle flag for interlock controls sub-tab
-         self.tec_toggle = True           #toggle flag for channel monitor sub-tab
          self.gra_toggle = True           #toggle flag for temperature graph sub-tab
          self.auto_go = False         #flag for killing auto-loop thread
          
@@ -61,6 +60,7 @@ class Arduino_TEC_Control_Tab(DeviceTab):
          self.last_kp = 0
          self.last_ki = 0
          self.last_kd = 0
+         self.last_ref_volt = 0
 
          #integer variables for graphing
          self.loop_time = 0         #starts a time count for the graph
@@ -96,21 +96,20 @@ class Arduino_TEC_Control_Tab(DeviceTab):
          self.volt_ref.addItem(pg.PlotCurveItem(self.plot_temp[2], self.plot_temp[1], pen ='y', name ='Volt')) #yellow
          
          #create lists for a general sub-tab function to use         
-         self.sub_tab_button = [self.ui.pid_controls, self.ui.tec_controls, self.ui.tec_graph]        
-         self.tab_toggle = [self.pid_toggle, self.tec_toggle, self.gra_toggle]
-         self.sub_tab = [self.ui.pid_box, self.ui.tec_box, self.ui.graph_widget]
+         self.sub_tab_button = [self.ui.pid_controls,  self.ui.tec_graph]        
+         self.tab_toggle = [self.pid_toggle, self.gra_toggle]
+         self.sub_tab = [self.ui.pid_box, self.ui.graph_con_box]
 
 
          # # Connect the appropriate signals for buttons
          #Connect clicked signal to the appropriate function for each respective sub-tab
          self.ui.pid_controls.clicked.connect(lambda: self.sub_tab_clicked(0))
-         self.ui.tec_controls.clicked.connect(lambda: self.sub_tab_clicked(1))
-         self.ui.tec_graph.clicked.connect(lambda: self.sub_tab_clicked(2))
+         self.ui.tec_graph.clicked.connect(lambda: self.sub_tab_clicked(1))
          
          
-         # #Connect clicked signal to the appropriate function for the auto-loop start/stop buttons
-         # self.ui.start_continuous.clicked.connect(self.on_const_temps)
-         # self.ui.stop_continuous.clicked.connect(self.off_const_temps)
+         #Connect clicked signal to the appropriate function for the auto-loop start/stop buttons
+         self.ui.start_cont_update.clicked.connect(self.on_const_up)
+         self.ui.stop_cont_update.clicked.connect(self.off_const_up)
           
          
          #Connect clicked signal to the appropriate function for each respective channel monitor button
@@ -121,37 +120,44 @@ class Arduino_TEC_Control_Tab(DeviceTab):
          self.ui.default_setpoint.clicked.connect(self.default_temp_clicked)         
         
         #Set parameters for spinboxes
-         self.ui.kp_adjust.setRange(0.00,65.00)   #Sets the range of the kp share spinbox
+         self.ui.kp_adjust_box.setRange(0.000,500)   #Sets the range of the kp share spinbox
+         self.ui.kp_adjust_box.setDecimals(3)   #Sets the precision in the spinbox
+         self.ui.kp_adjust_box.setSingleStep(0.001)   #Sets the size of a single step in the spinbox         
          self.set_kp = 0   #creates a placeholder value for each spinbox and stores in self.set_setpoint_vals
          
-         self.ui.ki_adjust.setRange(0.00,65.00)   #Sets the range of the kp share spinbox
+         self.ui.ki_adjust_box.setRange(0.000,500)   #Sets the range of the kp share spinbox
+         self.ui.ki_adjust_box.setDecimals(3)   #Sets the precision in the spinbox
+         self.ui.ki_adjust_box.setSingleStep(0.001)   #Sets the size of a single step in the spinbox
          self.set_ki = 0   #creates a placeholder value for each spinbox and stores in self.set_setpoint_vals
          
-         self.ui.kd_adjust.setRange(0.00,65.00)   #Sets the range of the kp share spinbox
+         self.ui.kd_adjust_box.setRange(0.000,500)   #Sets the range of the kp share spinbox
+         self.ui.kd_adjust_box.setDecimals(3)   #Sets the precision in the spinbox
+         self.ui.kd_adjust_box.setSingleStep(0.001)   #Sets the size of a single step in the spinbox
          self.set_kd = 0   #creates a placeholder value for each spinbox and stores in self.set_setpoint_vals
          
-         self.ui.temperature_setpoint_adjust.setRange(0,80)   #Sets the range of the kp share spinbox
+         self.ui.temp_setpoint_adjust.setRange(0,80)   #Sets the range of the kp share spinbox
+         self.ui.temp_setpoint_adjust.setSingleStep(0.1)   #Sets the size of a single step in the spinbox
+         self.ui.kd_adjust_box.setDecimals(1)   #Sets the precision in the spinbox
+         #self.ui.temp_setpoint_adjust.setSuffix(" deg C")   #Sets text for spinbox units
          self.set_setpoint = 0   #creates a placeholder value for each spinbox and stores in self.set_setpoint_vals
          
          
          #Connect editingFinished signal to the appropriate function for each respective adjustment spinbox
-         self.ui.kp_adjust.editingFinished.connect(self.send_kp)
-         self.ui.ki_adjust.editingFinished.connect(self.send_ki)
-         self.ui.kd_adjust.editingFinished.connect(self.send_kd)
-         self.ui.temperature_setpoint_adjust.editingFinished.connect(self.send_temp_setpoint)
+         self.ui.kp_adjust_box.editingFinished.connect(self.send_kp)
+         self.ui.ki_adjust_box.editingFinished.connect(self.send_ki)
+         self.ui.kd_adjust_box.editingFinished.connect(self.send_kd)
+         self.ui.temp_setpoint_adjust.editingFinished.connect(self.send_temp_setpoint)
 
          
          # #Sets icons and tool-tip for start / stop continuous buttons
-         # self.ui.start_continuous.setIcon(QtGui.QIcon(':/qtutils/fugue/control'))
-         # self.ui.start_continuous.setToolTip('Starts Automatic Updating of Temperatures, Graph, and Status')
-         # self.ui.stop_continuous.setIcon(QtGui.QIcon(':/qtutils/fugue/control-stop-square'))
-         # self.ui.stop_continuous.setToolTip('Ends Automatic Updating of Temperatures, Graph, and Status')
+         self.ui.start_cont_update.setIcon(QtGui.QIcon(':/qtutils/fugue/control'))
+         self.ui.start_cont_update.setToolTip('Starts Automatic Updating of Temperature and Voltage')
+         self.ui.stop_cont_update.setIcon(QtGui.QIcon(':/qtutils/fugue/control-stop-square'))
+         self.ui.stop_cont_update.setToolTip('Ends Automatic Updating of Temperature and Voltage')
          
          #Set icons and tool-tip for sub-tab buttons
          self.ui.pid_controls.setIcon(QtGui.QIcon(':/qtutils/fugue/toggle-small'))
          self.ui.pid_controls.setToolTip('Click to hide')
-         self.ui.tec_controls.setIcon(QtGui.QIcon(':/qtutils/fugue/toggle-small'))
-         self.ui.tec_controls.setToolTip('Click to hide')
          self.ui.tec_graph.setIcon(QtGui.QIcon(':/qtutils/fugue/toggle-small'))
          self.ui.tec_graph.setToolTip('Click to hide')
     
@@ -178,9 +184,16 @@ class Arduino_TEC_Control_Tab(DeviceTab):
          self.ui.volt_button.setStyleSheet("background-color : %s;border-style: solid;border-width: 1px;"
                                                "border-color: gray;border-radius: 3px" %(self.chanCol[1])) 
          
-         self.ui.kp_marker.setText("Kp \n (Proportional Share)")
-         self.ui.ki_marker.setText("Ki \n (Integral Share)")
-         self.ui.kd_marker.setText("Kd \n (Derivative Share)")
+         self.ui.kp_share_marker.setText("Kp \n (Proportional Share)")
+         self.ui.ki_share_marker.setText("Ki \n (Integral Share)")
+         self.ui.kd_share_marker.setText("Kd \n (Derivative Share)")
+         
+         self.ui.default_shares.setStyleSheet("border-style: solid;border-width: 1px;border-color: gray;border-radius: 3px")
+         self.ui.default_setpoint.setStyleSheet("border-style: solid;border-width: 1px;border-color: gray;border-radius: 3px")    
+         self.ui.start_cont_update.setStyleSheet("border-style: solid;border-width: 1px;border-color: gray;border-radius: 3px")
+         self.ui.stop_cont_update.setStyleSheet("border-style: solid;border-width: 1px;border-color: gray;border-radius: 3px")
+         
+         self.ui.stop_cont_update.hide()
         
          #hides a blank widget used for spacing (the widget pushes the other subtabs when the temp graph is hidden)
          self.ui.push_widg.hide()
@@ -216,17 +229,19 @@ class Arduino_TEC_Control_Tab(DeviceTab):
         self.tec_volt = (float(self.full_packet[1]) - 1.65)*10 
         self.ui.volt_button.setText("%s \n %.2f V" %('Output_Voltage', round(self.tec_volt,2)))
         if float(self.full_packet[2]) != self.last_setpoint:
-            self.ui.temperature_setpoint_adjust.setValue(float(self.full_packet[2]))
+            self.ui.temp_setpoint_adjust.setValue(float(self.full_packet[2]))
             self.last_setpoint = float(self.full_packet[2])
         if float(self.full_packet[5]) != self.last_kp:
-            self.ui.kp_adjust.setValue(float(self.full_packet[5]))
+            self.ui.kp_adjust_box.setValue(float(self.full_packet[5]))
             self.last_kp = float(self.full_packet[5])
         if float(self.full_packet[6]) != self.last_ki:
-            self.ui.ki_adjust.setValue(float(self.full_packet[6]))
+            self.ui.ki_adjust_box.setValue(float(self.full_packet[6]))
             self.last_ki = float(self.full_packet[6])
         if float(self.full_packet[7]) != self.last_kd:
-            self.ui.kd_adjust.setValue(float(self.full_packet[7]))
+            self.ui.kd_adjust_box.setValue(float(self.full_packet[7]))
             self.last_kd = float(self.full_packet[7])
+        if float(self.full_packet[8]) != self.last_ref_volt:
+            self.last_ref_volt = float(self.full_packet[8])
         self.on_const_up()    
  
 
@@ -234,22 +249,22 @@ class Arduino_TEC_Control_Tab(DeviceTab):
     def sub_tab_clicked(self, ID):
         if self.tab_toggle[ID]:
             self.sub_tab[ID].hide()
-            if ID == 2:
+            if ID == 1:
                 self.ui.push_widg.show()
             self.tab_toggle[ID] = False
             self.sub_tab_button[ID].setIcon(QtGui.QIcon(':/qtutils/fugue/toggle-small-expand'))
             self.sub_tab_button[ID].setToolTip('Click to show')
         else:
             self.sub_tab[ID].show()
-            if ID == 2:
-                self.ui.push_widg.show()
+            if ID == 1:
+                self.ui.push_widg.hide()
             self.tab_toggle[ID] = True
             self.sub_tab_button[ID].setIcon(QtGui.QIcon(':/qtutils/fugue/toggle-small'))
             self.sub_tab_button[ID].setToolTip('Click to hide')
               
         
     # Function that toggles the temperature button 
-    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+    #@define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
     def temp_clicked(self, ch=0):
         if self.temp_tog:
             self.temp_tog = False
@@ -269,7 +284,7 @@ class Arduino_TEC_Control_Tab(DeviceTab):
 
 
     # Function that toggles the output voltage button 
-    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+    #@define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
     def volt_clicked(self, ch=1):
         if self.volt_tog:
             self.volt_tog = False
@@ -308,7 +323,7 @@ class Arduino_TEC_Control_Tab(DeviceTab):
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
     def send_temp_setpoint(self):
         print('Sending New Setpoint...')
-        self.set_setpoint = self.ui.temperature_setpoint_adjust.value()
+        self.set_setpoint = self.ui.temp_setpoint_adjust.value()
         yield(self.queue_work(self._primary_worker,'set_setpoint', self.set_setpoint))
     
     
@@ -316,7 +331,7 @@ class Arduino_TEC_Control_Tab(DeviceTab):
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
     def send_kp(self):
         print('Sending New Setpoint...')
-        self.set_kp = self.ui.kp_adjust.value()
+        self.set_kp = self.ui.kp_adjust_box.value()
         yield(self.queue_work(self._primary_worker,'set_Kp', self.set_kp))
         
         
@@ -324,7 +339,7 @@ class Arduino_TEC_Control_Tab(DeviceTab):
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
     def send_ki(self):
         print('Sending New Setpoint...')
-        self.set_ki = self.ui.ki_adjust.value()
+        self.set_ki = self.ui.ki_adjust_box.value()
         yield(self.queue_work(self._primary_worker,'set_Ki', self.set_ki))
         
         
@@ -332,9 +347,17 @@ class Arduino_TEC_Control_Tab(DeviceTab):
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
     def send_kd(self):
         print('Sending New Setpoint...')
-        self.set_kd = self.ui.kd_adjust.value()
+        self.set_kd = self.ui.kd_adjust_box.value()
         yield(self.queue_work(self._primary_worker,'set_Kd', self.set_kd))
-    
+
+
+    #function for sending the compiled setpoints in the set_sendpoint_vals dictionary to the worker function
+    @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
+    def send_ref_volt(self, v = 2.6):
+        print('Sending New Setpoint...')
+        self.set_ref_volt = v
+        yield(self.queue_work(self._primary_worker,'set_ref_volt', self.set_ref_volt))
+        
 
     #function that activates the default setpoints worker function to reset setpoints to the arduino's default values
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
@@ -369,17 +392,19 @@ class Arduino_TEC_Control_Tab(DeviceTab):
         self.tec_volt = (float(self.full_packet[1]) - 1.65)*10 
         self.ui.volt_button.setText("%s \n %.2f V" %('Output_Voltage', round(self.tec_volt,2)))
         if float(self.full_packet[2]) != self.last_setpoint:
-            self.ui.temperature_setpoint_adjust.setValue(float(self.full_packet[2]))
+            self.ui.temp_setpoint_adjust.setValue(float(self.full_packet[2]))
             self.last_setpoint = float(self.full_packet[2])
         if float(self.full_packet[5]) != self.last_kp:
-            self.ui.kp_adjust.setValue(float(self.full_packet[5]))
+            self.ui.kp_adjust_box.setValue(float(self.full_packet[5]))
             self.last_kp = float(self.full_packet[5])
         if float(self.full_packet[6]) != self.last_ki:
-            self.ui.ki_adjust.setValue(float(self.full_packet[6]))
+            self.ui.ki_adjust_box.setValue(float(self.full_packet[6]))
             self.last_ki = float(self.full_packet[6])
         if float(self.full_packet[7]) != self.last_kd:
-            self.ui.kd_adjust.setValue(float(self.full_packet[7]))
+            self.ui.kd_adjust_box.setValue(float(self.full_packet[7]))
             self.last_kd = float(self.full_packet[7])
+        if float(self.full_packet[8]) != self.last_ref_volt:
+            self.last_ref_volt = float(self.full_packet[8])
         
         #Update the temperature graph with the new temperature data for each channel's line      
         #       check for the maximum points on the graph, and if reached, remove the oldest column of data
@@ -403,6 +428,10 @@ class Arduino_TEC_Control_Tab(DeviceTab):
        #increase point count by 1
         self.iter_count += 1
 
+        if float(self.full_packet[0]) < 25 and self.last_ref_volt != 2.6:
+            self.send_ref_volt(2.6)
+        elif float(self.full_packet[0]) > 30 and self.last_ref_volt != 2.75:
+            self.send_ref_volt(2.75)
 
     #function for reuqesting the packet from the worker during a shot    
     @define_state(MODE_MANUAL|MODE_TRANSITION_TO_MANUAL,True)      
@@ -416,16 +445,16 @@ class Arduino_TEC_Control_Tab(DeviceTab):
         self.tec_volt = (float(self.full_packet[1]) - 1.65)*10 
         self.ui.volt_button.setText("%s \n %.2f V" %('Output_Voltage', round(self.tec_volt,2)))
         if float(self.full_packet[2]) != self.last_setpoint:
-            self.ui.temperature_setpoint_adjust.setValue(float(self.full_packet[2]))
+            self.ui.temp_setpoint_adjust.setValue(float(self.full_packet[2]))
             self.last_setpoint = float(self.full_packet[2])
         if float(self.full_packet[5]) != self.last_kp:
-            self.ui.kp_adjust.setValue(float(self.full_packet[5]))
+            self.ui.kp_adjust_box.setValue(float(self.full_packet[5]))
             self.last_kp = float(self.full_packet[5])
         if float(self.full_packet[6]) != self.last_ki:
-            self.ui.ki_adjust.setValue(float(self.full_packet[6]))
+            self.ui.ki_adjust_box.setValue(float(self.full_packet[6]))
             self.last_ki = float(self.full_packet[6])
         if float(self.full_packet[7]) != self.last_kd:
-            self.ui.kd_adjust.setValue(float(self.full_packet[7]))
+            self.ui.kd_adjust_box.setValue(float(self.full_packet[7]))
             self.last_kd = float(self.full_packet[7])
    
      
@@ -434,8 +463,8 @@ class Arduino_TEC_Control_Tab(DeviceTab):
     @define_state(MODE_MANUAL,True)
     def on_const_up(self, button=0):
         print('Constant Temperature Acquisition Strarting...')  
-        # self.ui.start_continuous.hide()
-        # self.ui.stop_continuous.show()
+        self.ui.start_cont_update.hide()
+        self.ui.stop_cont_update.show()
         self.start_continuous()
         self.contin_on = True
         #self.auto_go = True
@@ -450,11 +479,11 @@ class Arduino_TEC_Control_Tab(DeviceTab):
     
     #stops (pauses) the auto-loop (continuos_loop) by setting the contin_on flag to False
     @define_state(MODE_MANUAL|MODE_BUFFERED|MODE_TRANSITION_TO_BUFFERED|MODE_TRANSITION_TO_MANUAL, True)
-    def off_const_up(self, button, verbose = False):
+    def off_const_up(self, button=0, verbose = False):
         if verbose:
             print('Stopping Constant Temperature Acquisition...')
-        # self.ui.stop_continuous.hide()
-        # self.ui.start_continuous.show()
+        self.ui.start_cont_update.show()
+        self.ui.stop_cont_update.hide()
         self.stop_continuous()
         self.contin_on = False
 

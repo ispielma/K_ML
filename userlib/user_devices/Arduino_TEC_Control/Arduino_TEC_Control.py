@@ -54,6 +54,8 @@ class Arduino_TEC_Control:
         self.last_Ki = ""
         self.Kd = ""
         self.last_Kd = ""
+        self.ref_volt = ""
+        self.last_ref_volt = ""
         
         self.packet = []
         self.last_packet = []
@@ -143,7 +145,7 @@ class Arduino_TEC_Control:
 
             # This will be stored on the python side as a list and then dictionary 
             #      of all the packet info (should be 16 channel temps, 16 setpoints, and the status)
-            self.temp_reading_packet, self.out_voltage_packet, self.setpoint_packet, self.Kcrit_packet, self.Tcrit_packet, self.Kp_packet, self.Ki_packet, self.Kd_packet, junk = output.split('#')
+            self.temp_reading_packet, self.out_voltage_packet, self.setpoint_packet, self.Kcrit_packet, self.Tcrit_packet, self.Kp_packet, self.Ki_packet, self.Kd_packet, self.ref_volt_packet, junk = output.split('#')
 
             self.temp_reading = self.temp_reading_packet
             #self.last_temp_reading = self.temp_reading
@@ -185,6 +187,11 @@ class Arduino_TEC_Control:
             self.packet.append(self.Kd)
             self.last_packet.append(self.Kd)
             
+            self.ref_volt = self.ref_volt_packet
+            #self.last_ref_volt = self.ref_volt
+            self.packet.append(self.ref_volt)
+            self.last_packet.append(self.ref_volt)
+            
             #ignore junk!
             
             return self.packet     
@@ -203,7 +210,7 @@ class Arduino_TEC_Control:
             output = rawOutput.decode('utf-8')
 
             # Read the packet and split into the appropriate variables
-            self.temp_reading_packet, self.out_voltage_packet, self.setpoint_packet, self.Kcrit_packet, self.Tcrit_packet, self.Kp_packet, self.Ki_packet, self.Kd_packet, junk = output.split('#')
+            self.temp_reading_packet, self.out_voltage_packet, self.setpoint_packet, self.Kcrit_packet, self.Tcrit_packet, self.Kp_packet, self.Ki_packet, self.Kd_packet, self.ref_volt_packet, junk = output.split('#')
 
             #update the temperature reading if a new one exists
             if self.temp_reading_packet:
@@ -238,7 +245,10 @@ class Arduino_TEC_Control:
             if self.Kd_packet:
                 self.packet[7] = self.Kd_packet
         
-            
+            #update the out voltage if a new one exists
+            if self.ref_volt_packet:
+                self.packet[8] = self.ref_volt_packet
+        
             return self.packet
   
     
@@ -298,6 +308,19 @@ class Arduino_TEC_Control:
 
 
 #-----------------------------------------------------------------
+    #Send command to set a new setpoint value for a particular channel, given as n for ch# and v for value
+    def set_ref_volt(self, v, verbose=False):
+        self.send_call_num()
+        setVal = v
+        if verbose:
+            print('Sending new reference voltage...')
+        self.device.write('@setRefVolt, %s,'%(setVal))
+        rawOutput = self.device.read_bytes(75, chunk_size = None, break_on_termchar = True)
+        output = rawOutput.decode('utf-8')
+        print(output)
+        
+
+#-----------------------------------------------------------------
     #Send command for the arduino to return all setpoints to the default values stored in the arduino sketch
     def set_default_settings(self, verbose=False):
         self.send_call_num()
@@ -330,7 +353,7 @@ class Arduino_TEC_Control:
             print('Requesting default PID settings...')
         
         #These are temporary default values, but they will be used for now
-        self.set_Kp(20)
+        self.set_Kp(65)
         self.call_plumber()
         self.set_Ki(0.01)
         self.call_plumber()

@@ -43,6 +43,7 @@ class Arduino_TEC_Control_Worker(Worker):
         self.Kp = 0
         self.Ki = 0
         self.Kd = 0
+        self.ref_volt = 0
         
         self.full_pack = []        #used to store the packet of values, including temperature, voltage, setpoint, and PID shares
         self.last_pack = []        #used for the last packet of values (may not need)
@@ -149,6 +150,7 @@ class Arduino_TEC_Control_Worker(Worker):
         self.Kp = self.full_pack[5]
         self.Ki = self.full_pack[6]
         self.Kd = self.full_pack[7]
+        self.ref_volt = self.full_pack[8]
         return 
 
 
@@ -230,6 +232,19 @@ class Arduino_TEC_Control_Worker(Worker):
             pass
         return
 
+
+    #Accepts reference voltage, and then sends a write command for a changed reference voltage value
+    def set_ref_volt(self, write_ref_volt, verbose = True):
+        if verbose:
+            print("Writing new reference voltage...")
+        if write_ref_volt != self.ref_volt:
+            new = self.controller.set_ref_volt(write_ref_volt)
+            self.controller.call_plumber()     #to flush the serial
+            print(new)
+        else:
+            pass
+        return
+    
     
     #Sends a default write command to set the TEC controller values back to default
     def set_defaults(self):
