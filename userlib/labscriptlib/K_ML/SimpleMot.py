@@ -14,6 +14,9 @@ import labscriptlib.K_ML.Stages as st
 
 lu.import_or_reload('labscriptlib.K_ML.connection_table')
 
+MOT_Fl_Cameras = [MOT_x, MOT_z]
+MOT_Fl_Download_Time = len(MOT_Fl_Cameras)*Mako_Download_Time
+
 t = ls.start()
 
 #
@@ -30,7 +33,7 @@ t += st.MOT(t, Time_UV_MOT,
         MOT_x_mz_Bias_MOT,
         MOT_Quad_MOT,
         D2_Lock_Freq_MOT,
-        D2_Repump_Freq,
+        D2_Repump_Freq_MOT,
         UV=MOT_UV,
         DelayLight=10e-3,
         stage_label='UV')
@@ -44,42 +47,42 @@ t += st.MOT(t, Time_MOT,
         MOT_x_mz_Bias_MOT,
         MOT_Quad_MOT,
         D2_Lock_Freq_MOT,
-        D2_Repump_Freq,
+        D2_Repump_Freq_MOT,
         UV=False,
         DelayLight=0)
 
 #
 # FL  image the MOT
 #
-t += st.SimpleImage(t - Mako_Download_Time,
-        [MOT_x, MOT_z],
+t += st.SimpleImage(t - MOT_Fl_Download_Time,
+        MOT_Fl_Cameras,
         MOT_Fl_Exposure,
-        Mako_Download_Time,
+        MOT_Fl_Download_Time,
         ShutterDevices=[],
         DigitalDevices=[],
         AnalogDevices=[],
         AnalogValues=[],
-        CloseShutters=False,
+        CloseShutters=[False, False],
         mode='fluorescence',
         frametype='MOT')
 
 #
 # cMOT
 #
-t += st.cMOT(t)
+t += st.cMOT(t) + 1e-3
 
 #
-# FL  image the cMOT
+# FL  image the cMOT (do not increment time)
 #
 t += st.SimpleImage(t,
-        [MOT_x, MOT_z],
-        MOT_Fl_Exposure,
+        MOT_Fl_Cameras,
+        cMOT_Fl_Exposure,
         0,
         ShutterDevices=[],
         DigitalDevices=[],
         AnalogDevices=[],
         AnalogValues=[],
-        CloseShutters=False,
+        CloseShutters=[False, False],
         mode='fluorescence',
         frametype='cMOT')
 
@@ -92,17 +95,19 @@ t += st.Molasses(t)
 #
 # Optical pump
 #
-t += st.OpticalPump(t)
+
+# t += st.OpticalPump(t)
 
 #
 # Capture in quadrupole trap!
 #
 
-t += st.MagneticTrapCapture(t)
+# t += st.MagneticTrapCapture(t)
 
 #
 # TOF
 #
+
 t += st.MOT_Cell_TOF(t)
 
 #
@@ -111,12 +116,13 @@ t += st.MOT_Cell_TOF(t)
 t += st.SimpleImage(t,
         [MOT_y],
         MOT_Abs_Exposure,
-        Mako_Download_Time,
-        ShutterDevices=[D2_Repump_Sh, D2_Probe_1_Sh],
-        DigitalDevices=[D2_Repump_DO, D2_Probe_OP_DO],
-        AnalogDevices=[D2_Repump_AO, D2_Probe_OP_AO],
-        AnalogValues=[D2_Repump_Volts_Imaging, D2_Probe_Volts_Abs],
-        CloseShutters=False,
+        Basler_Download_Time,
+        ShutterDevices=[D2_Probe_1_Sh, D2_Repump_Img_Sh],
+        DigitalDevices=[D2_Probe_OP_DO, D2_Repump_DO],
+        AnalogDevices=[D2_Probe_OP_AO, D2_Repump_AO],
+        AnalogValues=[D2_Probe_Volts_AI, D2_Repump_Volts_Imaging],
+        PretriggerTime=20e-6,
+        CloseShutters=[False, False],
         mode='absorption',
         frametype='MOT_TOF')
 
@@ -127,24 +133,26 @@ t += st.SimpleImage(t,
 t += st.SimpleImage(t,
         [MOT_y],
         MOT_Abs_Exposure,
-        Mako_Download_Time,
-        ShutterDevices=[D2_Repump_Sh, D2_Probe_1_Sh],
-        DigitalDevices=[D2_Repump_DO, D2_Probe_OP_DO],
-        AnalogDevices=[D2_Repump_AO, D2_Probe_OP_AO],
-        AnalogValues=[D2_Repump_Volts_Imaging, D2_Probe_Volts_Abs],
-        CloseShutters=False,
+        Basler_Download_Time,
+        ShutterDevices=[D2_Probe_1_Sh, D2_Repump_Img_Sh],
+        DigitalDevices=[D2_Probe_OP_DO, D2_Repump_DO],
+        AnalogDevices=[D2_Probe_OP_AO, D2_Repump_AO],
+        AnalogValues=[D2_Probe_Volts_AI, D2_Repump_Volts_Imaging],
+        PretriggerTime=20e-6,
+        CloseShutters=[True, False],
         mode='absorption',
         frametype='MOT_TOF_probe')
 
 t += st.SimpleImage(t,
         [MOT_y],
         MOT_Abs_Exposure,
-        Mako_Download_Time,
-        ShutterDevices=[D2_Repump_Sh,],
-        DigitalDevices=[D2_Repump_DO,],
-        AnalogDevices=[D2_Repump_AO,],
-        AnalogValues=[D2_Repump_Volts_Imaging,],
-        CloseShutters=True,
+        Basler_Download_Time,
+        ShutterDevices=[D2_Repump_Img_Sh],
+        DigitalDevices=[D2_Repump_DO],
+        AnalogDevices=[D2_Repump_AO],
+        AnalogValues=[D2_Repump_Volts_Imaging],
+        PretriggerTime=20e-6,
+        CloseShutters=[True,True],
         mode='absorption',
         frametype='MOT_TOF_dark')
 
@@ -153,26 +161,26 @@ t += st.SimpleImage(t,
 # the values during the associated stages.)
 #
 t += st.SimpleImage(t,
-        [MOT_x, MOT_z],
+        MOT_Fl_Cameras,
         MOT_Fl_Exposure,
-        Mako_Download_Time,
-        ShutterDevices=[D2_Repump_Sh, D2_Cooling_Sh, D2_Probe_1_Sh],
-        DigitalDevices=[D2_Repump_DO, D2_Cooling_DO, D2_Probe_OP_DO],
-        AnalogDevices=[D2_Repump_AO, D2_Cooling_AO, D2_Probe_OP_AO],
-        AnalogValues=[D2_Repump_Volts, D2_Cooling_Volts, D2_Cooling_Volts],
-        CloseShutters=False,
+        MOT_Fl_Download_Time,
+        ShutterDevices=[D2_Repump_Sh, D2_Cooling_Sh],
+        DigitalDevices=[D2_Repump_DO, D2_Cooling_DO],
+        AnalogDevices=[D2_Repump_AO, D2_Cooling_AO],
+        AnalogValues=[D2_Repump_Volts, D2_Cooling_Volts],
+        CloseShutters=[False, False],
         mode='fluorescence',
         frametype='MOT_dark')
 
 t += st.SimpleImage(t,
-        [MOT_x, MOT_z],
-        MOT_Fl_Exposure,
-        Mako_Download_Time,
-        ShutterDevices=[D2_Repump_Sh, D2_Cooling_Sh, D2_Probe_1_Sh],
-        DigitalDevices=[D2_Repump_DO, D2_Cooling_DO, D2_Probe_OP_DO],
-        AnalogDevices=[D2_Repump_AO, D2_Cooling_AO, D2_Probe_OP_AO],
-        AnalogValues=[D2_Repump_Volts_cMOT_Stop, D2_Cooling_Volts, D2_Cooling_Volts],
-        CloseShutters=True,
+        MOT_Fl_Cameras,
+        cMOT_Fl_Exposure,
+        MOT_Fl_Download_Time,
+        ShutterDevices=[D2_Repump_Sh, D2_Cooling_Sh],
+        DigitalDevices=[D2_Repump_DO, D2_Cooling_DO],
+        AnalogDevices=[D2_Repump_AO, D2_Cooling_AO],
+        AnalogValues=[D2_Repump_Volts_cMOT_Stop, D2_Cooling_Volts],
+        CloseShutters=[True, True],
         mode='fluorescence',
         frametype='cMOT_dark')
 
@@ -186,4 +194,6 @@ t += st.SimpleImage(t,
 t += st.SetDefaults(t, mode='Shutdown')
 
 # Stop the experiment
+t += 100e-6
+print("Stopping!")
 ls.stop(t)

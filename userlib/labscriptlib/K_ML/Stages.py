@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Created on Wed Feb 16 11:04:54 2022
 
@@ -6,7 +5,10 @@ Created on Wed Feb 16 11:04:54 2022
 """
 
 from labscriptlib.common.utilities import stage
+import labscript as ls
+import numpy as np
 
+@stage
 def SetDefaults(t, mode='Startup', **kwargs):
     """
     Here we  set the default starting and ending state for the experiment.
@@ -18,7 +20,7 @@ def SetDefaults(t, mode='Startup', **kwargs):
     ScopeTrigger.go_low(t)
 
     # The TTL like for the satspec lock (repumper): needs to be always high
-    D2_Lock_DO.go_high(t)
+    D2_SatSpec_DO.go_high(t)
 
     UV_DO.go_low(t)
     
@@ -32,6 +34,7 @@ def SetDefaults(t, mode='Startup', **kwargs):
     # NI_PCI_02
     D2_Repump_AO.constant(t, D2_Repump_Volts)
     D2_Repump_FM.constant(t, D2_Repump_Freq, units='MHz')
+    D2_SatSpec_FM.constant(t, D2_SatSpec_Freq, units='MHz')
     D2_Cooling_AO.constant(t, D2_Cooling_Volts)
     D2_Probe_OP_AO.constant(t, 0.0)
 
@@ -48,20 +51,19 @@ def SetDefaults(t, mode='Startup', **kwargs):
     MOT_y_Bias.constant(t, 0, units='A')
     MOT_x_z_Bias.constant(t, 0, units='A')
     MOT_x_mz_Bias.constant(t, 0, units='A')
-    MOT_Quad.constant(t, 0, units='A')
+    ni_usb_01_ao3.constant(t, 0, units='A')
 
     MOT_y_Bias_Disable.go_high(t)
     MOT_x_z_Bias_Disable.go_high(t)
     MOT_x_mz_Bias_Disable.go_high(t)
-    MOT_Quad_Disable.go_high(t)
-
+    ni_usb_01_ao3_Disable.go_high(t)
+    
     # NI_USB_02
-    if mode == 'startup':
-        ni_usb_02_do0.go_high(t)
-        ni_usb_02_ao0.constant(t, 1.0)
-    else:
-        ni_usb_02_do0.go_low(t)
-        ni_usb_02_ao0.constant(t, 0)        
+    MOT_Quad.constant(t, 0, units='A')
+    
+    FourChan_A_Bit0.go_low(t)
+    FourChan_A_Bit1.go_low(t)
+    FourChan_A_Enable.go_low(t)      
 
     # NT_1
     D2_Lock_DDS.setfreq(t, D2_Lock_Freq_MOT)
@@ -95,11 +97,13 @@ def MOT(t, duration,
     MOT_y_Bias_Disable.go_low(t)
     MOT_x_z_Bias_Disable.go_low(t)
     MOT_x_mz_Bias_Disable.go_low(t)
-    MOT_Quad_Disable.go_low(t)
+    FourChan_A_Enable.go_high(t)
 
     D2_Lock_DDS.setfreq(t, D2_Lock_Freq)
     D2_Repump_FM.constant(t, D2_Repump_Freq, units='MHz')
-    
+    D2_Cooling_AO.constant(t, D2_Cooling_Volts_MOT)
+    D2_Repump_AO.constant(t, D2_Repump_Volts_MOT)
+
     if UV:
         UV_DO.go_high(t)
         UV_DO.go_low(t + duration)
@@ -156,37 +160,42 @@ def cMOT(t, **kwargs):
 @stage
 def Molasses(t, **kwargs):
 
+    # maybe need to discritize time here.
+    Time_Quad_Int = np.ceil ((Time_Mol/10) * RampRate_Mol) / RampRate_Mol
+    Time_Mol_Int = np.ceil (Time_Mol * RampRate_Mol) / RampRate_Mol
+
+
     MOT_y_Bias.constant(t, MOT_y_Bias_Mol, units='A')
     MOT_x_z_Bias.constant(t, MOT_x_z_Bias_Mol, units='A')
     MOT_x_mz_Bias.constant(t,MOT_x_mz_Bias_Mol, units='A')
-    MOT_Quad.ramp(t, Time_Mol/10, MOT_Quad_cMOT_Stop, 
+    MOT_Quad.ramp(t, Time_Quad_Int, MOT_Quad_cMOT_Stop, 
                   0, RampRate_Mol, units='A')
-    # MOT_Quad_Disable.go_high(t+Time_Mol/10)
+    # FourChan_A_Enable.go_low(t+Time_Mol/10)
 
     # Cooling Detuning ramp
-    D2_Lock_DDS.frequency.ramp(t, Time_Mol, 
+    D2_Lock_DDS.frequency.ramp(t, Time_Mol_Int, 
                                D2_Lock_Freq_Mol_Start, 
                                D2_Lock_Freq_Mol_Stop, 
                                RampRate_Mol)
 
     # Cooling intensity ramp
-    D2_Cooling_AO.ramp(t, Time_Mol, 
+    D2_Cooling_AO.ramp(t, Time_Mol_Int, 
                        D2_Cooling_Volts_Mol_Start, 
                        D2_Cooling_Volts_Mol_Stop,
                        RampRate_Mol)
 
     # Repump Detuning ramp
-    D2_Repump_FM.ramp(t, Time_Mol, 
+    D2_Repump_FM.ramp(t, Time_Mol_Int, 
                       D2_Repump_Freq_Mol_Start,
                       D2_Repump_Freq_Mol_Stop, RampRate_Mol, units='MHz')
 
     # Repump intensity ramp
-    D2_Repump_AO.ramp(t, Time_Mol,
+    D2_Repump_AO.ramp(t, Time_Mol_Int,
                       D2_Repump_Volts_Mol_Start,
                       D2_Repump_Volts_Mol_Stop, 
                       RampRate_Mol)
 
-    return Time_Mol
+    return Time_Mol_Int
 
 @stage
 def OpticalPump(t, **kwargs):
@@ -199,7 +208,7 @@ def OpticalPump(t, **kwargs):
 
 @stage
 def MagneticTrapCapture(t, **kwargs):
-    MOT_Quad_Disable.go_low(t)
+    FourChan_A_Enable.go_high(t)
     MOT_Quad.constant(t, MOT_Quad_Capture, units='A')
     
     D2_Repump_DO.go_low(t)
@@ -210,7 +219,15 @@ def MagneticTrapCapture(t, **kwargs):
     D2_Cooling_AO.constant(t, 0.0)
     D2_Cooling_Sh.go_low(t)
 
-    return Capture_Hold_Time
+    #Magnetic Trap Compress
+    MOT_Quad.ramp(t, Time_MOT_Quad_Compress,
+                  MOT_Quad_Capture,
+                  MOT_Quad_Compress,
+                  RampRate_Compress, units='A')
+
+    return Time_MOT_Quad_Compress + Time_MOT_Quad_Hold
+
+
 
 @stage
 def MOT_Cell_TOF(t, **kwargs):
@@ -219,18 +236,21 @@ def MOT_Cell_TOF(t, **kwargs):
     MOT_y_Bias.constant(t, MOT_y_Bias_Imaging, units='A')
     MOT_x_z_Bias.constant(t, MOT_x_z_Bias_Imaging, units='A')
     MOT_x_mz_Bias.constant(t, MOT_x_mz_Bias_Imaging, units='A')    
-    MOT_Quad_Disable.go_high(t)
+    FourChan_A_Enable.go_low(t)
     MOT_Quad.constant(t, 0, units='A')
     
     # Frequencies
-    D2_Lock_DDS.setfreq(t, D2_Lock_Freq_Imaging)
+    D2_Lock_DDS.setfreq(t, D2_Lock_Freq_AI)
     D2_Repump_FM.constant(t, D2_Repump_Freq_Imaging, units='MHz')
     
     # Turn off lasers
     D2_Repump_DO.go_low(t)
     D2_Repump_AO.constant(t, 0.0)
+    D2_Repump_Sh.go_low(t)
+    
     D2_Cooling_DO.go_low(t)
     D2_Cooling_AO.constant(t, 0.0)
+    D2_Cooling_Sh.go_low(t)
  
     return TOF_Time
 
@@ -243,7 +263,8 @@ def SimpleImage(t,
                 DigitalDevices=[],
                 AnalogDevices=[],
                 AnalogValues=[],
-                CloseShutters=True,
+                PretriggerTime=0,
+                CloseShutters=[],
                 mode='fluorescence',
                 frametype='bright',
                 **kwargs):
@@ -252,7 +273,15 @@ def SimpleImage(t,
     
     In many cases set CloseShutters=False until the last image.
     """
-    
+    PretriggerTime = 40e-6
+        
+        
+    for Device in DigitalDevices:
+        Device.go_low(t-5e-3)
+        
+    for (Device, Value) in zip(AnalogDevices, AnalogValues):
+        Device.constant(t-5e-3, 0)
+
     for Device in ShutterDevices:
         Device.go_high(t-5e-3)
     
@@ -263,15 +292,14 @@ def SimpleImage(t,
         Device.constant(t, Value)
     
     for camera in cameras:
-        camera.expose(t, mode, 
+        camera.expose(t-PretriggerTime, mode, 
                       frametype=frametype, 
                       trigger_duration=trigger_duration)
         
     t += trigger_duration
     
-    if CloseShutters:
-        for Device in ShutterDevices:
-            Device.go_high(t-5e-3)
+    for (Device, Value) in zip(ShutterDevices, CloseShutters):
+        if Value: Device.go_low(t)
     
     for Device in DigitalDevices:
         Device.go_low(t)
@@ -283,6 +311,7 @@ def SimpleImage(t,
     
     return trigger_duration + download_time
 
-
-
+@stage 
+def stop(t):
+    ls.stop(t)
 
